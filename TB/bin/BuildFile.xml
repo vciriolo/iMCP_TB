@@ -1,0 +1,12 @@
+<use name="root"/>
+<use name="rootcore"/>
+<use name="rootgraphics"/>
+<use name="FWCore/PythonParameterSet"/>
+<use name="iMCP_TB/TB"/>
+<flags CXXFLAGS="-g -Wall -fpermissive -std=c++0x -Wno-reorder"/>
+<export>
+<lib name="1"/>
+</export>
+<bin file="dumper.cpp" name="dumper"> </bin>
+<bin file="calcTreshold.cpp" name="calcTreshold"> </bin>
+<bin file="analyzer.cpp" name="analyzer"> </bin>
