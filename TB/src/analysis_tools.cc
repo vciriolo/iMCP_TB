@@ -41,7 +41,7 @@ void SubtractBaseline(int tb1, int tb2, vector<float>* samples)
 //---------------------------------------------------------------------------------------
 //---estimate time (ns) with CFD, samples must be a negative signal and baseline subtracted
 float TimeConstFrac(int t1, int t2, const vector<float>* samples, float AmpFraction, 
-                    float step=DIGITIZER_SAMPLING_UNIT, int Nsamples = 5)
+                    float step, int Nsamples)
 {
     float xx= 0.;
     float xy= 0.;
