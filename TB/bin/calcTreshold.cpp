@@ -133,6 +133,9 @@ int main (int argc, char** argv)
        
 	    }
 	  if (doPlot==1) {
+	    std::string command = "if [ ! -e plots/tresholdScan ] ; then mkdir plots/tresholdScan/ ; fi";
+            system(command.c_str());
+
 	    char canvasName[100];
 	    sprintf(canvasName, "plots/tresholdScan/charge_channel_%d.pdf", iCh);
 	    TCanvas *c1 = new TCanvas ();
