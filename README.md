@@ -3,6 +3,17 @@ iMCP_TB
 
 Code for iMCP analysis (test beam)
 
+instruction for download and compiling:
+
+	cmsrel CMSSW_6_1_1 (but you can use different releases)
+	cd CMSSW_6_1_1/src
+	git clone https://github.com/lbrianza/iMCP_TB
+	scramv1 b -j16
+	cmsenv
+
+..and start to use it!
+
+------------------------------------------------------
 Main codes:
 
 1- dumper: 	
