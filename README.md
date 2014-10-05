@@ -10,6 +10,7 @@ instruction for download and compiling:
 	git clone https://github.com/lbrianza/iMCP_TB
 	scramv1 b -j16
 	cmsenv
+	cd iMCP_TB/TB/
 
 ..and start to use it!
 
