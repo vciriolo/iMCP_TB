@@ -265,7 +265,8 @@ int main(int argc, char** argv)
 	    c->Print(plot_name, "pdf");
 	}
     }    
-  
+
+  std::cout<<"results printed in results/"<<std::endl;
   //  outputFile.close();
   inFile->Close();
   
