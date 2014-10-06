@@ -39,6 +39,9 @@ THIS PROGRAM COMPUTES THE TRESHOLDS FOR EACH MCP USING A FIXED S/B VALUE (IN INP
 #include "TClass.h"
 #include "TApplication.h"
 #include "TCanvas.h"
+#include "TGraph.h"
+#include "TLegend.h"
+#include "TLine.h"
 
 //#include "../include/analysis_tools.h"
 #include "../src/init_Reco_Tree.cc"
@@ -65,7 +68,6 @@ int main (int argc, char** argv)
     SBTreshold = atoi(argv[2]);  //desired treshold (e.g. S/B=1000)
     nChannels = atoi(argv[3]);  //nChannels in the reco tree
     HVtresh = atoi(argv[4]);   //HV treshold
-    doPlot = atoi(argv[5]);   //do plots?
   }
 
   TFile *inputFile = new TFile ((inputFileName).c_str()); 
@@ -92,7 +94,12 @@ int main (int argc, char** argv)
           }
         }
     }
-  
+
+  TCanvas* SoB = new TCanvas("SoB", "SoB", 800, 800);  
+  TGraph* g_SoB[20];
+  TLegend* leg = new TLegend(0.88,0.45,0.98,0.65);
+  leg->SetFillColor(0);
+  SoB->cd();
 
   //------analyze the good channels and compute the charge tresholds--------
   std::cout<<"\n--------------------------------\n-->OK, now computing tresholds:"<<std::endl;
@@ -107,8 +114,8 @@ int main (int argc, char** argv)
 	  sprintf(hSName, "hS_%d", iCh);
 	  sprintf(hBName, "hB_%d", iCh);
 
-	  TH1F *hS = new TH1F(hSName,hSName, 1000, 0, 10000);
-	  TH1F *hB = new TH1F(hBName,hBName, 1000, 0, 10000);
+	  TH1F *hS = new TH1F(hSName,hSName, 30000, 0, 30000);
+	  TH1F *hB = new TH1F(hBName,hBName, 30000, 0, 30000);
 	      
 	  char hSDraw[100], hBDraw[100];
 	  sprintf(hSDraw, "charge[%d]>>%s", iCh, hSName);
@@ -120,36 +127,52 @@ int main (int argc, char** argv)
 	  inputTree->Draw(hSDraw,cut,"goff");
 	  inputTree->Draw(hBDraw,cut,"goff");
 
-	  for (int iBin=1; iBin<10000; iBin++)
-	    {
-	       double S = hS->Integral(iBin, 10000);
-	       double B = hB->Integral(iBin, 10000);
-	       if (S/B > SBTreshold) 
-	         {
-		   std::cout<<" Channel: "<<iCh<<" ("<<inverted_MCPList.at(iCh)<<")   Treshold Value: "<<iBin*10<<std::endl;
-		   outputFile<<iCh<<" "<<iBin*10<<std::endl;
-	           break;
-	         }
-       
-	    }
-	  if (doPlot==1) {
-	    std::string command = "if [ ! -e plots/tresholdScan ] ; then mkdir plots/tresholdScan/ ; fi";
-            system(command.c_str());
+	  char gName[50];
+	  sprintf(gName, "g_SoB_%d", iCh);
+	  g_SoB[iCh] = new TGraph();
 
-	    char canvasName[100];
-	    sprintf(canvasName, "plots/tresholdScan/charge_channel_%d.pdf", iCh);
-	    TCanvas *c1 = new TCanvas ();
-	    c1->cd();
-	    hS->SetLineColor(2);
-	    hB->SetLineColor(4);
-	    hS->Draw();
-	    hB->Draw("same");
-	    c1->Print(canvasName,"pdf");
-	  }
+	  int SBvalue=0;
+
+	  for (int iBin=1; iBin<30000; iBin++)
+	    {
+	       double S = hS->Integral(iBin, 30000);
+	       double B = hB->Integral(iBin, 30000);
+	       double SoverB=2000;
+	       if (B!=0)    SoverB = S/B;
+	       g_SoB[iCh]->SetPoint(iBin,iBin,SoverB);
+
+	       if (SoverB > SBTreshold) 
+	         {
+		   std::cout<<" Channel: "<<iCh<<" ("<<inverted_MCPList.at(iCh)<<")   Treshold Value: "<<iBin<<std::endl;
+		   outputFile<<iCh<<" "<<iBin<<std::endl;
+		   SBvalue = iBin;
+	           break;
+	         }       
+	    }
+
+	  g_SoB[iCh]->SetLineColor(iCh+1);
+	  if (iCh==0) 
+	    g_SoB[iCh]->Draw("APL");
+      	  else          g_SoB[iCh]->Draw("pl,same");
+
+	    g_SoB[iCh]->GetXaxis()->SetLimits(0,600);
+	    g_SoB[iCh]->SetMinimum(0);
+	    g_SoB[iCh]->SetMaximum(1001);
+	    g_SoB[iCh]->GetXaxis()->SetTitle("charge");
+	    g_SoB[iCh]->GetYaxis()->SetTitle("S/B");
+
+	    TLine* tl = new TLine(SBvalue, 0, SBvalue, 1000);
+	    tl->SetLineColor(iCh+1);
+	    tl->Draw("same");
+
+	  leg->AddEntry(g_SoB[iCh],inverted_MCPList.at(iCh).c_str(),"l");
 
 	}
 
-  std::cout<<"\nResults printed in "<<outputFileName<<std::endl;
+  leg->Draw("same");
+  SoB->Print("prova.pdf","pdf");
+
+  std::cout<<"\nTreshold values printed in "<<outputFileName<<std::endl;
   inputFile->Close();
   return 0;
 }
