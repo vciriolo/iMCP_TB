@@ -26,8 +26,8 @@
 #include "TError.h"
 #include "TCanvas.h"
 
-#include "../interface/init_Reco_Tree.h"
-#include "../interface/MCPMap.h"
+#include "../src/init_Reco_Tree.cc"
+#include "../src/MCPMap.cc"
 
 #define RES_TRIG 58.93
 #define RES_TRIG_ERR 0.373

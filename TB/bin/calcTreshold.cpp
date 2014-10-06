@@ -41,9 +41,9 @@ THIS PROGRAM COMPUTES THE TRESHOLDS FOR EACH MCP USING A FIXED S/B VALUE (IN INP
 #include "TCanvas.h"
 
 //#include "../include/analysis_tools.h"
-#include "../interface/init_Reco_Tree.h"
+#include "../src/init_Reco_Tree.cc"
 #include "../interface/histo_func.h"
-#include "../interface/MCPMap.h"
+#include "../src/MCPMap.cc"
 
 using namespace std;
 

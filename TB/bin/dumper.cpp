@@ -41,11 +41,11 @@ BE CAREFUL: the number of channels MUST coincide with the number of channel in t
 #include "TClass.h"
 #include "TApplication.h"
 
-#include "../interface/analysis_tools.h"
-#include "../interface/init_tree_BTF.h"
-#include "../interface/init_Reco_Tree.h"
+#include "../src/analysis_tools.cc"
+#include "../src/init_tree_BTF.cc"
+#include "../src/init_Reco_Tree.cc"
 #include "../interface/histo_func.h"
-#include "../interface/MCPMap.h"
+#include "../src/MCPMap.cc"
 
 //*******MAIN*******************************************************************
 int main (int argc, char** argv)
