@@ -15,5 +15,5 @@ if __name__ == '__main__':
     parser.add_argument ('-p', '--doPlots' , default = '0', help='do plot of charge for S and B')
     args = parser.parse_args ()
     print 'calcTreshold '+args.inputFile+' '+args.tresholdValue+' '+args.chNumber+' '+args.HV+' ' +args.doPlots
-    os.system('calcTreshold '+args.inputFile+' '+args.tresholdValue+' '+args.chNumber+' '+args.HV+' '+args.doPlots)
+    os.system('./calcTreshold '+args.inputFile+' '+args.tresholdValue+' '+args.chNumber+' '+args.HV+' '+args.doPlots)
     
