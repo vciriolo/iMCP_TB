@@ -47,11 +47,11 @@ int main(int argc, char** argv)
   doWhat = argv[4];
   scanType = argv[5];
   label = argv[6];
-
+ 
   int MCPNumber = MCPList.at(MCP);
   std::map <int,int> treshold;
   int ch, tresh;
-
+ 
   //---open cfg file and fill map with treshold for each channel----
   while(!inputCfg.eof())
       {
@@ -59,14 +59,19 @@ int main(int argc, char** argv)
 	treshold.insert(std::make_pair(ch,tresh));
       }
 
+  //  inputCfg.close();
+
+  std::string inFileName = "ntuples/reco_"+string(label)+".root";
+  TFile *inFile = new TFile (inFileName.c_str());
+  TTree* nt = (TTree*)inFile->Get("reco_tree");
+
+  InitRecoTree(nt);
+  
   char outputFileName[200]="";
   sprintf(outputFileName, "results/%s_%s_%s_%s_%s.txt", MCP.c_str(), hodo_cut, doWhat, scanType, label);
 
-  std::ofstream outputFile (outputFileName, std::ofstream::out);
 
-  //-------ROOT Object definitions------------------------------------------------------
-  TCanvas* c1 = new TCanvas();
-  c1->cd();
+  std::ofstream outputFile (outputFileName, std::ofstream::out);
 
     //------Build TCut and draw variables--------------------------------------------------
   char str_cut_sig[200]="";
@@ -81,16 +86,14 @@ int main(int argc, char** argv)
   char var_trig0[100]="";
   char var_trig1[100]="";
     //-----Draw cut-----
-  //---open tree and get: run list and corresponding HV-----
-  TFile* inFile = TFile::Open("ntuples/reco_"+TString(label)+".root", "r");
-  TTree* nt = (TTree*)inFile->Get("reco_tree");
 
-  InitRecoTree(nt);
+  //---open tree and get: run list and corresponding HV-----
   std::vector<int> runList, HVVal;
   runList.clear();  HVVal.clear();
   std::vector<float> X0Step;
   X0Step.clear();
   int prevRun=0;
+
 
   for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++)
     {
@@ -103,13 +106,12 @@ int main(int argc, char** argv)
       }
     }
 
-
-  nt->GetEntry(1);
+  //  nt->GetEntry(1);
     //---HV Scan
   //  if(TString(scanType).Contains("Scan") == 1)
   //   {  
 
-      sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
+  sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
 	//(strcmp(MCP, "MiB2") == 0)
 	//sprintf(str_cut_sig_2D, "-charge_%s > -13.28*amp_max_%s - 350", MCP, MCP);
       sprintf(str_cut_trig0, "charge[%d] < %d  && charge[%d] < %d && sci_front_adc < 500",MCPList.at("Trig1"), treshold.at(MCPList.at("Trig1")), MCPList.at("Trig2"), treshold.at(MCPList.at("Trig2")));
@@ -138,7 +140,7 @@ int main(int argc, char** argv)
   TCut cut_trig1 = str_cut_trig1;
   TCut cut_hodoX = str_cut_hodoX;
   TCut cut_hodoY = str_cut_hodoY;
-
+  
   //-------Runs loop---------------------------------------------------------------------
   for(unsigned int i=0; i<runList.size(); i++)
     {
@@ -166,15 +168,14 @@ int main(int argc, char** argv)
       sprintf(var_trig0, "charge[%d]>>%s", MCPList.at("Trig1"), h_trig0_name);
       sprintf(var_trig1, "charge[%d]>>%s", MCPList.at("Trig1"), h_trig1_name);
 
-
 	//---Run cut
 	char cut_run[20];
 	sprintf(cut_run, "run_id == %d", runList.at(i));
      	//-----Draw and print infos-----
-	nt->Draw(var_sig, cut_trig1 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_run);
-	nt->Draw(var_base, cut_trig0 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_run);
-	nt->Draw(var_trig0,cut_trig0 && cut_hodoX && cut_hodoY && cut_run);
-	nt->Draw(var_trig1,cut_trig1 && cut_hodoX && cut_hodoY && cut_run);
+	nt->Draw(var_sig, cut_trig1 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_run, "goff");
+	nt->Draw(var_base, cut_trig0 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_run, "goff");
+	nt->Draw(var_trig0,cut_trig0 && cut_hodoX && cut_hodoY && cut_run, "goff");
+	nt->Draw(var_trig1,cut_trig1 && cut_hodoX && cut_hodoY && cut_run, "goff");
 	float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
 	float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig1->GetEntries());
 	if(eff < 0)
@@ -182,8 +183,6 @@ int main(int argc, char** argv)
 	char var_name[3] = "X0";
 	if(TString(scanType).Contains("HV") == 1)
 	    sprintf(var_name, "HV");
-
-	//	std::cout<<HVVal.at(0)<<" "<<eff<<std::endl;
 	//---Eff study
 	if(strcmp(doWhat,"eff") == 0)
 	{
@@ -199,7 +198,7 @@ int main(int argc, char** argv)
 	    }
 	    else {
 	      printf("%.3f\t%.3f\t%.3f\t%.3f\n", X0Step.at(i), eff, 0., e_eff);
-      	      outputFile << X0Step.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
+	      outputFile << X0Step.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
 	    }
 	    if(i == (runList.size()-1))    
 		printf("-----------------------------\n");
@@ -257,17 +256,20 @@ int main(int argc, char** argv)
 		printf("---------------------------------------\n");
 	    TCanvas* c = new TCanvas();
 	    char plot_name[100];
-
-	    std::string command = "if [ ! -e plots/time_resolutions/"+string(label)+" ] ; then mkdir plots/time_resolutions/"+label+" ; fi";
+	    std::string command = "if [ ! -e plots/time_resolution/"+string(label)+" ] ; then mkdir plots/time_resolution/"+label+" ; fi";
 	    system(command.c_str());
 
-	    sprintf(plot_name, "plots/time_resolutions/%s/%s_%d.pdf", label, MCP.c_str(), i);
+	    sprintf(plot_name, "plots/time_resolution/%s/%s_%d.pdf", label, MCP.c_str(), i);
 	    h_time->Draw();
 	    c->Print(plot_name, "pdf");
 	}
     }    
-
-  outputFile.close();
+  
+  //  outputFile.close();
+  inFile->Close();
+  std::cout<<"luca"<<std::endl;
+  
   return 0;     
+
 }
 
