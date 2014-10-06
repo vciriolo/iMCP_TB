@@ -159,7 +159,6 @@ int main(int argc, char** argv)
       TH1F* h_trig1 = new TH1F(h_trig1_name, h_trig1_name, 500, -5000, 25000);
       TH1F* h_trig0 = new TH1F(h_trig0_name, h_trig0_name, 500, -5000, 25000);
       TH1F* h_time = new TH1F(h_time_name, h_time_name, 500, -5, 5);
-      TF1* res_func = new TF1("res_func", "gausn", -10, 10);
 
     //-----Draw variables-----
       sprintf(var_sig, "charge[%d]>>%s", MCPNumber, h_sig_name);
@@ -227,6 +226,8 @@ int main(int argc, char** argv)
 	//---Time study 
 	else if(strcmp(doWhat,"time") == 0)
 	{
+	  TF1* res_func = new TF1(res_func_name, "gausn", -10, 10);
+
 	    nt->Draw(var_time, cut_trig1 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_run);
 	    res_func->SetParameters(h_time->GetEntries()/2, h_time->GetMean(), h_time->GetRMS()/2);
 	    res_func->SetParLimits(0, 0, h_time->GetEntries()*2);
@@ -241,7 +242,7 @@ int main(int argc, char** argv)
 	    if(i == 0)
 	    {
 		printf("----------Time Resolution(ps)----------\n");
-		printf(" %s\tt_res\te_%s\te_t_res\tX²_prob\n", var_name, var_name);
+		printf(" %s\tt_res\te_%s\te_t_res\tX_prob\n", var_name, var_name);
 		printf("---------------------------------------\n");
 	    }
 	    if(TString(scanType).Contains("HV") == 1) {
@@ -267,7 +268,6 @@ int main(int argc, char** argv)
   
   //  outputFile.close();
   inFile->Close();
-  std::cout<<"luca"<<std::endl;
   
   return 0;     
 
