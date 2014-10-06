@@ -150,5 +150,6 @@ int main (int argc, char** argv)
 	}
 
   std::cout<<"\nResults printed in "<<outputFileName<<std::endl;
+  inputFile->Close();
   return 0;
 }
