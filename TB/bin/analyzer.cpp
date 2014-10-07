@@ -51,15 +51,16 @@ int main(int argc, char** argv)
   int MCPNumber = MCPList.at(MCP);
   std::map <int,int> treshold;
   int ch, tresh;
+  int nChannels=0;
+  int trigPos1 = -1, trigPos2 = -1;
  
   //---open cfg file and fill map with treshold for each channel----
   while(!inputCfg.eof())
       {
 	inputCfg >> ch >> tresh;
 	treshold.insert(std::make_pair(ch,tresh));
+	nChannels++;
       }
-
-  //  inputCfg.close();
 
   std::string inFileName = "ntuples/reco_"+string(label)+".root";
   TFile *inFile = new TFile (inFileName.c_str());
@@ -105,6 +106,13 @@ int main(int argc, char** argv)
 	  HVVal.push_back(HV[MCPNumber]);
 	  X0Step.push_back(X0);
 	  prev=HV[MCPNumber];
+	  if (iEntry==0) {
+	    for (int i=0; i<nChannels; i++)
+	      {
+		if (isTrigger[i]==1)       trigPos1 = i;
+		else if (isTrigger[i]==2)  trigPos2 = i; 
+	      }
+	  }
 	}
       }
   }
@@ -119,6 +127,14 @@ int main(int argc, char** argv)
 	  HVVal.push_back(HV[MCPNumber]);
 	  X0Step.push_back(X0);
 	  prev=X0;
+	  if (iEntry==0) {
+	    for (int i=0; i<nChannels; i++)
+	      {
+		if (isTrigger[i]==1)       trigPos1 = i;
+		else if (isTrigger[i]==2)  trigPos2 = i; 
+	      }
+	  }
+
 	}
       }
   }
@@ -127,11 +143,18 @@ int main(int argc, char** argv)
   //  if(TString(scanType).Contains("Scan") == 1)
   //   {  
 
+  if (trigPos1==-1 || trigPos2==-1) {
+    std::cout<<"ERROR!!! trigger not found!!!"<<std::endl;
+    return -1;
+  }
+  else
+    std::cout<<"TRIGGER INFO: --> \ntrigger 1 = "<<inverted_MCPList.at(trigPos1)<<"\ntrigger 2 = "<<inverted_MCPList.at(trigPos2)<<"\n----------"<<std::endl;
+
   sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
 	//(strcmp(MCP, "MiB2") == 0)
 	//sprintf(str_cut_sig_2D, "-charge_%s > -13.28*amp_max_%s - 350", MCP, MCP);
-      sprintf(str_cut_trig0, "charge[%d] < %d  && charge[%d] < %d && sci_front_adc < 500",MCPList.at("Trig1"), treshold.at(MCPList.at("Trig1")), MCPList.at("Trig2"), treshold.at(MCPList.at("Trig2")));
-      sprintf(str_cut_trig1, "charge[%d] > %d  && charge[%d] > %d && sci_front_adc > 500 && sci_front_adc < 1500",MCPList.at("Trig1"), treshold.at(MCPList.at("Trig1")), MCPList.at("Trig2"), treshold.at(MCPList.at("Trig2")));
+  sprintf(str_cut_trig0, "charge[%d] < %d  && charge[%d] < %d && sci_front_adc < 500", trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
+  sprintf(str_cut_trig1, "charge[%d] > %d  && charge[%d] > %d && sci_front_adc > 500 && sci_front_adc < 1500",trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
       // }
 
     //---Hodoscope cut
@@ -180,9 +203,9 @@ int main(int argc, char** argv)
     //-----Draw variables-----
       sprintf(var_sig, "charge[%d]>>%s", MCPNumber, h_sig_name);
       sprintf(var_base, "baseline[%d]>>%s", MCPNumber, h_base_name);
-      sprintf(var_time, "(time_CF[%d]-time_CF[%d])>>%s", MCPNumber, MCPList.at("Trig1"), h_time_name);
-      sprintf(var_trig0, "charge[%d]>>%s", MCPList.at("Trig1"), h_trig0_name);
-      sprintf(var_trig1, "charge[%d]>>%s", MCPList.at("Trig1"), h_trig1_name);
+      sprintf(var_time, "(time_CF[%d]-time_CF[%d])>>%s", MCPNumber, trigPos1, h_time_name);
+      sprintf(var_trig0, "charge[%d]>>%s", trigPos1, h_trig0_name);
+      sprintf(var_trig1, "charge[%d]>>%s", trigPos1, h_trig1_name);
 
 	//---Run cut
 	char cut_scan[20];
