@@ -76,24 +76,15 @@ int main (int argc, char** argv)
 
   Fill_inverted_MCPList();
 
-  std::string outputFileName = "cfg/treshold.txt";
+  std::string outputFileName = "cfg/treshold_SB1000.txt";
   std::ofstream outputFile ((outputFileName).c_str(), std::ofstream::out);
+  std::string outputFileName3s = "cfg/treshold_3s.txt";
+  std::ofstream outputFile3s ((outputFileName3s).c_str(), std::ofstream::out);
 
+  char hBNameFit[100] = "hB_0_Fit";
+  TH1F *hBFit = new TH1F(hBNameFit,hBNameFit, 30, -500, 500);
+  TF1 *base = new TF1("gaus","gaus",-1000,1000);
   //-----get the run list and the list of channel to analyze------
-  std::vector<int> goodCh;
-  goodCh.clear();
-
-  std::cout<<"Channels to analyze: ";
-  inputTree->GetEntry(1);
-    {
-      for (int iCh=0; iCh<nChannels; iCh++)  //scan all the channels -> save only the channels with PC on and HV>treshold
-        {
-          if (isPCOn[iCh]!=0 && HV[iCh]>=HVtresh) {
-	    goodCh.push_back(iCh);
-	    std::cout<<iCh<<" ";
-          }
-        }
-    }
 
   TCanvas* SoB = new TCanvas("SoB", "SoB", 800, 800);  
   TGraph* g_SoB[20];
@@ -105,11 +96,6 @@ int main (int argc, char** argv)
   std::cout<<"\n--------------------------------\n-->OK, now computing tresholds:"<<std::endl;
   for (int iCh=0; iCh<nChannels; iCh++)
 	{
-	  //---is it a good channel? check: if not, go to next channel----
-	  std::vector<int>::iterator it;
-	  it = find (goodCh.begin(), goodCh.end(), iCh);
-	  if (it == goodCh.end())    continue;
-
 	  char hSName[100], hBName[100];
 	  sprintf(hSName, "hS_%d", iCh);
 	  sprintf(hBName, "hB_%d", iCh);
@@ -117,15 +103,23 @@ int main (int argc, char** argv)
 	  TH1F *hS = new TH1F(hSName,hSName, 30000, 0, 30000);
 	  TH1F *hB = new TH1F(hBName,hBName, 30000, 0, 30000);
 	      
-	  char hSDraw[100], hBDraw[100];
+	  char hSDraw[100], hBDraw[100], hBDrawFit[100];
 	  sprintf(hSDraw, "charge[%d]>>%s", iCh, hSName);
 	  sprintf(hBDraw, "baseline[%d]>>%s", iCh, hBName);
+	  sprintf(hBDrawFit, "baseline[%d]>>%s", iCh, hBNameFit);
 
 	  char cut[300];
-	  sprintf(cut, "sci_front_adc>500 && sci_front_adc<1500 && isPCOn[0]!=0 && HV>=%d", HVtresh); 
+	  sprintf(cut, "sci_front_adc>500 && sci_front_adc<1500 && isPCOn[%d]!=0 && HV[%d]>=%d", iCh, iCh, HVtresh); 
 
 	  inputTree->Draw(hSDraw,cut,"goff");
 	  inputTree->Draw(hBDraw,cut,"goff");
+	  inputTree->Draw(hBDrawFit,cut,"goff");
+
+	  base->SetParameter(1,0);
+	  base->SetParameter(2,0);
+     	  hBFit->Fit(base,"QN");
+	  std::cout<<"sigma baseline: "<<base->GetParameter(2)<<std::endl;
+	  outputFile3s << iCh << "  "<<(int)(base->GetParameter(2)*3)<<std::endl;
 
 	  char gName[50];
 	  sprintf(gName, "g_SoB_%d", iCh);
@@ -135,6 +129,13 @@ int main (int argc, char** argv)
 
 	  for (int iBin=1; iBin<30000; iBin++)
 	    {
+	      if (hS->GetEntries()==0) {
+		g_SoB[iCh]->SetPoint(0,0,-1);
+		std::cout<<" Channel: "<<iCh<<" is PC OFF or HV under treshold!"<<std::endl;
+		outputFile<<iCh<<" "<<-1<<std::endl;
+		break;
+	      }
+
 	       double S = hS->Integral(iBin, 30000);
 	       double B = hB->Integral(iBin, 30000);
 	       double SoverB=2000;
@@ -151,8 +152,8 @@ int main (int argc, char** argv)
 	    }
 
 	  g_SoB[iCh]->SetLineColor(iCh+1);
-	  if (iCh==0) 
-	    g_SoB[iCh]->Draw("APL");
+	  g_SoB[iCh]->SetMarkerColor(iCh+1);
+	  if (iCh==0)   g_SoB[iCh]->Draw("APL");
       	  else          g_SoB[iCh]->Draw("pl,same");
 
 	    g_SoB[iCh]->GetXaxis()->SetLimits(0,600);
@@ -170,9 +171,16 @@ int main (int argc, char** argv)
 	}
 
   leg->Draw("same");
-  SoB->Print("prova.pdf","pdf");
-
-  std::cout<<"\nTreshold values printed in "<<outputFileName<<std::endl;
+  SoB->Print("plots/SoverB.pdf","pdf");
+  
+  /*  TCanvas* ch_baseline = new TCanvas("ch_baseline", "ch_baseline", 800, 800);  
+  ch_baseline->cd();
+  hBFit->Draw("");
+  base->Draw("same");
+  ch_baseline->Print("plots/baseline_ch0.pdf","pdf");
+  */  
+  std::cout<<"\nS/B=1000: treshold values printed in "<<outputFileName<<std::endl;
+  std::cout<<"\n3sigma:   treshold values printed in "<<outputFileName3s<<std::endl;
   inputFile->Close();
   return 0;
 }
