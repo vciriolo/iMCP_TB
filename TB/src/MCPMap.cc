@@ -2,8 +2,8 @@
    
 void Fill_MCPList (void)
     {
-      MCPList.insert(std::make_pair("Trig1",0));
-      MCPList.insert(std::make_pair("Trig2",1));
+      MCPList.insert(std::make_pair("MiB1",0));
+      MCPList.insert(std::make_pair("Roma2",1));
       MCPList.insert(std::make_pair("MiB2",2));
       MCPList.insert(std::make_pair("MiB3",3));
       MCPList.insert(std::make_pair("Planacon",4));
@@ -15,8 +15,8 @@ void Fill_MCPList (void)
 
 void Fill_inverted_MCPList (void)
     {
-      inverted_MCPList.insert(std::make_pair(0,"Trig1"));
-      inverted_MCPList.insert(std::make_pair(1,"Trig2"));
+      inverted_MCPList.insert(std::make_pair(0,"MiB1"));
+      inverted_MCPList.insert(std::make_pair(1,"Roma2"));
       inverted_MCPList.insert(std::make_pair(2,"MiB2"));
       inverted_MCPList.insert(std::make_pair(3,"MiB3"));
       inverted_MCPList.insert(std::make_pair(4,"Planacon"));
