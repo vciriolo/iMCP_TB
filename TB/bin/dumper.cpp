@@ -99,7 +99,7 @@ int main (int argc, char** argv)
       vector<float> digiCh[9];
       float timeCF[9];
       float intBase[9], intSignal[9], ampMax[9];
-      //   int goodEvt=1;
+      //      int goodEvt=1;
       ///int fibreX[8], hodoYchannels[8];
       //---Chain
       TChain* chain = new TChain("eventRawData");
@@ -122,6 +122,11 @@ int main (int argc, char** argv)
             //---Read the entry
             chain->GetEntry(iEntry);
 
+	    //---DAQ bug workaround
+	    //	    if(run < 145) goodEvt = 10;
+	    //	    else goodEvt = 1;
+	    //   if(evtNumber % goodEvt == 0) 
+	    //  {
             //---Read SciFront ADC value and set the e- multiplicity 
 	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
 		{
@@ -181,6 +186,7 @@ int main (int argc, char** argv)
       	     run_id = run;
 	     X0     = X0temp;
 	     outTree->Fill();    
+	     //}
 	}     
         //---Get ready for next run
         chain->Delete();
