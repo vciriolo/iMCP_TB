@@ -88,24 +88,40 @@ int main(int argc, char** argv)
     //-----Draw cut-----
 
   //---open tree and get: run list and corresponding HV-----
-  std::vector<int> runList, HVVal;
-  runList.clear();  HVVal.clear();
+  std::vector<int> HVVal;
+  HVVal.clear();
   std::vector<float> X0Step;
   X0Step.clear();
-  int prevRun=0;
+  std::vector<float> ScanList;
+  ScanList.clear();
 
-
-  for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++)
-    {
-      nt->GetEntry(iEntry);
-      if (run_id!=prevRun) {
-	runList.push_back(run_id);
-	HVVal.push_back(HV[MCPNumber]);
-	X0Step.push_back(X0);
-	prevRun=run_id;
+  if (strcmp(scanType,"HV")==0) {
+    int prev=0;  
+    for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++)
+      {
+	nt->GetEntry(iEntry);
+	if (HV[MCPNumber]!=prev) {
+	  ScanList.push_back((float)HV[MCPNumber]);
+	  HVVal.push_back(HV[MCPNumber]);
+	  X0Step.push_back(X0);
+	  prev=HV[MCPNumber];
+	}
       }
-    }
+  }
 
+  else {
+    float prev=0.;
+    for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++)
+      {
+	nt->GetEntry(iEntry);
+	if (X0!=prev) {
+	  ScanList.push_back(X0);
+	  HVVal.push_back(HV[MCPNumber]);
+	  X0Step.push_back(X0);
+	  prev=X0;
+	}
+      }
+  }
   //  nt->GetEntry(1);
     //---HV Scan
   //  if(TString(scanType).Contains("Scan") == 1)
@@ -142,16 +158,16 @@ int main(int argc, char** argv)
   TCut cut_hodoY = str_cut_hodoY;
   
   //-------Runs loop---------------------------------------------------------------------
-  for(unsigned int i=0; i<runList.size(); i++)
+  for(unsigned int i=0; i<ScanList.size(); i++)
     {
 
       char h_sig_name[20], h_base_name[20], h_trig1_name[20], h_trig0_name[20], res_func_name[20], h_time_name[20];
-	sprintf(h_sig_name, "h_sig_%d", runList.at(i));
-	sprintf(h_base_name, "h_base_%d", runList.at(i));
-	sprintf(h_trig1_name, "h_trig1_%d", runList.at(i));
-	sprintf(h_trig0_name, "h_trig0_%d", runList.at(i));
-	sprintf(h_time_name, "h_time_%d", runList.at(i));
-	sprintf(res_func_name, "res_func_%d", runList.at(i));
+	sprintf(h_sig_name, "h_sig_%d", i);
+	sprintf(h_base_name, "h_base_%d", i);
+	sprintf(h_trig1_name, "h_trig1_%d", i);
+	sprintf(h_trig0_name, "h_trig0_%d", i);
+	sprintf(h_time_name, "h_time_%d", i);
+	sprintf(res_func_name, "res_func_%d", i);
 
 
       TH1F* h_sig= new TH1F(h_sig_name, h_sig_name, 500, -5000, 25000);
@@ -169,13 +185,14 @@ int main(int argc, char** argv)
       sprintf(var_trig1, "charge[%d]>>%s", MCPList.at("Trig1"), h_trig1_name);
 
 	//---Run cut
-	char cut_run[20];
-	sprintf(cut_run, "run_id == %d", runList.at(i));
+	char cut_scan[20];
+	if (strcmp(scanType,"HV")==0)
+	  sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
      	//-----Draw and print infos-----
-	nt->Draw(var_sig, cut_trig1 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_run, "goff");
-	nt->Draw(var_base, cut_trig0 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_run, "goff");
-	nt->Draw(var_trig0,cut_trig0 && cut_hodoX && cut_hodoY && cut_run, "goff");
-	nt->Draw(var_trig1,cut_trig1 && cut_hodoX && cut_hodoY && cut_run, "goff");
+	nt->Draw(var_sig, cut_trig1 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan, "goff");
+	nt->Draw(var_base, cut_trig0 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan, "goff");
+	nt->Draw(var_trig0,cut_trig0 && cut_hodoX && cut_hodoY && cut_scan, "goff");
+	nt->Draw(var_trig1,cut_trig1 && cut_hodoX && cut_hodoY && cut_scan, "goff");
 	float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
 	float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig1->GetEntries());
 	if(eff < 0)
@@ -200,7 +217,7 @@ int main(int argc, char** argv)
 	      printf("%.3f\t%.3f\t%.3f\t%.3f\n", X0Step.at(i), eff, 0., e_eff);
 	      outputFile << X0Step.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
 	    }
-	    if(i == (runList.size()-1))    
+	    if(i == (ScanList.size()-1))    
 		printf("-----------------------------\n");
 	}
 	//---Charge study
@@ -212,7 +229,7 @@ int main(int argc, char** argv)
 		printf(" %s\tQ\te_%s\te_Q\n", var_name, var_name);
 		printf("-----------------------------\n");
 	    }
-	    nt->Draw(var_sig, cut_trig1 && cut_sig_2D && cut_hodoX && cut_hodoY && cut_run);
+	    nt->Draw(var_sig, cut_trig1 && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan);
 	    if(TString(scanType).Contains("HV") == 1) {
 	      printf("%d\t%.0f\t%.0f\t%.0f\n", HVVal.at(i), h_sig->GetMean(), 0., h_sig->GetMeanError());
 	      outputFile << HVVal.at(i)<<"\t"<<h_sig->GetMean()<<"\t 0.\t"<<h_sig->GetMeanError()<<std::endl;
@@ -221,14 +238,14 @@ int main(int argc, char** argv)
 	      printf("%.3f\t%.0f\t%.0f\t%.0f\n", X0Step.at(i), h_sig->GetMean(), 0., h_sig->GetMeanError());
 	      outputFile << X0Step.at(i)<<"\t"<<h_sig->GetMean()<<"\t 0.\t"<<h_sig->GetMeanError()<<std::endl;
 	    }
-	    if(i == (runList.size()-1))    
+	    if(i == (ScanList.size()-1))    
 		printf("-----------------------------\n");
 	}
 	//---Time study 
 	else if(strcmp(doWhat,"time") == 0)
 	{
 
-	    nt->Draw(var_time, cut_trig1 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_run);
+	    nt->Draw(var_time, cut_trig1 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan);
 	    res_func->SetParameters(h_time->GetEntries()/2, h_time->GetMean(), h_time->GetRMS()/2);
 	    res_func->SetParLimits(0, 0, h_time->GetEntries()*2);
 	    res_func->SetParLimits(2, 0, h_time->GetRMS());
@@ -253,7 +270,7 @@ int main(int argc, char** argv)
 	      printf("%.3f\t%.0f\t%.3f\t%.0f\t%.3f\n", X0Step.at(i), t_res, 0., e_t_res, prob);
 	      outputFile << X0Step.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
 	    }
-	    if(i == (runList.size()-1))    
+	    if(i == (ScanList.size()-1))    
 		printf("---------------------------------------\n");
 	    TCanvas* c = new TCanvas();
 	    char plot_name[100];
