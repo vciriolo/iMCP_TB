@@ -71,12 +71,14 @@ int main (int argc, char** argv)
 
     int run=0, chNumber=0, HVtemp=0, PC=0;
     float X0temp=0.;
-    std::string name;
+    std::string name, trig1, trig2;
 
     //---------definitions-----------
     std::map<int, int> PCOn;
     std::map<int, int> HVVal; 
     std::map<int, std::string> MCPName; 
+
+    int start=0;
 
     //-------start to read the cfg file--------
     while(!inputCfg.eof())  
@@ -84,6 +86,11 @@ int main (int argc, char** argv)
       PCOn.clear();
       HVVal.clear();
       MCPName.clear();
+
+      if (start==0) {   //read trigger chambers
+	inputCfg >> trig1 >> trig2;
+	start=1;
+      }
 
       //-----fill maps--------
       for (int count=0; count<nChannels; count++)   //read exactly nChannels lines of the cfg file -> be careful to give the right number in input!!!!
@@ -99,7 +106,7 @@ int main (int argc, char** argv)
       vector<float> digiCh[9];
       float timeCF[9];
       float intBase[9], intSignal[9], ampMax[9];
-      //      int goodEvt=1;
+            int goodEvt=1;
       ///int fibreX[8], hodoYchannels[8];
       //---Chain
       TChain* chain = new TChain("eventRawData");
@@ -123,10 +130,10 @@ int main (int argc, char** argv)
             chain->GetEntry(iEntry);
 
 	    //---DAQ bug workaround
-	    //	    if(run < 145) goodEvt = 10;
-	    //	    else goodEvt = 1;
-	    //   if(evtNumber % goodEvt == 0) 
-	    //  {
+	    	    if(run < 145) goodEvt = 10;
+	    	    else goodEvt = 1;
+	       if(evtNumber % goodEvt == 0) 
+	      {
             //---Read SciFront ADC value and set the e- multiplicity 
 	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
 		{
@@ -181,12 +188,16 @@ int main (int argc, char** argv)
 
 		    isPCOn[MCPList.at(MCPName.at(iCh))]      = PCOn.at(iCh);
 		    HV[MCPList.at(MCPName.at(iCh))]          = HVVal.at(iCh);
+		    if (strcmp((MCPName.at(iCh)).c_str(),trig1.c_str())==0)          isTrigger[MCPList.at(MCPName.at(iCh))] = 1;
+		    else if (strcmp((MCPName.at(iCh)).c_str(),trig2.c_str())==0)     isTrigger[MCPList.at(MCPName.at(iCh))] = 2;
+		    else                                           isTrigger[MCPList.at(MCPName.at(iCh))] = 0;
+		      
 		  }
 
       	     run_id = run;
 	     X0     = X0temp;
 	     outTree->Fill();    
-	     //}
+	        }
 	}     
         //---Get ready for next run
         chain->Delete();
