@@ -130,11 +130,12 @@ int main (int argc, char** argv)
             chain->GetEntry(iEntry);
 
 	    //---DAQ bug workaround
-	    	    if(run < 145) goodEvt = 10;
-	    	    else goodEvt = 1;
-	       if(evtNumber % goodEvt == 0) 
-	      {
+	    //	    	    if(run < 145) goodEvt = 10;
+	    // 	    else goodEvt = 1;
+	    //   if(evtNumber % goodEvt == 0) 
+	    //   {
             //---Read SciFront ADC value and set the e- multiplicity 
+
 	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
 		{
                     if(adcBoard[iCh] == 1 && adcChannel[iCh] == 0) 
@@ -197,7 +198,7 @@ int main (int argc, char** argv)
       	     run_id = run;
 	     X0     = X0temp;
 	     outTree->Fill();    
-	        }
+	     //  }
 	}     
         //---Get ready for next run
         chain->Delete();
