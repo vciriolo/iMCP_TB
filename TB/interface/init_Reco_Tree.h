@@ -15,6 +15,7 @@ int                   sci_front_adc=0;
 int                   run_id=0;   
 int                   isPCOn[10]={};   
 int                   HV[10]={};   
+int                   isTrigger[10]={};
 float                 X0=0.; 
 
     // List of branches
@@ -28,6 +29,7 @@ float                 X0=0.;
     TBranch        *b_run_id;   //!
     TBranch        *b_isPCOn;   //!
     TBranch        *b_HV;   //!
+    TBranch        *b_isTrigger;
     TBranch        *b_X0;
    
 void InitRecoTree(TTree* nt);
