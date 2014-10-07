@@ -21,6 +21,7 @@ void SetOutTree(TTree* outTree)
   //---additional branches                                                                                                                                      
   outTree->Branch("isPCOn",&isPCOn,"isPCOn[10]/I");
   outTree->Branch("HV",&HV,"HV[10]/I");
+  outTree->Branch("isTrigger",&isTrigger,"isTrigger[10]/I");
   outTree->Branch("X0",&X0,"X0/F");
   //    outTree->Branch("MCPName"+nameMCP->at(Ch_1),&baseline_Ch1,"baseline_"+nameMCP->at(Ch_1)+"/F");                                                          
 }
@@ -38,5 +39,6 @@ void SetOutTree(TTree* outTree)
         nt->SetBranchAddress("run_id", &run_id, &b_run_id);
         nt->SetBranchAddress("isPCOn", &isPCOn, &b_isPCOn);
         nt->SetBranchAddress("HV", &HV, &b_HV);
+        nt->SetBranchAddress("isTrigger", &isTrigger, &b_isTrigger);
         nt->SetBranchAddress("X0", &X0, &b_X0);
     }
