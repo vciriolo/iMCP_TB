@@ -1,10 +1,8 @@
 /*******************************************************************************
-THIS PROGRAM READ THE RAW DATA AND PRODUCE THE RECO FILE USED FOR THE ANALYSIS
+THIS PROGRAM READ THE RAW DATA AND DRAW 10 WAVEFORMS
 -
     compile with --> c++ -o drawWaveform bin/drawWaveform.cpp `root-config --cflags --glibs`
-    run with --> ./drawWaveform /gwteray/users/marzocchi/iMCP/dataTrees 9 251 0
-
-BE CAREFUL: the number of channels MUST coincide with the number of channel in the cfg file
+    run with --> ./drawWaveform /gwteray/users/marzocchi/iMCP/dataTrees 9 251 0 0
 
 *******************************************************************************/
 #include <cstdio>
