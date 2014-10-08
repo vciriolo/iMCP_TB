@@ -20,7 +20,6 @@ Main codes:
 		- many rows with 5 columns:
 		1)run 2)channel 3)HV 4)X0 5)NameMCP
 		there must be exactly n rows for each run (where n=number of channel in input from the digitizer). Look into cfg/ folder for example.
-
 		In the reco tree, branches are sorted following the MCP name list saved in interface/MCPMap.h.
 
 --> usage:      python python/dumper.py
@@ -38,3 +37,9 @@ Main codes:
 
 --> usage:      python python/analyzer.py
 
+
+4- drawWaveform:
+		read raw data and draw 10 waveforms.
+
+--> usage:
+		python python/drawWaveform.py
