@@ -43,18 +43,21 @@ int main(int argc, char** argv)
   Fill_MCPList();
   Fill_inverted_MCPList();
 
+  //read input options
   std::ifstream inputCfg (argv[1],ios::in);
   std::string MCP = argv[2];
   hodo_cut = argv[3];
   doWhat = argv[4];
   scanType = argv[5];
   label = argv[6];
+
+  std::cout<<"----START ANALYZER: analyzing MCP "<<MCP<<", mode: "<<scanType<<", scan: "<<label<<"-------"<<std::endl;
  
   int MCPNumber = MCPList.at(MCP);
   std::map <int,int> treshold;
   int ch, tresh;
   int nChannels=0;
-  int trigPos1 = -1, trigPos2 = -1;
+  int trigPos1 = -1, trigPos2 = -1;  //positions of the two trigger chambers in the reco tree
  
   //---open cfg file and fill map with treshold for each channel----
   while(!inputCfg.eof())
@@ -64,19 +67,17 @@ int main(int argc, char** argv)
 	nChannels++;
       }
 
+  //open reco tree
   std::string inFileName = "ntuples/reco_"+string(label)+".root";
   TFile *inFile = new TFile (inFileName.c_str());
   TTree* nt = (TTree*)inFile->Get("reco_tree");
-
   InitRecoTree(nt);
   
   char outputFileName[200]="";
   sprintf(outputFileName, "results/%s_%s_%s_%s_%s.txt", MCP.c_str(), hodo_cut, doWhat, scanType, label);
-
-
   std::ofstream outputFile (outputFileName, std::ofstream::out);
 
-    //------Build TCut and draw variables--------------------------------------------------
+  //------Build TCut and draw variables--------------------------------------------------
   char str_cut_sig[200]="";
   char str_cut_sig_2D[200]="";
   char str_cut_trig0[200]="";
@@ -88,9 +89,8 @@ int main(int argc, char** argv)
   char var_time[100]="";
   char var_trig0[100]="";
   char var_trig1[100]="";
-    //-----Draw cut-----
 
-  //---open tree and get: run list and corresponding HV-----
+  //---open tree and get: run list and corresponding HV/X0-----
   std::vector<int> HVVal;
   HVVal.clear();
   std::vector<float> X0Step;
@@ -98,6 +98,7 @@ int main(int argc, char** argv)
   std::vector<float> ScanList;
   ScanList.clear();
 
+  //---save list of HV (or X0) step---
   if (strcmp(scanType,"HV")==0) {
     int prev=0;  
     for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++)
@@ -109,7 +110,7 @@ int main(int argc, char** argv)
 	  X0Step.push_back(X0);
 	  prev=HV[MCPNumber];
 	  if (iEntry==0) {
-	    for (int i=0; i<nChannels; i++)
+	    for (int i=0; i<nChannels; i++)  //save trigger position!
 	      {
 		if (isTrigger[i]==1)       trigPos1 = i;
 		else if (isTrigger[i]==2)  trigPos2 = i; 
@@ -130,7 +131,7 @@ int main(int argc, char** argv)
 	  X0Step.push_back(X0);
 	  prev=X0;
 	  if (iEntry==0) {
-	    for (int i=0; i<nChannels; i++)
+	    for (int i=0; i<nChannels; i++)  //save trigger position!!
 	      {
 		if (isTrigger[i]==1)       trigPos1 = i;
 		else if (isTrigger[i]==2)  trigPos2 = i; 
@@ -140,10 +141,6 @@ int main(int argc, char** argv)
 	}
       }
   }
-  //  nt->GetEntry(1);
-    //---HV Scan
-  //  if(TString(scanType).Contains("Scan") == 1)
-  //   {  
 
   if (trigPos1==-1 || trigPos2==-1) {
     std::cout<<"ERROR!!! trigger not found!!!"<<std::endl;
@@ -152,14 +149,13 @@ int main(int argc, char** argv)
   else
     std::cout<<"TRIGGER INFO: --> \ntrigger 1 = "<<inverted_MCPList.at(trigPos1)<<"\ntrigger 2 = "<<inverted_MCPList.at(trigPos2)<<"\n----------"<<std::endl;
 
+  //cut strings
   sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
-	//(strcmp(MCP, "MiB2") == 0)
 	//sprintf(str_cut_sig_2D, "-charge_%s > -13.28*amp_max_%s - 350", MCP, MCP);
   sprintf(str_cut_trig0, "charge[%d] < %d  && charge[%d] < %d && sci_front_adc < 500", trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
   sprintf(str_cut_trig1, "charge[%d] > %d  && charge[%d] > %d && sci_front_adc > 500 && sci_front_adc < 1500",trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
-      // }
 
-    //---Hodoscope cut
+  //---Hodoscope cut
   float thX[8]={113,95,127,118,94,134,133,160};
   float thY[8]={110,101,119,136,94,98,87,97};
   if(strcmp(hodo_cut,"all") == 0)
@@ -174,7 +170,8 @@ int main(int argc, char** argv)
 	sprintf(str_cut_hodoX, "(fibreX[3] > %f || fibreX[4] > %f)", thX[3], thX[4]);
 	sprintf(str_cut_hodoY, "(fibreY[3] > %f || fibreY[4] > %f)", thY[3], thY[4]);
     }
-    //-----construct TCut-----
+
+  //-----construct TCut-----
   TCut cut_sig = str_cut_sig;
   TCut cut_sig_2D = str_cut_sig_2D;
   TCut cut_trig0 = str_cut_trig0;
@@ -182,53 +179,52 @@ int main(int argc, char** argv)
   TCut cut_hodoX = str_cut_hodoX;
   TCut cut_hodoY = str_cut_hodoY;
 
-  TGraphErrors *g_eff = new TGraphErrors("eff", "eff");
+  TGraphErrors *g_eff = new TGraphErrors();
   
   //-------Runs loop---------------------------------------------------------------------
   for(unsigned int i=0; i<ScanList.size(); i++)
     {
 
       char h_sig_name[20], h_base_name[20], h_trig1_name[20], h_trig0_name[20], res_func_name[20], h_time_name[20];
-	sprintf(h_sig_name, "h_sig_%d", i);
-	sprintf(h_base_name, "h_base_%d", i);
-	sprintf(h_trig1_name, "h_trig1_%d", i);
-	sprintf(h_trig0_name, "h_trig0_%d", i);
-	sprintf(h_time_name, "h_time_%d", i);
-	sprintf(res_func_name, "res_func_%d", i);
-
+      sprintf(h_sig_name, "h_sig_%d", i);
+      sprintf(h_base_name, "h_base_%d", i);
+      sprintf(h_trig1_name, "h_trig1_%d", i);
+      sprintf(h_trig0_name, "h_trig0_%d", i);
+      sprintf(h_time_name, "h_time_%d", i);
+      sprintf(res_func_name, "res_func_%d", i);
 
       TH1F* h_sig= new TH1F(h_sig_name, h_sig_name, 500, -5000, 25000);
       TH1F* h_base = new TH1F(h_base_name, h_base_name, 500, 5000, 25000);
       TH1F* h_trig1 = new TH1F(h_trig1_name, h_trig1_name, 500, -5000, 25000);
       TH1F* h_trig0 = new TH1F(h_trig0_name, h_trig0_name, 500, -5000, 25000);
       TH1F* h_time = new TH1F(h_time_name, h_time_name, 500, -5, 5);
-	  TF1* res_func = new TF1(res_func_name, "gausn", -10, 10);
+      TF1* res_func = new TF1(res_func_name, "gausn", -10, 10);
 
-    //-----Draw variables-----
+      //-----Draw variables-----
       sprintf(var_sig, "charge[%d]>>%s", MCPNumber, h_sig_name);
       sprintf(var_base, "baseline[%d]>>%s", MCPNumber, h_base_name);
       sprintf(var_time, "(time_CF[%d]-time_CF[%d])>>%s", MCPNumber, trigPos1, h_time_name);
       sprintf(var_trig0, "charge[%d]>>%s", trigPos1, h_trig0_name);
       sprintf(var_trig1, "charge[%d]>>%s", trigPos1, h_trig1_name);
 
-	//---Run cut
-	char cut_scan[20];
-	if (strcmp(scanType,"HV")==0)
-	  sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
-     	//-----Draw and print infos-----
-	nt->Draw(var_sig, cut_trig1 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan, "goff");
-	nt->Draw(var_base, cut_trig0 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan, "goff");
-	nt->Draw(var_trig0,cut_trig0 && cut_hodoX && cut_hodoY && cut_scan, "goff");
-	nt->Draw(var_trig1,cut_trig1 && cut_hodoX && cut_hodoY && cut_scan, "goff");
-	float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
-	float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig1->GetEntries());
-	if(eff < 0)
-	    eff = 0;
-	char var_name[3] = "X0";
-	if(TString(scanType).Contains("HV") == 1)
-	    sprintf(var_name, "HV");
-	//---Eff study
-	if(strcmp(doWhat,"eff") == 0)
+      char cut_scan[20];
+      if (strcmp(scanType,"HV")==0)  sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
+      else                           sprintf(cut_scan, "X0 > %f && X0 < %f", X0Step.at(i)-0.0001, X0Step.at(i)+0.0001); //"X0==%f" does not work, don't know why 
+
+      //-----Draw and print infos-----
+      nt->Draw(var_sig, cut_trig1 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan, "goff");
+      nt->Draw(var_base, cut_trig0 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan, "goff");
+      nt->Draw(var_trig0,cut_trig0 && cut_hodoX && cut_hodoY && cut_scan, "goff");
+      nt->Draw(var_trig1,cut_trig1 && cut_hodoX && cut_hodoY && cut_scan, "goff");
+      //      std::cout<<h_sig->GetEntries()<<" "<<h_base->GetEntries()<<" "<<h_trig1->GetEntries()<<" "<<h_trig0->GetEntries()<<std::endl;
+
+      float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
+      float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig1->GetEntries());
+      if(eff < 0)   eff = 0;
+      char var_name[3] = "X0";
+      if(TString(scanType).Contains("HV") == 1)    sprintf(var_name, "HV");
+      //---Eff study
+      if(strcmp(doWhat,"eff") == 0)
 	{
 	    if(i == 0)
 	    {
@@ -251,8 +247,8 @@ int main(int argc, char** argv)
 	    if(i == (ScanList.size()-1))    
 		printf("-----------------------------\n");
 	}
-	//---Charge study
-	else if(strcmp(doWhat,"Q") == 0)
+      //---Charge study
+      else if(strcmp(doWhat,"Q") == 0)
 	{
 	    if(i == 0)
 	    {
@@ -275,8 +271,8 @@ int main(int argc, char** argv)
 	    if(i == (ScanList.size()-1))    
 		printf("-----------------------------\n");
 	}
-	//---Time study 
-	else if(strcmp(doWhat,"time") == 0)
+      //---Time study 
+      else if(strcmp(doWhat,"time") == 0)
 	{
 
 	    nt->Draw(var_time, cut_trig1 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan);
@@ -317,6 +313,7 @@ int main(int argc, char** argv)
 	}
     }    
 
+  //do efficiency plot!
   if(strcmp(doWhat,"time") != 0)
     {
       TCanvas* c2 = new TCanvas();
