@@ -15,12 +15,15 @@ instruction for download and compiling:
 Main codes:
 
 1- dumper: 	
-		read the raw data and produce a file with a reco tree. A cfg file should be given in input, with 5 columns:
+		read the raw data and produce a file with a reco tree. A cfg file should be given in input, with:
+		- a first raw with the names of the two MCP used as trigger (the 1st one sould be the one used for the time measurement)
+		- many rows with 5 columns:
 		1)run 2)channel 3)HV 4)X0 5)NameMCP
+		there must be exactly n rows for each run (where n=number of channel in input from the digitizer). Look into cfg/ folder for example.
+
 		In the reco tree, branches are sorted following the MCP name list saved in interface/MCPMap.h.
 
 --> usage:      python python/dumper.py
-
 (for the list of options, look inside the python)	
 
 2- calcTreshold:
