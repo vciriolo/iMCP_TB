@@ -1,9 +1,7 @@
 /*******************************************************************************                                                                                  
-THIS PROGRAM COMPUTES THE TRESHOLDS FOR EACH MCP USING A FIXED S/B VALUE (IN INPUT)
+SIMPLE PROGRAM TO CREATE THE CFG FILE
                                                                                                     
-    compile with --> c++ -o calcTreshold bin/calcTreshold.cpp `root-config --cflags --glibs`                                                                
-    run with --> ./calcTreshold ntuples/reco_prova.root 1000 9 2000  
-                          where the arguments are: -inputTree -S/B treshold -number of channels -HV treshold (analyze only MCPs with HV>treshold)
+    compile with --> c++ -o produceCfg bin/produceCfg.cpp `root-config --cflags --glibs`                                                                
                                                                                                                                                                   
 *******************************************************************************/
 #include <cstdio>
@@ -49,7 +47,7 @@ using namespace std;
 int main (int argc, char** argv)
 {
 
-  std::string outputFileName = "cfg/Scan4.cfg";
+  std::string outputFileName = "cfg/Scan5.cfg";
   std::ofstream outputFile ((outputFileName).c_str(), std::ofstream::out);
   
   int run,v1,v2,v3;
