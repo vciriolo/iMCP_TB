@@ -25,6 +25,8 @@
 #include "TApplication.h"
 #include "TError.h"
 #include "TCanvas.h"
+#include "TGraphErrors.h"
+#include "TPad.h"
 
 #include "../src/init_Reco_Tree.cc"
 #include "../src/MCPMap.cc"
@@ -179,6 +181,8 @@ int main(int argc, char** argv)
   TCut cut_trig1 = str_cut_trig1;
   TCut cut_hodoX = str_cut_hodoX;
   TCut cut_hodoY = str_cut_hodoY;
+
+  TGraphErrors *g_eff = new TGraphErrors("eff", "eff");
   
   //-------Runs loop---------------------------------------------------------------------
   for(unsigned int i=0; i<ScanList.size(); i++)
@@ -235,10 +239,14 @@ int main(int argc, char** argv)
 	    if(TString(scanType).Contains("HV") == 1) {
 	      printf("%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i), eff, 0., e_eff);
 	      outputFile << HVVal.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
+	      g_eff->SetPoint(i, HVVal.at(i), eff);
+	      g_eff->SetPointError(i, 0, e_eff);
 	    }
 	    else {
 	      printf("%.3f\t%.3f\t%.3f\t%.3f\n", X0Step.at(i), eff, 0., e_eff);
 	      outputFile << X0Step.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
+	      g_eff->SetPoint(i, X0Step.at(i), eff);
+	      g_eff->SetPointError(i, 0, e_eff);
 	    }
 	    if(i == (ScanList.size()-1))    
 		printf("-----------------------------\n");
@@ -256,10 +264,13 @@ int main(int argc, char** argv)
 	    if(TString(scanType).Contains("HV") == 1) {
 	      printf("%d\t%.0f\t%.0f\t%.0f\n", HVVal.at(i), h_sig->GetMean(), 0., h_sig->GetMeanError());
 	      outputFile << HVVal.at(i)<<"\t"<<h_sig->GetMean()<<"\t 0.\t"<<h_sig->GetMeanError()<<std::endl;
+	      g_eff->SetPoint(i, HVVal.at(i), h_sig->GetMean());
+	      g_eff->SetPoint(i, 0, h_sig->GetMeanError());
 	    }
 	    else {
 	      printf("%.3f\t%.0f\t%.0f\t%.0f\n", X0Step.at(i), h_sig->GetMean(), 0., h_sig->GetMeanError());
 	      outputFile << X0Step.at(i)<<"\t"<<h_sig->GetMean()<<"\t 0.\t"<<h_sig->GetMeanError()<<std::endl;
+	      g_eff->SetPoint(i, 0, h_sig->GetMeanError());
 	    }
 	    if(i == (ScanList.size()-1))    
 		printf("-----------------------------\n");
@@ -305,6 +316,23 @@ int main(int argc, char** argv)
 	    c->Print(plot_name, "pdf");
 	}
     }    
+
+  if(strcmp(doWhat,"time") != 0)
+    {
+      TCanvas* c2 = new TCanvas();
+      c2->cd();
+      g_eff->GetXaxis()->SetTitle(scanType);
+      g_eff->GetYaxis()->SetTitle("Efficiency");
+      g_eff->SetTitle(MCP.c_str());
+      g_eff->SetMarkerStyle(20);
+      g_eff->SetMarkerSize(0.9);
+      g_eff->SetMarkerColor(4);
+      gPad->SetGrid();
+      g_eff->Draw("AP");
+      char effPlotName[200]="";
+      sprintf(effPlotName, "plots/efficiency/efficiency_%s_%s_%s_%s_%s.pdf", MCP.c_str(), hodo_cut, doWhat, scanType, label);
+      c2->Print(effPlotName,"pdf");
+    }
 
   std::cout<<"results printed in results/"<<std::endl;
   //  outputFile.close();
