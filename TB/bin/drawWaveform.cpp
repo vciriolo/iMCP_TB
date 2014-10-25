@@ -41,7 +41,7 @@ THIS PROGRAM READ THE RAW DATA AND DRAW 10 WAVEFORMS
 #include "TCanvas.h"
 
 #include "../src/analysis_tools.cc"
-#include "../src/init_tree_BTF.cc"
+#include "../src/init_tree_H4.cc"
 #include "../src/init_Reco_Tree.cc"
 #include "../interface/histo_func.h"
 #include "../src/MCPMap.cc"
