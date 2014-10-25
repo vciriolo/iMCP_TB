@@ -42,7 +42,7 @@ BE CAREFUL: the number of channels MUST coincide with the number of channel in t
 #include "TApplication.h"
 
 #include "../src/analysis_tools.cc"
-#include "../src/init_tree_BTF.cc"
+#include "../src/init_tree_H4.cc"
 #include "../src/init_Reco_Tree.cc"
 #include "../interface/histo_func.h"
 #include "../src/MCPMap.cc"
@@ -109,17 +109,17 @@ int main (int argc, char** argv)
             int goodEvt=1;
       ///int fibreX[8], hodoYchannels[8];
       //---Chain
-      TChain* chain = new TChain("eventRawData");
+      TChain* chain = new TChain("H4tree");
       InitTree(chain);
       //-----Read raw data tree-----------------------------------------------
       char iRun_str[40];
-      sprintf(iRun_str, "%s/run_IMCP_%d_*.root", (inputFolder).c_str(), run);
+      sprintf(iRun_str, "%s/%d/*.root", (inputFolder).c_str(), run);
       chain->Add(iRun_str);
       cout << "\nReading:  "<<iRun_str << endl;
       //-----Data loop--------------------------------------------------------
       for(int iEntry=0; iEntry<chain->GetEntries(); iEntry++)
         {
-	    if(iEntry % 1000 == 0)
+	  //	    if(iEntry % 1000 == 0)
 		cout << "read entry: " << iEntry << endl;
             //-----Unpack data--------------------------------------------------
             for(int iCh=0; iCh<nChannels; iCh++)
@@ -128,7 +128,6 @@ int main (int argc, char** argv)
             }
             //---Read the entry
             chain->GetEntry(iEntry);
-
 	    //---DAQ bug workaround
 	    //	    	    if(run < 145) goodEvt = 10;
 	    // 	    else goodEvt = 1;
@@ -148,6 +147,7 @@ int main (int argc, char** argv)
 			fibreY[(adcChannel[iCh]-HODOY_ADC_START_CHANNEL)] = adcData[iCh];
 		}
 	    
+
 		//---Read digitizer samples
              for(unsigned int iSample=0; iSample<nDigiSamples; iSample++)
 	       {
@@ -156,6 +156,7 @@ int main (int argc, char** argv)
 		 else
                         digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
 	       }
+
                 //---loop over MPC's channels
              for(int iCh=0; iCh<nChannels; iCh++)
                 {
