@@ -1,6 +1,6 @@
 /*************************************************************
 
-    tools for the BTF iMCP data.
+    tools for the H4 data.
     1-Charge treshold for every MCP
     2-Waveform manipulation function
 
