@@ -7,7 +7,7 @@
         nt->SetBranchAddress("evtTimeStart", &evtTimeStart, &b_evtTimeStart);
 	//        nt->SetBranchAddress("evtTime", &evtTime, &b_evtTime);
 	//        nt->SetBranchAddress("boardTriggerBit", &boardTriggerBit, &b_boardTriggerBit);
-        nt->SetBranchAddress("triggerWord", &triggerWord, &b_triggerWord);
+	//        nt->SetBranchAddress("triggerWord", &triggerWord, &b_triggerWord);
         nt->SetBranchAddress("nAdcChannels", &nAdcChannels, &b_nAdcChannels);
         nt->SetBranchAddress("adcBoard", adcBoard, &b_adcBoard);
         nt->SetBranchAddress("adcChannel", adcChannel, &b_adcChannel);
