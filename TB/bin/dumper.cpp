@@ -113,13 +113,13 @@ int main (int argc, char** argv)
       InitTree(chain);
       //-----Read raw data tree-----------------------------------------------
       char iRun_str[40];
-      sprintf(iRun_str, "%s/%d/*.root", (inputFolder).c_str(), run);
+      sprintf(iRun_str, "%s/%d/[0-9]*.root", (inputFolder).c_str(), run);
       chain->Add(iRun_str);
       cout << "\nReading:  "<<iRun_str << endl;
       //-----Data loop--------------------------------------------------------
       for(int iEntry=0; iEntry<chain->GetEntries(); iEntry++)
         {
-	  //	    if(iEntry % 1000 == 0)
+	    if(iEntry % 1000 == 0)
 		cout << "read entry: " << iEntry << endl;
             //-----Unpack data--------------------------------------------------
             for(int iCh=0; iCh<nChannels; iCh++)
