@@ -150,9 +150,9 @@ int main(int argc, char** argv)
     std::cout<<"TRIGGER INFO: --> \ntrigger 1 = "<<inverted_MCPList.at(trigPos1)<<"\ntrigger 2 = "<<inverted_MCPList.at(trigPos2)<<"\n----------"<<std::endl;
 
   //cut strings
-  sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
+  sprintf(str_cut_sig, "amp_max[%d] > %d", MCPNumber, 30);//treshold.at(MCPNumber));
 	//sprintf(str_cut_sig_2D, "-charge_%s > -13.28*amp_max_%s - 350", MCP, MCP);
-  sprintf(str_cut_trig0, "charge[%d] > %d", trigPos1, treshold.at(trigPos1));
+  sprintf(str_cut_trig0, "amp_max[%d] > %d", trigPos1, 200);//treshold.at(trigPos1));
   //  sprintf(str_cut_trig0, "charge[%d] < %d  && charge[%d] < %d && sci_front_adc < 500", trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
   //  sprintf(str_cut_trig1, "charge[%d] > %d  && charge[%d] > %d && sci_front_adc > 500 && sci_front_adc < 1500",trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
 
@@ -180,7 +180,8 @@ int main(int argc, char** argv)
   TCut cut_hodoX = str_cut_hodoX;
   TCut cut_hodoY = str_cut_hodoY;
 
-  TGraphErrors *g_eff = new TGraphErrors();
+  TGraphErrors *g_eff = new TGraphErrors(ScanList.size());
+  g_eff->SetName("eff");
   
   //-------Runs loop---------------------------------------------------------------------
   for(unsigned int i=0; i<ScanList.size(); i++)
@@ -208,16 +209,17 @@ int main(int argc, char** argv)
       sprintf(var_trig0, "charge[%d]>>%s", trigPos1, h_trig0_name);
       sprintf(var_trig1, "charge[%d]>>%s", trigPos1, h_trig1_name);
 
-      char cut_scan[20];
+      char cut_scan[100];
       if (strcmp(scanType,"HV")==0)  sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
       else                           sprintf(cut_scan, "X0 > %f && X0 < %f", X0Step.at(i)-0.0001, X0Step.at(i)+0.0001); //"X0==%f" does not work, don't know why 
 
       //-----Draw and print infos-----
-      nt->Draw(var_sig, cut_trig1 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan, "goff");
+      nt->Draw(var_sig, cut_trig0 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan, "goff");
       nt->Draw(var_base, cut_trig0 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan, "goff");
       nt->Draw(var_trig0,cut_trig0 && cut_hodoX && cut_hodoY && cut_scan, "goff");
       nt->Draw(var_trig1,cut_trig1 && cut_hodoX && cut_hodoY && cut_scan, "goff");
       //      std::cout<<h_sig->GetEntries()<<" "<<h_base->GetEntries()<<" "<<h_trig1->GetEntries()<<" "<<h_trig0->GetEntries()<<std::endl;
+
 
       float eff = (h_sig->GetEntries()/h_trig0->GetEntries());
       float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
@@ -333,6 +335,13 @@ int main(int argc, char** argv)
       char effPlotName[200]="";
       sprintf(effPlotName, "plots/efficiency/efficiency_%s_%s_%s_%s_%s.pdf", MCP.c_str(), hodo_cut, doWhat, scanType, label);
       c2->Print(effPlotName,"pdf");
+
+            char effRootName[200]="";
+            sprintf(effRootName, "plots/efficiency/efficiency_%s_%s_%s_%s_%s.root", MCP.c_str(), hodo_cut, doWhat, scanType, label);
+
+	    TFile *out = new TFile (TString(effRootName),"RECREATE");
+      out->cd();
+      g_eff->Write();
     }
 
   std::cout<<"results printed in results/"<<std::endl;
