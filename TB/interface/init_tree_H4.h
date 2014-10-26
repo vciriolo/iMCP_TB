@@ -10,7 +10,7 @@
     unsigned int          evtTimeStart;
 //    unsigned int          evtTime;
 //    unsigned int          boardTriggerBit;
-    unsigned int          triggerWord;
+//    unsigned int          triggerWord;
     unsigned int          nAdcChannels;
     unsigned int          adcBoard[100];   
     unsigned int          adcChannel[100];   
@@ -31,7 +31,7 @@
     TBranch        *b_evtTimeStart;   //!
 //    TBranch        *b_evtTime;   //!
 //    TBranch        *b_boardTriggerBit;   //!
-    TBranch        *b_triggerWord;   //!
+//    TBranch        *b_triggerWord;   //!
     TBranch        *b_nAdcChannels;   //!
     TBranch        *b_adcBoard;   //!
     TBranch        *b_adcChannel;   //!
