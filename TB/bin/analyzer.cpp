@@ -152,8 +152,9 @@ int main(int argc, char** argv)
   //cut strings
   sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
 	//sprintf(str_cut_sig_2D, "-charge_%s > -13.28*amp_max_%s - 350", MCP, MCP);
-  sprintf(str_cut_trig0, "charge[%d] < %d  && charge[%d] < %d && sci_front_adc < 500", trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
-  sprintf(str_cut_trig1, "charge[%d] > %d  && charge[%d] > %d && sci_front_adc > 500 && sci_front_adc < 1500",trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
+  sprintf(str_cut_trig0, "charge[%d] > %d", trigPos1, treshold.at(trigPos1));
+  //  sprintf(str_cut_trig0, "charge[%d] < %d  && charge[%d] < %d && sci_front_adc < 500", trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
+  //  sprintf(str_cut_trig1, "charge[%d] > %d  && charge[%d] > %d && sci_front_adc > 500 && sci_front_adc < 1500",trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
 
   //---Hodoscope cut
   float thX[8]={113,95,127,118,94,134,133,160};
@@ -218,8 +219,11 @@ int main(int argc, char** argv)
       nt->Draw(var_trig1,cut_trig1 && cut_hodoX && cut_hodoY && cut_scan, "goff");
       //      std::cout<<h_sig->GetEntries()<<" "<<h_base->GetEntries()<<" "<<h_trig1->GetEntries()<<" "<<h_trig0->GetEntries()<<std::endl;
 
-      float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
-      float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig1->GetEntries());
+      float eff = (h_sig->GetEntries()/h_trig0->GetEntries());
+      float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
+
+      //      float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
+      //      float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig1->GetEntries());
       if(eff < 0)   eff = 0;
       char var_name[3] = "X0";
       if(TString(scanType).Contains("HV") == 1)    sprintf(var_name, "HV");
