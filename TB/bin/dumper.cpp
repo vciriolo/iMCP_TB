@@ -103,9 +103,9 @@ int main (int argc, char** argv)
 	}
 
       //-----Definitions
-      vector<float> digiCh[9];
-      float timeCF[9];
-      float intBase[9], intSignal[9], ampMax[9];
+      vector<float> digiCh[10];
+      float timeCF[10];
+      float intBase[10], intSignal[10], ampMax[10];
             int goodEvt=1;
       ///int fibreX[8], hodoYchannels[8];
       //---Chain
@@ -151,10 +151,11 @@ int main (int argc, char** argv)
 		//---Read digitizer samples
              for(unsigned int iSample=0; iSample<nDigiSamples; iSample++)
 	       {
-		 if(MCPName.at(digiChannel[iSample]) == "Planacon")
-			digiCh[digiChannel[iSample]].push_back(-digiSampleValue[iSample]);
+		 if (digiGroup[iSample]==1 && digiChannel[iSample]==0)
+                        digiCh[9].push_back(digiSampleValue[iSample]);
 		 else
                         digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
+
 	       }
 
                 //---loop over MPC's channels
