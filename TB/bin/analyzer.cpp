@@ -105,6 +105,7 @@ int main(int argc, char** argv)
       {
 	nt->GetEntry(iEntry);
 	if (HV[MCPNumber]!=prev) {
+	  std::cout<<HV[MCPNumber]<<std::endl;
 	  ScanList.push_back((float)HV[MCPNumber]);
 	  HVVal.push_back(HV[MCPNumber]);
 	  X0Step.push_back(X0);
@@ -150,9 +151,9 @@ int main(int argc, char** argv)
     std::cout<<"TRIGGER INFO: --> \ntrigger 1 = "<<inverted_MCPList.at(trigPos1)<<"\ntrigger 2 = "<<inverted_MCPList.at(trigPos2)<<"\n----------"<<std::endl;
 
   //cut strings
-  sprintf(str_cut_sig, "amp_max[%d] > %d", MCPNumber, 30);//treshold.at(MCPNumber));
+  sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
 	//sprintf(str_cut_sig_2D, "-charge_%s > -13.28*amp_max_%s - 350", MCP, MCP);
-  sprintf(str_cut_trig0, "amp_max[%d] > %d", trigPos1, 200);//treshold.at(trigPos1));
+  sprintf(str_cut_trig0, "charge[%d] > %d", trigPos1, treshold.at(trigPos1));
   //  sprintf(str_cut_trig0, "charge[%d] < %d  && charge[%d] < %d && sci_front_adc < 500", trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
   //  sprintf(str_cut_trig1, "charge[%d] > %d  && charge[%d] > %d && sci_front_adc > 500 && sci_front_adc < 1500",trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
 
@@ -281,16 +282,21 @@ int main(int argc, char** argv)
       else if(strcmp(doWhat,"time") == 0)
 	{
 
-	    nt->Draw(var_time, cut_trig1 && cut_sig && cut_sig_2D && cut_hodoX && cut_hodoY && cut_scan);
+	    nt->Draw(var_time, cut_trig0 && cut_sig && cut_scan);
 	    res_func->SetParameters(h_time->GetEntries()/2, h_time->GetMean(), h_time->GetRMS()/2);
 	    res_func->SetParLimits(0, 0, h_time->GetEntries()*2);
 	    res_func->SetParLimits(2, 0, h_time->GetRMS());
 	    res_func->SetRange(h_time->GetMean()-2*h_time->GetRMS(), h_time->GetMean()+2*h_time->GetRMS());
 	    h_time->Fit(res_func, "QR");
+
+	    std::cout<<h_time->GetEntries()<<std::endl;
+
 	    float err_time = res_func->GetParError(2)*1000;
-	    float t_res = sqrt(pow(res_func->GetParameter(2)*1000, 2) - pow(float(RES_TRIG), 2));
-	    float e_t_res = sqrt(pow(err_time*res_func->GetParameter(2)*1000, 2) + pow(float(RES_TRIG_ERR)*RES_TRIG, 2))/
-		t_res;
+	    //	    float t_res = sqrt(pow(res_func->GetParameter(2)*1000, 2) - pow(float(RES_TRIG), 2));
+	    //	    float e_t_res = sqrt(pow(err_time*res_func->GetParameter(2)*1000, 2) + pow(float(RES_TRIG_ERR)*RES_TRIG, 2))/t_res;
+
+	    float t_res = res_func->GetParameter(2)*1000/sqrt(2);
+	    float e_t_res = err_time*res_func->GetParameter(2)*1000/(sqrt(2)*t_res);
 	    float prob = res_func->GetProb();
 	    if(i == 0)
 	    {
