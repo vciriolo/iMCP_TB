@@ -1,13 +1,27 @@
 {
 
   //  std::string HVE = "HVH_50";
-    std::string HVE = "HVH_20";
+    std::string HVE = "EffAll";
   //  std::string HVE = "HVL_50";
   //  std::string HVE = "HVL_20";
 
-  TFile* inF_MiB3;
+  TFile* inF_MiB3_ON;
+  TFile* inF_MiB3_OFF;
   TFile* inF_enSEE;
-  TFile* inF_ZStack2;
+  TFile* inF_ZStack1_ON;
+  TFile* inF_ZStack1_OFF;
+  TFile* inF_ZStack2_ON;
+  TFile* inF_ZStack2_OFF;
+
+  if(HVE == "EffAll"){
+    inF_MiB3_ON = TFile::Open("plots/efficiency/efficiency_MiB3_no_eff_HV_HVScan2.root");
+    inF_MiB3_OFF = TFile::Open("plots/efficiency/efficiency_MiB3_no_eff_HV_HVScan3.root");
+    inF_enSEE = TFile::Open("plots/efficiency/efficiency_enSEE_no_eff_HV_HVScan4.root");
+    inF_ZStack1_ON = TFile::Open("plots/efficiency/efficiency_ZStack1_no_eff_HV_HVScan1.root");
+    inF_ZStack1_OFF = TFile::Open("plots/efficiency/efficiency_ZStack1_no_eff_HV_HVScan5.root");
+    inF_ZStack2_ON = TFile::Open("plots/efficiency/efficiency_ZStack2_no_eff_HV_HVScan2.root");
+    inF_ZStack2_OFF = TFile::Open("plots/efficiency/efficiency_ZStack2_no_eff_HV_HVScan1.root");
+  }
 
   if(HVE == "HVH_50"){
   inF_MiB3 = TFile::Open("plots/efficiency/efficiency_MiB3_no_eff_X0_H4test_X0scan_HVH_50GeV.root");
@@ -31,23 +45,43 @@
   }
 
 
-  TGraphErrors* eff_MiB3 = (TGraphErrors*)inF_MiB3->Get("eff");
+  TGraphErrors* eff_MiB3_ON = (TGraphErrors*)inF_MiB3_ON->Get("eff");
+  TGraphErrors* eff_MiB3_OFF = (TGraphErrors*)inF_MiB3_OFF->Get("eff");
   TGraphErrors* eff_enSEE = (TGraphErrors*)inF_enSEE->Get("eff");
-  TGraphErrors* eff_ZStack2 = (TGraphErrors*)inF_ZStack2->Get("eff");
+  TGraphErrors* eff_ZStack2_ON = (TGraphErrors*)inF_ZStack2_ON->Get("eff");
+  TGraphErrors* eff_ZStack1_ON = (TGraphErrors*)inF_ZStack1_ON->Get("eff");
+  TGraphErrors* eff_ZStack2_OFF = (TGraphErrors*)inF_ZStack2_OFF->Get("eff");
+  TGraphErrors* eff_ZStack1_OFF = (TGraphErrors*)inF_ZStack1_OFF->Get("eff");
 
   //settings
-  eff_MiB3->SetMarkerColor(kGreen+1);
-  eff_MiB3->SetLineColor(kGreen+1);
-  eff_ZStack2->SetMarkerColor(kBlue);
-  eff_ZStack2->SetLineColor(kBlue);
-  eff_enSEE->SetMarkerColor(kRed+1);
-  eff_enSEE->SetLineColor(kRed+1);
+  eff_MiB3_ON->SetMarkerColor(kGreen+1);
+  eff_MiB3_ON->SetLineColor(kGreen+1);
+  eff_MiB3_OFF->SetMarkerColor(kGreen+1);
+  eff_MiB3_OFF->SetLineColor(kGreen+1);
+  eff_ZStack2_ON->SetMarkerColor(kBlue);
+  eff_ZStack2_ON->SetLineColor(kBlue);
+  eff_ZStack1_ON->SetMarkerColor(kRed);
+  eff_ZStack1_ON->SetLineColor(kRed);
+  eff_ZStack2_OFF->SetMarkerColor(kBlue);
+  eff_ZStack2_OFF->SetLineColor(kBlue);
+  eff_ZStack1_OFF->SetMarkerColor(kRed);
+  eff_ZStack1_OFF->SetLineColor(kRed);
+  eff_enSEE->SetMarkerColor(1);
+  eff_enSEE->SetLineColor(1);
   //
-  eff_MiB3->SetMarkerStyle(20);
-  eff_MiB3->SetLineWidth(2);
-  eff_ZStack2->SetMarkerStyle(20);
-  eff_ZStack2->SetLineWidth(2);
-  eff_enSEE->SetMarkerStyle(20);
+  eff_MiB3_ON->SetMarkerStyle(20);
+  eff_MiB3_ON->SetLineWidth(2);
+  eff_MiB3_OFF->SetMarkerStyle(22);
+  eff_MiB3_OFF->SetLineWidth(2);
+  eff_ZStack2_ON->SetMarkerStyle(20);
+  eff_ZStack2_ON->SetLineWidth(2);
+  eff_ZStack1_ON->SetMarkerStyle(20);
+  eff_ZStack1_ON->SetLineWidth(2);
+  eff_ZStack2_OFF->SetMarkerStyle(22);
+  eff_ZStack2_OFF->SetLineWidth(2);
+  eff_ZStack1_OFF->SetMarkerStyle(22);
+  eff_ZStack1_OFF->SetLineWidth(2);
+  eff_enSEE->SetMarkerStyle(22);
   eff_enSEE->SetLineWidth(2);
 
 
@@ -57,6 +91,17 @@
   legC->SetFillColor(kWhite);
   legC->SetLineColor(kWhite);
   legC->SetShadowColor(kWhite);
+
+  if(HVE == "EffAll"){
+  legC->AddEntry(eff_MiB3_OFF, "MiB3 chevron-OFF", "p");
+  legC->AddEntry(eff_MiB3_ON, "MiB3 chevron-ON", "p");
+  legC->AddEntry(eff_ZStack2_ON, "ZStack2 ON", "p");
+  legC->AddEntry(eff_ZStack2_OFF, "ZStack2 OFF", "p");
+  legC->AddEntry(eff_ZStack1_ON, "ZStack1 ON", "p");
+  legC->AddEntry(eff_ZStack1_OFF, "ZStack1 OFF", "p");
+  legC->AddEntry(eff_enSEE, "SEE OFF", "p");
+  }
+
 
   if(HVE == "HVH_50" || HVE == "HVH_20"){
   legC->AddEntry(eff_MiB3, "MiB3 chevron-OFF HV 3100", "p");
@@ -72,17 +117,23 @@
 
   TCanvas* c_HVH_50 = new TCanvas();
   gPad->SetTicks();
-  if(HVE == "HVH_50" || "HVL_50")  eff_MiB3->SetTitle("50 GeV");
-  if(HVE == "HVH_20" || "HVL_20")  eff_MiB3->SetTitle("20 GeV");
-  eff_MiB3->GetXaxis()->SetLabelSize(0.05);
-  eff_MiB3->GetXaxis()->SetTitleSize(0.05);
-  eff_MiB3->GetYaxis()->SetLabelSize(0.05);
-  eff_MiB3->GetYaxis()->SetTitleSize(0.05);
-  eff_MiB3->SetMaximum(1.05);
-  eff_MiB3->SetMinimum(0.);
-  eff_MiB3->Draw("aspl");
-  eff_ZStack2->Draw("spl,same");
-  eff_enSEE->Draw("spl,same");
+  if(HVE == "HVH_50" || "HVL_50" || "EffAll")  eff_MiB3_ON->SetTitle("50 GeV");
+  if(HVE == "HVH_20" || "HVL_20")  eff_MiB3_ON->SetTitle("50 GeV");
+
+
+  eff_MiB3_ON->GetXaxis()->SetLabelSize(0.05);
+  eff_MiB3_ON->GetXaxis()->SetTitleSize(0.05);
+ eff_MiB3_ON->GetYaxis()->SetLabelSize(0.05);
+  eff_MiB3_ON->GetYaxis()->SetTitleSize(0.05);
+  eff_MiB3_ON->SetMaximum(1.05);
+  eff_MiB3_ON->SetMinimum(0.);
+  eff_MiB3_ON->Draw("asp");
+  eff_MiB3_OFF->Draw("sp,same");
+  eff_ZStack2_ON->Draw("sp,same");
+  eff_ZStack1_ON->Draw("sp,same");
+  eff_ZStack2_OFF->Draw("sp,same");
+  eff_ZStack1_OFF->Draw("sp,same");
+  eff_enSEE->Draw("sp,same");
   legC->Draw("same");
 
   //  c_HVH_50->Print("plots/X0scan/");
