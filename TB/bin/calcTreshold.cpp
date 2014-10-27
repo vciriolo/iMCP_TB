@@ -109,7 +109,7 @@ int main (int argc, char** argv)
 	  sprintf(hBDrawFit, "baseline[%d]>>%s", iCh, hBNameFit);
 
 	  char cut[300];
-	  sprintf(cut, "sci_front_adc>500 && sci_front_adc<1500 && isPCOn[%d]!=0 && HV[%d]>=%d", iCh, iCh, HVtresh); 
+	  sprintf(cut, "isPCOn[%d]!=0 && HV[%d]>=%d", iCh, iCh, HVtresh); 
 
 	  inputTree->Draw(hSDraw,cut,"goff");
 	  inputTree->Draw(hBDraw,cut,"goff");
