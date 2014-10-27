@@ -215,7 +215,7 @@ int main(int argc, char** argv)
       sprintf(var_time, "(time_CF[%d]-time_CF[%d])>>%s", MCPNumber, trigPos1, h_time_name);
       sprintf(var_trig0, "charge[%d]>>%s", trigPos1, h_trig0_name);
       sprintf(var_trig1, "charge[%d]>>%s", trigPos1, h_trig1_name);
-      sprintf(var_acc, "charge[%d]>>%s", MCPNumber, h_acc);
+      sprintf(var_acc, "charge[%d]>>%s", MCPNumber, h_acc_name);
 
       char cut_scan[100];
       if (strcmp(scanType,"HV")==0)  sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
@@ -229,7 +229,7 @@ int main(int argc, char** argv)
       nt->Draw(var_acc, cut_acc && cut_scan, "goff");
      
 
-      //      std::cout<<h_sig->GetEntries()<<" "<<h_acc->GetEntries()<<" "<<h_trig0->GetEntries()<<std::endl;
+      //            std::cout<<h_sig->GetEntries()<<" "<<h_acc->GetEntries()<<" "<<h_trig0->GetEntries()<<std::endl;
       
       float eff = ((h_sig->GetEntries()-h_acc->GetEntries())/h_trig0->GetEntries());
       float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
@@ -296,9 +296,9 @@ int main(int argc, char** argv)
 	    res_func->SetParLimits(0, 0, h_time->GetEntries()*2);
 	    res_func->SetParLimits(2, 0, h_time->GetRMS());
 	    res_func->SetRange(h_time->GetMean()-2*h_time->GetRMS(), h_time->GetMean()+2*h_time->GetRMS());
-	    h_time->Fit(res_func, "QR");
+	    h_time->Fit(res_func, "QR+");
 
-	    std::cout<<h_time->GetEntries()<<std::endl;
+	    //	    std::cout<<h_time->GetEntries()<<std::endl;
 
 	    float err_time = res_func->GetParError(2)*1000;
 	    //	    float t_res = sqrt(pow(res_func->GetParameter(2)*1000, 2) - pow(float(RES_TRIG), 2));
