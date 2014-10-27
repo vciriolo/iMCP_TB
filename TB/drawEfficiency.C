@@ -31,18 +31,24 @@
   }
 
 
-  TGraph* eff_MiB3 = (TGraph*)inF_MiB3->Get("eff");
-  TGraph* eff_enSEE = (TGraph*)inF_enSEE->Get("eff");
-  TGraph* eff_ZStack2 = (TGraph*)inF_ZStack2->Get("eff");
+  TGraphErrors* eff_MiB3 = (TGraphErrors*)inF_MiB3->Get("eff");
+  TGraphErrors* eff_enSEE = (TGraphErrors*)inF_enSEE->Get("eff");
+  TGraphErrors* eff_ZStack2 = (TGraphErrors*)inF_ZStack2->Get("eff");
 
   //settings
   eff_MiB3->SetMarkerColor(kGreen+1);
+  eff_MiB3->SetLineColor(kGreen+1);
   eff_ZStack2->SetMarkerColor(kBlue);
+  eff_ZStack2->SetLineColor(kBlue);
   eff_enSEE->SetMarkerColor(kRed+1);
+  eff_enSEE->SetLineColor(kRed+1);
   //
   eff_MiB3->SetMarkerStyle(20);
+  eff_MiB3->SetLineWidth(2);
   eff_ZStack2->SetMarkerStyle(20);
+  eff_ZStack2->SetLineWidth(2);
   eff_enSEE->SetMarkerStyle(20);
+  eff_enSEE->SetLineWidth(2);
 
 
   TLegend *legC = new TLegend(0.50,0.20,0.79,0.4,NULL,"brNDC");
@@ -65,11 +71,20 @@
   }
 
   TCanvas* c_HVH_50 = new TCanvas();
-  gPad->SetGrid();
-  eff_MiB3->SetMaximum(1);
-  eff_MiB3->SetMinimum(0.5);
-  eff_MiB3->Draw("ap");
-  eff_ZStack2->Draw("p,same");
-  eff_enSEE->Draw("p,same");
+  gPad->SetTicks();
+  if(HVE == "HVH_50" || "HVL_50")  eff_MiB3->SetTitle("50 GeV");
+  if(HVE == "HVH_20" || "HVL_20")  eff_MiB3->SetTitle("20 GeV");
+  eff_MiB3->GetXaxis()->SetLabelSize(0.05);
+  eff_MiB3->GetXaxis()->SetTitleSize(0.05);
+  eff_MiB3->GetYaxis()->SetLabelSize(0.05);
+  eff_MiB3->GetYaxis()->SetTitleSize(0.05);
+  eff_MiB3->SetMaximum(1.05);
+  eff_MiB3->SetMinimum(0.);
+  eff_MiB3->Draw("aspl");
+  eff_ZStack2->Draw("spl,same");
+  eff_enSEE->Draw("spl,same");
   legC->Draw("same");
+
+  //  c_HVH_50->Print("plots/X0scan/");
+
 }
