@@ -5,7 +5,7 @@ Code for iMCP analysis (test beam)
 
 instruction for download and compiling:
 
-	git clone https://github.com/lbrianza/iMCP_TB
+	git clone git@github.com:lbrianza/iMCP_TB.git
 	cd iMCP_TB/TB/
 	sh compile.sh
 
@@ -23,6 +23,7 @@ Main codes:
 		In the reco tree, branches are sorted following the MCP name list saved in interface/MCPMap.h.
 
 --> usage:      python python/dumper.py
+--> example:    python python/analyzer.py -m MiB3 -n HVScan4 -a eff -s HV -cfg cfg/HVScan4.cfg 
 (for the list of options, look inside the python)	
 
 2- calcTreshold:
@@ -30,12 +31,13 @@ Main codes:
 		(to ensure the MCP has efficiency=1). Tresholds are saved in cfg/treshold.txt
 
 --> usage: 	python python/calcTreshold.py
-
+--> example:    python python/calcTreshold.py -HV 2700 -i ntuples/reco_HVScan4.root -SB 1000
 
 3- analyzer:
 		read the reco tree and calculate efficiencies/time resolution, depending on the options given in input.
 
 --> usage:      python python/analyzer.py
+--> example:    python python/analyzer.py -m MiB3 -n HVScan4 -a eff -s HV
 
 
 4- drawWaveform:
