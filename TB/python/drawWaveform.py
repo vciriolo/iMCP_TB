@@ -14,6 +14,6 @@ if __name__ == '__main__':
     parser.add_argument ('-f', '--firstEntry' , default = '0', help='first entry')
     parser.add_argument ('-n', '--nEvents' , default = '100', help='number of events to analyze')
     args = parser.parse_args ()
-    print './drawWaveform '+args.cfg+' '+args.dir+' '+args.run+' '+args.channel+' '+args.firstEntry+' '+args.nEvents
-    os.system('./drawWaveform '+args.cfg+' '+args.dir+' '+args.run+' '+args.channel+' '+args.firstEntry+' '+args.nEvents)
+    print './drawWaveform '+args.dir+' '+args.run+' '+args.channel+' '+args.firstEntry+' '+args.nEvents
+    os.system('./drawWaveform '+args.dir+' '+args.run+' '+args.channel+' '+args.firstEntry+' '+args.nEvents)
     
