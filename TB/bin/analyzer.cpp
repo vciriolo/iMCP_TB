@@ -31,8 +31,8 @@
 #include "../src/init_Reco_Tree.cc"
 #include "../src/MCPMap.cc"
 
-#define RES_TRIG 58.93
-#define RES_TRIG_ERR 0.373
+#define RES_TRIG 85.3
+#define RES_TRIG_ERR 0.3
 
 using namespace std;
 
@@ -123,11 +123,11 @@ int main(int argc, char** argv)
   }
 
   else {
-    float prev=0.;
+    float prev=-1.;
     for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++)
       {
 	nt->GetEntry(iEntry);
-	if (X0!=prev) {
+	if (X0>(prev+0.001)||X0<(prev-0.001)) {
 	  ScanList.push_back(X0);
 	  HVVal.push_back(HV[MCPNumber]);
 	  X0Step.push_back(X0);
@@ -231,11 +231,11 @@ int main(int argc, char** argv)
 
       //            std::cout<<h_sig->GetEntries()<<" "<<h_acc->GetEntries()<<" "<<h_trig0->GetEntries()<<std::endl;
       
-      float eff = ((h_sig->GetEntries()-h_acc->GetEntries())/h_trig0->GetEntries());
-      float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
+            float eff = ((h_sig->GetEntries()-h_acc->GetEntries())/h_trig0->GetEntries());
+            float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
 
-      //      float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
-      //      float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig1->GetEntries());
+	    //      float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
+	    //     float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig1->GetEntries());
       if(eff < 0)   eff = 0;
       char var_name[3] = "X0";
       if(TString(scanType).Contains("HV") == 1)    sprintf(var_name, "HV");
@@ -301,11 +301,11 @@ int main(int argc, char** argv)
 	    //	    std::cout<<h_time->GetEntries()<<std::endl;
 
 	    float err_time = res_func->GetParError(2)*1000;
-	    //	    float t_res = sqrt(pow(res_func->GetParameter(2)*1000, 2) - pow(float(RES_TRIG), 2));
+	    //   	    float t_res = sqrt(pow(res_func->GetParameter(2)*1000, 2) - pow(float(RES_TRIG), 2));
 	    //	    float e_t_res = sqrt(pow(err_time*res_func->GetParameter(2)*1000, 2) + pow(float(RES_TRIG_ERR)*RES_TRIG, 2))/t_res;
 
-	    float t_res = res_func->GetParameter(2)*1000/sqrt(2);
-	    float e_t_res = err_time*res_func->GetParameter(2)*1000/(sqrt(2)*t_res);
+		      float t_res = res_func->GetParameter(2)*1000/sqrt(2);
+		     float e_t_res = err_time*res_func->GetParameter(2)*1000/(sqrt(2)*t_res);
 	    float prob = res_func->GetProb();
 	    if(i == 0)
 	    {
@@ -346,6 +346,8 @@ int main(int argc, char** argv)
       g_eff->SetMarkerSize(0.9);
       g_eff->SetMarkerColor(4);
       gPad->SetGrid();
+      g_eff->Draw("AP");
+      g_eff->GetXaxis()->SetRangeUser(1100,3500);
       g_eff->Draw("AP");
       char effPlotName[200]="";
       sprintf(effPlotName, "plots/efficiency/efficiency_%s_%s_%s_%s_%s.pdf", MCP.c_str(), hodo_cut, doWhat, scanType, label);
