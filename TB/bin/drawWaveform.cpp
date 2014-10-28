@@ -62,16 +62,15 @@ int main (int argc, char** argv)
     TCanvas* c[10];
 
       //---Chain
-      TChain* chain = new TChain("eventRawData");
+      TChain* chain = new TChain("H4tree");
       InitTree(chain);
       //-----Read raw data tree-----------------------------------------------
       char iRun_str[40];
-      sprintf(iRun_str, "%s/run_IMCP_%d_*.root", (inputFolder).c_str(), run);
+      sprintf(iRun_str, "%s/%d/[0-9]*.root", (inputFolder).c_str(), run);
       chain->Add(iRun_str);
       cout << "\nReading:  "<<iRun_str << endl;
       //-----Data loop--------------------------------------------------------
-      for(int iEntry=firstEntry; iEntry<(firstEntry+10); iEntry++)
-        {
+      for(int iEntry=0; iEntry<chain->GetEntries(); iEntry++){
 	  cout << "read entry: " << iEntry << endl;
           //---Read the entry
           chain->GetEntry(iEntry);
@@ -83,7 +82,8 @@ int main (int argc, char** argv)
 		//---Read digitizer samples
 	  for(unsigned int iSample=0; iSample<nDigiSamples; iSample++)
 	      {
-		if(digiChannel[iSample] == channel)
+		if( (digiGroup[iSample]==0 && digiChannel[iSample] == channel) ||
+		    (digiGroup[iSample]==1 && digiChannel[iSample] == 0 && channel == 9) )
 		  {
 		    gWF[iEntry-firstEntry]->SetPoint(iSample, i, -digiSampleValue[iSample]);
 		    i++;
