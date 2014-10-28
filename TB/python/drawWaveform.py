@@ -8,7 +8,7 @@ import argparse
 import string
 if __name__ == '__main__':
     parser = argparse.ArgumentParser (description = 'draw waveform: read raw data and draw some waveforms')
-    parser.add_argument ('-d', '--dir' , default = '/gwteray/users/marzocchi/iMCP/dataTrees', help='directory containing raw data')
+    parser.add_argument ('-d', '--dir' , default = 'cfg/HVScan1.cfg', help='directory containing raw data')
     parser.add_argument ('-n', '--chNumber' , default = '9', help='number of channels (in the raw data!)')
     parser.add_argument ('-r', '--run' , default = '251', help='run to scan')
     parser.add_argument ('-c', '--channel' , default = '0', help='channel to analyze')
