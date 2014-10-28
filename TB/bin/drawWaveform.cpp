@@ -53,53 +53,58 @@ int main (int argc, char** argv)
     
     //--------Read Options--------------------------------
     std::string inputFolder = argv[1];
-    int nChannels = atoi (argv[2]);
-    int run = atoi (argv[3]);
-    int channel = atoi (argv[4]);
-    int firstEntry = atoi (argv[5]);
+    int run = atoi (argv[2]);
+    int channel = atoi (argv[3]);
+    int firstEntry = atoi (argv[4]);
+    int nEvents = atoi (argv[5]);
 
-    TGraph* gWF[10];
-    TCanvas* c[10];
-
+    // TGraph* gWF_single;
+    // TCanvas* c_single;
+    TGraph* gWF = new TGraph();
+    TCanvas* c = new TCanvas();
+    c->cd();
       //---Chain
       TChain* chain = new TChain("H4tree");
       InitTree(chain);
+
       //-----Read raw data tree-----------------------------------------------
       char iRun_str[40];
       sprintf(iRun_str, "%s/%d/[0-9]*.root", (inputFolder).c_str(), run);
       chain->Add(iRun_str);
       cout << "\nReading:  "<<iRun_str << endl;
+
       //-----Data loop--------------------------------------------------------
-      for(int iEntry=0; iEntry<chain->GetEntries(); iEntry++){
+      float totEvents = nEvents;
+      if(nEvents > chain->GetEntries()) totEvents = chain->GetEntries();
+
+      for(int iEntry=0; iEntry<totEvents; iEntry++){
 	  cout << "read entry: " << iEntry << endl;
           //---Read the entry
           chain->GetEntry(iEntry);
 
-	  gWF[iEntry-firstEntry] = new TGraph();
-	  c[iEntry-firstEntry]  = new TCanvas();
-	  c[iEntry-firstEntry]->cd();
 	  int i=0;
 		//---Read digitizer samples
-	  for(unsigned int iSample=0; iSample<nDigiSamples; iSample++)
-	      {
+	  for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
 		if( (digiGroup[iSample]==0 && digiChannel[iSample] == channel) ||
 		    (digiGroup[iSample]==1 && digiChannel[iSample] == 0 && channel == 9) )
 		  {
-		    gWF[iEntry-firstEntry]->SetPoint(iSample, i, -digiSampleValue[iSample]);
+		    gWF->SetPoint(iSample, i, -digiSampleValue[iSample]);
 		    i++;
 		  }
 	      }
 
-	  gWF[iEntry-firstEntry]->GetXaxis()->SetTitle("sample");
-	  gWF[iEntry-firstEntry]->Draw("APL");
-	  char plot_name[100];
-	  sprintf(plot_name, "plots/waveform/run_%d_entry_%d_ch_%d.pdf", run, iEntry, channel);
-	  c[iEntry-firstEntry]->Print(plot_name, "pdf");
-	}     
+	  gWF->GetXaxis()->SetTitle("sample");
+	  if(iEntry == 0) gWF->Draw("APL");
+	  else gWF->Draw("PL,same");      
+      }     
 
-        chain->Delete();
+      char plot_name[100];
+      sprintf(plot_name, "plots/waveform/run_%d_nEvents_%d_ch_%d.pdf", run, totEvents, channel);
+      c->Print(plot_name, "pdf");
+
+      chain->Delete();
     
-return 0;
+      return 0;
 }
 
         
