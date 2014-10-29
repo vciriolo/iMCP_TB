@@ -38,6 +38,7 @@ THIS PROGRAM READ THE RAW DATA AND DRAW 10 WAVEFORMS
 #include "TClass.h"
 #include "TApplication.h"
 #include "TGraph.h"
+#include "TMultiGraph.h"
 #include "TCanvas.h"
 
 #include "../src/analysis_tools.cc"
@@ -58,9 +59,15 @@ int main (int argc, char** argv)
     int firstEntry = atoi (argv[4]);
     int nEvents = atoi (argv[5]);
 
+    std::cout << " >>> run = " << run << std::endl;
+    std::cout << " >>> channel = " << channel << std::endl;
+    std::cout << " >>> firstEntry = " << firstEntry << std::endl;
+    std::cout << " >>> nEvents = " << nEvents << std::endl;
+
     // TGraph* gWF_single;
     // TCanvas* c_single;
-    TGraph* gWF = new TGraph();
+    TMultiGraph *mgWF = new TMultiGraph();
+    TGraph* gWF;
     TCanvas* c = new TCanvas();
     c->cd();
       //---Chain
@@ -82,6 +89,7 @@ int main (int argc, char** argv)
           //---Read the entry
           chain->GetEntry(iEntry);
 
+	  gWF = new TGraph();
 	  int i=0;
 		//---Read digitizer samples
 	  for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
@@ -94,13 +102,14 @@ int main (int argc, char** argv)
 	      }
 
 	  gWF->GetXaxis()->SetTitle("sample");
-	  if(iEntry == 0) gWF->Draw("APL");
-	  else gWF->Draw("PL,same");      
+	  mgWF->Add(gWF);
+	  // if(iEntry == 0) gWF->Draw("APL");
+	  // else gWF->Draw("PL,same");      
       }     
-
+      mgWF->Draw("apl");
       char plot_name[100];
-      sprintf(plot_name, "plots/waveform/run_%d_nEvents_%d_ch_%d.pdf", run, totEvents, channel);
-      c->Print(plot_name, "pdf");
+      sprintf(plot_name, "plots/waveform/run_%d_nEvents_%d_ch_%d.png", run, totEvents, channel);
+      c->Print(plot_name, "png");
 
       chain->Delete();
     
