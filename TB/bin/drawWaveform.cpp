@@ -81,11 +81,11 @@ int main (int argc, char** argv)
       cout << "\nReading:  "<<iRun_str << endl;
 
       //-----Data loop--------------------------------------------------------
-      float totEvents = nEvents;
+      int totEvents = nEvents;
       if(nEvents > chain->GetEntries()) totEvents = chain->GetEntries();
 
       for(int iEntry=0; iEntry<totEvents; iEntry++){
-	  cout << "read entry: " << iEntry << endl;
+	if(iEntry%100 == 0) std::cout << "read entry: " << iEntry << std::endl;
           //---Read the entry
           chain->GetEntry(iEntry);
 
