@@ -105,6 +105,7 @@ int main (int argc, char** argv)
       //-----Definitions
       vector<float> digiCh[10];
       float timeCF[10];
+      float timeOT[10];
       float intBase[10], intSignal[10], ampMax[10];
             int goodEvt=1;
       ///int fibreX[8], hodoYchannels[8];
@@ -117,8 +118,8 @@ int main (int argc, char** argv)
       chain->Add(iRun_str);
       cout << "\nReading:  "<<iRun_str << endl;
       //-----Data loop--------------------------------------------------------
-      for(int iEntry=0; iEntry<chain->GetEntries(); iEntry++)
-        {
+      for(int iEntry=0; iEntry<chain->GetEntries(); iEntry++){
+	//	for(int iEntry=0; iEntry<10; iEntry++){    //RA
 	    if(iEntry % 1000 == 0)
 		cout << "read entry: " << iEntry << endl;
             //-----Unpack data--------------------------------------------------
@@ -155,7 +156,6 @@ int main (int argc, char** argv)
                         digiCh[9].push_back(digiSampleValue[iSample]);
 		 else
                         digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
-
 	       }
 
                 //---loop over MPC's channels
@@ -163,7 +163,7 @@ int main (int argc, char** argv)
                 {
                     SubtractBaseline(5, 25, &digiCh[iCh]);
                     timeCF[iCh]=TimeConstFrac(47, 500, &digiCh[iCh], 0.5);
-                    //timeAM[iCh]=TimeConstFrac(47, 500, &digiCh[iCh], 1);
+		    timeOT[iCh]=TimeOverThreshold(210, 500, &digiCh[iCh], -20.);
                     int t1 = (int)(timeCF[iCh]/0.2) - 3;
                     int t2 = (int)(timeCF[iCh]/0.2) + 17;
                     intBase[iCh] = ComputeIntegral(26, 46, &digiCh[iCh]);
@@ -185,6 +185,7 @@ int main (int argc, char** argv)
 	     for (int iCh=0; iCh<nChannels; iCh++)
 		  {
 		    time_CF[MCPList.at(MCPName.at(iCh))]   = timeCF[iCh];
+		    time_OT[MCPList.at(MCPName.at(iCh))]   = timeOT[iCh];
 		    amp_max[MCPList.at(MCPName.at(iCh))]   = -ampMax[iCh];
 		    charge[MCPList.at(MCPName.at(iCh))]    = -intSignal[iCh];
 		    baseline[MCPList.at(MCPName.at(iCh))]  = -intBase[iCh];
