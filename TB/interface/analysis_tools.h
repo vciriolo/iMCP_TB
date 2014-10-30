@@ -51,6 +51,11 @@ float TimeConstFrac(int t1, int t2, const vector<float>* samples, float AmpFract
                     float step=DIGITIZER_SAMPLING_UNIT, int Nsamples = 5);
 
 //---------------------------------------------------------------------------------------
+//---estimate time (ns) with CFD, samples must be a negative signal and baseline subtracted
+float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float threshold, 
+			float step=DIGITIZER_SAMPLING_UNIT, int Nsamples = 5);
+
+//---------------------------------------------------------------------------------------
 //---compute the maximum amplitude for negative signals (range selectable)
 
 float AmpMax(int t1, int t2, const vector<float>* samples);

@@ -6,6 +6,7 @@
 
     // Declaration of leaf types
 float                 time_CF[10]={};   
+float                 time_OT[10]={};   
 float                 amp_max[10]={};   
 float                 charge[10]={};   
 float                 baseline[10]={};   
@@ -20,6 +21,7 @@ float                 X0=0.;
 
     // List of branches
     TBranch        *b_time_CF;   //!
+    TBranch        *b_time_OT;   //!
     TBranch        *b_amp_max;   //!
     TBranch        *b_baseline;   //!
     TBranch        *b_charge;   //!

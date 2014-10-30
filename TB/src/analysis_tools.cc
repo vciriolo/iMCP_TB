@@ -66,6 +66,7 @@ float TimeConstFrac(int t1, int t2, const vector<float>* samples, float AmpFract
         if(samples->at(iSample) > minValue*AmpFraction) 
         {
             cfSample = iSample;
+	    //	    std::cout << " CF cfSample = " << cfSample << " samples->at(iSample) = " << samples->at(iSample) << std::endl;
             break;
         }
     }
@@ -93,7 +94,122 @@ float TimeConstFrac(int t1, int t2, const vector<float>* samples, float AmpFract
     } 
     // A+Bx = AmpFraction * amp
     float interpolation = (samples->at(minSample) * AmpFraction - A) / B;
+    //    std::cout << " >>> interp = " << interpolation << " A = " << A << " B = " << B << std::endl;
     return interpolation;
+
+}
+
+//---------------------------------------------------------------------------------------
+//---estimate time (ns) with CFD, samples must be a negative signal and baseline subtracted
+float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float threshold, 
+			float step, int Nsamples){
+
+  float xx = 0.;
+  float xy = 0.;
+  float Sx = 0.;
+  float Sy = 0.;
+  float Sxx = 0.;
+  float Sxy = 0.;
+  float Chi2 = 0.;
+  int minSample = t1;
+  int otSample = t1;       // first sample over threshold
+  float minValue = 0;
+  
+  for(int iSample=t1; iSample<t2; iSample++){
+    //      std::cout << " iSample = " << iSample << " samples->at(iSample) = " << samples->at(iSample) << " threshold = " << threshold << std::endl;
+    if(samples->at(iSample) < threshold){
+      minSample = iSample;
+      break;
+    }
+  }
+  minValue = samples->at(minSample);
+  
+  for(int iSample=minSample; iSample>t1; iSample--){
+    if(samples->at(iSample) > threshold){
+      otSample = iSample;
+      //	    std::cout << " start otSample = " << otSample << " samples->at(iSample) = " << samples->at(iSample) << std::endl;
+      break;
+    }
+  }
+  for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++){
+    if(otSample+n<0) continue;
+    xx = (otSample+n)*(otSample+n)*step*step;
+    xy = (otSample+n)*step*(samples->at(otSample+n));
+    Sx = Sx + (otSample+n)*step;
+    Sy = Sy + samples->at(otSample+n);
+    Sxx = Sxx + xx;
+    Sxy = Sxy + xy;
+  }
+
+  float Delta = Nsamples*Sxx - Sx*Sx;
+  float A = (Sxx*Sy - Sx*Sxy) / Delta;
+  float B = (Nsamples*Sxy - Sx*Sy) / Delta;
+  
+  float sigma2 = pow(step/sqrt(12)*B,2);
+    
+  for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++){
+    if(otSample+n<0) continue;
+    Chi2 = Chi2 + pow(samples->at(otSample+n) - A - B*((otSample+n)*step),2)/sigma2;
+  } 
+
+  // A+Bx = threshold
+  float tStart = (samples->at(minSample) - A) / B;
+  // std::cout << " >>> tStart = " << tStart << std::endl;
+  // std::cout << " >>> A = " << A << " B = " << B << std::endl;
+  
+  ///////compute tStop
+  xx = 0.;
+  xy = 0.;
+  Sx = 0.;
+  Sy = 0.;
+  Sxx = 0.;
+  Sxy = 0.;
+  Chi2 = 0.;
+  minSample = t1;
+  otSample = t1; 
+  minValue = 0;
+  
+  for(int iSample=t2; iSample>t1; iSample--){
+    if(samples->at(iSample) < threshold){
+      minSample = iSample;
+      break;
+    }
+  }
+  minValue = samples->at(minSample);
+  
+  for(int iSample=minSample; iSample<t2; iSample++){
+    if(samples->at(iSample) > threshold){
+      otSample = iSample;
+      //	    std::cout << " stop otSample = " << otSample <<  " samples->at(iSample) = " << samples->at(iSample) <<std::endl;
+      break;
+    }
+  }
+  for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++){
+    if(otSample+n<0) continue;
+    xx = (otSample+n)*(otSample+n)*step*step;
+    xy = (otSample+n)*step*(samples->at(otSample+n));
+    Sx = Sx + (otSample+n)*step;
+    Sy = Sy + samples->at(otSample+n);
+    Sxx = Sxx + xx;
+    Sxy = Sxy + xy;
+  }
+  
+  Delta = Nsamples*Sxx - Sx*Sx;
+  A = (Sxx*Sy - Sx*Sxy) / Delta;
+  B = (Nsamples*Sxy - Sx*Sy) / Delta;
+  
+  sigma2 = pow(step/sqrt(12)*B,2);
+  
+  for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++){
+    if(otSample+n<0) continue;
+    Chi2 = Chi2 + pow(samples->at(otSample+n) - A - B*((otSample+n)*step),2)/sigma2;
+  } 
+  // A+Bx = threshold
+  float tStop = (samples->at(minSample) - A) / B;
+  // std::cout << " >>> tStop = " << tStop << std::endl;
+  // std::cout << " >>> A = " << A << " B = " << B << std::endl;
+  ///    std::cout << " >>> DT = " << tStop - tStart << std::endl;
+  return (tStop - tStart);
 }
 
 //---------------------------------------------------------------------------------------
