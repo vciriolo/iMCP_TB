@@ -70,9 +70,12 @@ int main (int argc, char** argv)
     TGraph* gWF;
     TCanvas* c = new TCanvas();
     c->cd();
-      //---Chain
-      TChain* chain = new TChain("H4tree");
-      InitTree(chain);
+    //---Chain
+    TChain* chain = new TChain("H4tree");
+    InitTree(chain);
+
+    // Definitions
+    vector<float> digiCh[10];
 
       //-----Read raw data tree-----------------------------------------------
       char iRun_str[40];
@@ -89,30 +92,40 @@ int main (int argc, char** argv)
           //---Read the entry
           chain->GetEntry(iEntry);
 
+	  for(int iCh=0; iCh<10; iCh++) digiCh[iCh].clear();
+
+	  //---Read digitizer samples
+	  for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
+	    if (digiGroup[iSample] == 1 && digiChannel[iSample] == 0 && channel == 9) 
+	      digiCh[9].push_back(digiSampleValue[iSample]);
+	    else
+	      digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
+	  }
+
 	  gWF = new TGraph();
 	  int i=0;
-		//---Read digitizer samples
-	  for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
-		if( (digiGroup[iSample]==0 && digiChannel[iSample] == channel) ||
-		    (digiGroup[iSample]==1 && digiChannel[iSample] == 0 && channel == 9) )
-		  {
-		    gWF->SetPoint(iSample, i, -digiSampleValue[iSample]);
-		    i++;
-		  }
-	      }
+	  
+	  //---loop over MPC's channels                                                                                                               
+	  SubtractBaseline(5, 25, &digiCh[channel]);
+	  for(unsigned int iSample=0; iSample<digiCh[channel].size(); iSample++){
+	    gWF->SetPoint(iSample, i, digiCh[channel].at(iSample));
+	    i++;
+	  }
 
 	  gWF->GetXaxis()->SetTitle("sample");
 	  mgWF->Add(gWF);
 	  // if(iEntry == 0) gWF->Draw("APL");
 	  // else gWF->Draw("PL,same");      
       }     
+      //      if(channel != 4) mgWF->SetMaximum(-3250); 
       mgWF->Draw("apl");
       char plot_name[100];
       sprintf(plot_name, "plots/waveform/run_%d_nEvents_%d_ch_%d.png", run, totEvents, channel);
       c->Print(plot_name, "png");
 
+      mgWF->Delete();
       chain->Delete();
-    
+      
       return 0;
 }
 
