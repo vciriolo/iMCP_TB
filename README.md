@@ -7,6 +7,7 @@ instruction for download and compiling:
 
 	git clone git@github.com:lbrianza/iMCP_TB.git
 	cd iMCP_TB/TB/
+	source thisroot.sh
 	sh compile.sh
 
 ..and start to use it!
