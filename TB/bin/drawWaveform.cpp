@@ -75,27 +75,30 @@ int main (int argc, char** argv)
     InitTree(chain);
 
     // Definitions
-    vector<float> digiCh[10];
-
+    std::vector<float> digiCh[10];
+    for(int iCh=0; iCh<10; iCh++) digiCh[iCh].clear();
+  
+    
       //-----Read raw data tree-----------------------------------------------
-      char iRun_str[40];
-      sprintf(iRun_str, "%s/%d/[0-9]*.root", (inputFolder).c_str(), run);
-      chain->Add(iRun_str);
-      cout << "\nReading:  "<<iRun_str << endl;
+      std::string iRun_str = inputFolder+Form("/%d/[0-9]*.root", run);
+      chain->Add(iRun_str.c_str());
+      std::cout << "\nReading:  " << iRun_str << std::endl;
 
       //-----Data loop--------------------------------------------------------
       int totEvents = nEvents;
-      if(nEvents > chain->GetEntries()) totEvents = chain->GetEntries();
+      if(nEvents > chain->GetEntries() || totEvents == -1) totEvents = chain->GetEntries();
 
       for(int iEntry=0; iEntry<totEvents; iEntry++){
 	if(iEntry%100 == 0) std::cout << "read entry: " << iEntry << std::endl;
           //---Read the entry
           chain->GetEntry(iEntry);
-
-	  for(int iCh=0; iCh<10; iCh++) digiCh[iCh].clear();
+	
 
 	  //---Read digitizer samples
 	  for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
+	    if(iSample > 1024*10 - 1) break;
+	    // std::cout << " >>> iSample = " << iSample << std::endl;
+	    // std::cout << " >>> digiChannel[iSample] = " << digiChannel[iSample] << std::endl;
 	    if (digiGroup[iSample] == 1 && digiChannel[iSample] == 0 && channel == 9) 
 	      digiCh[9].push_back(digiSampleValue[iSample]);
 	    else
@@ -107,6 +110,7 @@ int main (int argc, char** argv)
 	  
 	  //---loop over MPC's channels                                                                                                               
 	  SubtractBaseline(5, 25, &digiCh[channel]);
+	  //	  std::cout << " >>> digiCh[channel].size() = " << digiCh[channel].size() << std::endl;
 	  for(unsigned int iSample=0; iSample<digiCh[channel].size(); iSample++){
 	    gWF->SetPoint(iSample, i, digiCh[channel].at(iSample));
 	    i++;
@@ -116,12 +120,12 @@ int main (int argc, char** argv)
 	  mgWF->Add(gWF);
 	  // if(iEntry == 0) gWF->Draw("APL");
 	  // else gWF->Draw("PL,same");      
-      }     
-      //      if(channel != 4) mgWF->SetMaximum(-3250); 
+      } 
+      
       mgWF->Draw("apl");
       char plot_name[100];
       sprintf(plot_name, "plots/waveform/run_%d_nEvents_%d_ch_%d.png", run, totEvents, channel);
-      c->Print(plot_name, "png");
+      c->Print(plot_name, ".png");
 
       mgWF->Delete();
       chain->Delete();
