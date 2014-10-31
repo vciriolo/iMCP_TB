@@ -110,7 +110,7 @@ int main (int argc, char** argv)
 	  
 	  //---loop over MPC's channels                                                                                                               
 	  SubtractBaseline(5, 25, &digiCh[channel]);
-	  //	  std::cout << " >>> digiCh[channel].size() = " << digiCh[channel].size() << std::endl;
+	  //std::cout << " >>> digiCh[channel].size() = " << digiCh[channel].size() << std::endl;
 	  for(unsigned int iSample=0; iSample<digiCh[channel].size(); iSample++){
 	    gWF->SetPoint(iSample, i, digiCh[channel].at(iSample));
 	    i++;
@@ -126,6 +126,7 @@ int main (int argc, char** argv)
       char plot_name[100];
       sprintf(plot_name, "plots/waveform/run_%d_nEvents_%d_ch_%d.png", run, totEvents, channel);
       c->Print(plot_name, ".png");
+      std::cout << plot_name << "created" << std::endl;
 
       mgWF->Delete();
       chain->Delete();
