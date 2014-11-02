@@ -41,11 +41,11 @@ BE CAREFUL: the number of channels MUST coincide with the number of channel in t
 #include "TClass.h"
 #include "TApplication.h"
 
-#include "../interface/analysis_tools.h"
-#include "../interface/init_tree_H4.h"
-#include "../interface/init_Reco_Tree.h"
+#include "../src/analysis_tools.cc"
+#include "../src/init_tree_H4.cc"
+#include "../src/init_Reco_Tree.cc"
 //#include "../interface/histo_func.h"
-#include "../interface/MCPMap.h"
+#include "../src/MCPMap.cc"
 
 //*******MAIN*******************************************************************
 int main (int argc, char** argv)
@@ -193,7 +193,7 @@ int main (int argc, char** argv)
 		    isPCOn[MCPList.at(MCPName.at(iCh))]      = PCOn.at(iCh);
 		    HV[MCPList.at(MCPName.at(iCh))]          = HVVal.at(iCh);
 		    if (strcmp((MCPName.at(iCh)).c_str(),trig1.c_str())==0)          isTrigger[MCPList.at(MCPName.at(iCh))] = 1;
-		    else if (strcmp((MCPName.at(iCh)).c_str(),trig2.c_str())==0)     isTrigger[MCPList.at(MCPName.at(iCh))] = 2;
+		    //		    else if (strcmp((MCPName.at(iCh)).c_str(),trig2.c_str())==0)     isTrigger[MCPList.at(MCPName.at(iCh))] = 2;
 		    else                                           isTrigger[MCPList.at(MCPName.at(iCh))] = 0;
 		      
 		  }
