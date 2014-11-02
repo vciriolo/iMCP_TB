@@ -114,7 +114,7 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
   int minSample = t1;
   int otSample = t1;       // first sample over threshold
   float minValue = 0;
-  
+
   for(int iSample=t1; iSample<t2; iSample++){
     //      std::cout << " iSample = " << iSample << " samples->at(iSample) = " << samples->at(iSample) << " threshold = " << threshold << std::endl;
     if(samples->at(iSample) < threshold){
@@ -204,6 +204,7 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
     if(otSample+n<0) continue;
     Chi2 = Chi2 + pow(samples->at(otSample+n) - A - B*((otSample+n)*step),2)/sigma2;
   } 
+
   // A+Bx = threshold
   float tStop = (samples->at(minSample) - A) / B;
   // std::cout << " >>> tStop = " << tStop << std::endl;
