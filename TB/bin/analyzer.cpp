@@ -139,12 +139,12 @@ int main(int argc, char** argv)
       }
   }
 
-  if (trigPos1==-1 || trigPos2==-1) {
+  if (trigPos1==-1) {
     std::cout<<"ERROR!!! trigger not found!!!"<<std::endl;
     return -1;
   }
   else
-    std::cout<<"TRIGGER INFO: --> \ntrigger 1 = "<<inverted_MCPList.at(trigPos1)<<"\ntrigger 2 = "<<inverted_MCPList.at(trigPos2)<<"\n----------"<<std::endl;
+    std::cout<<"TRIGGER INFO: --> \ntrigger 1 = "<<inverted_MCPList.at(trigPos1)<<"\n----------"<<std::endl;
 
   //cut strings
   sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
