@@ -25,6 +25,9 @@
     unsigned int          digiSampleIndex[100000];   
     float                 digiSampleValue[100000];   
 
+std::vector<float>   *TDCreco = 0;
+int spillNumber;
+
     // List of branches
     TBranch        *b_evtNumber;   //!
     TBranch        *b_evtTimeDist;   //!
@@ -45,7 +48,12 @@
     TBranch        *b_digiChannel;   //!
     TBranch        *b_digiSampleIndex;   //!
     TBranch        *b_digiSampleValue;   //!
+
+TBranch  *b_TDCreco;
+TBranch  *b_spillNumber;
    
 void InitTree(TChain* nt);
+
+void InitTree2(TChain* nt2);
 
 #endif
