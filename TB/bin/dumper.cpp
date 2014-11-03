@@ -112,31 +112,53 @@ int main (int argc, char** argv)
       //--reading wire chamber from other tree --
       TChain* t1 = new TChain("outputTree");
       InitTree2(t1);
-      //      sprintf(iRun_tW, "%s/%d/[0-9]*/dqmPlotstotal.root", (inputFolder).c_str(), run);
-      //      t1->Add(iRun_tW);
-
-      char command[300];
-      sprintf(command, "find  %s/%d/*/dqmPlotstotal.root >> listTemp.txt", (inputFolder).c_str(), run);
-      system(command);
-    ifstream rootList ("listTemp.txt");
-    while (!rootList.eof())
-      {
-	char a[100], b[100], c[100], d[100];
-      char iRun_tW[70];
-      rootList >> a >> b >> c >> iRun_tW >> d;
-      t1->Add(iRun_tW);	
-      }
-    system("rm listTemp.txt");
 
       //---Chain
       TChain* chain = new TChain("H4tree");
       InitTree(chain);
-      //-----Read raw data tree-----------------------------------------------
+
+      char command1[300];
+      sprintf(command1, "find  %s/%d/*/dqmPlotstotal.root > listTemp.txt", (inputFolder).c_str(), run);
+      system(command1);
+      char command2[300];
+      sprintf(command2, "find  %s/%d/[0-9]*.root > listTemp2.txt", (inputFolder).c_str(), run);
+      system(command2);
+
+    ifstream rootList ("listTemp.txt");
+    ifstream rootList2 ("listTemp2.txt");
+
+    while (!rootList.eof() && !rootList2.eof())
+      {
+	char iRun_tW[70];
+	rootList >> iRun_tW;
+	char iRun_str[70];
+	rootList2 >> iRun_str;
+
+	TChain* tTemp = new TChain("outputTree");
+	tTemp->Add(iRun_tW);
+	TChain* tTempH4 = new TChain("H4tree");
+	tTempH4->Add(iRun_str);
+
+	if (tTemp->GetEntries() == tTempH4->GetEntries())
+	  {
+	    t1->Add(iRun_tW);	
+	    chain->Add(iRun_str);	
+	  }
+	else
+	  std::cout<<"Bad spill found.. Skipped"<<std::endl;
+      }
+
+    system("rm listTemp.txt");
+    system("rm listTemp2.txt");
+
+    std::cout<<"start reading run: "<<run<<std::endl;
+
+    /*      //-----Read raw data tree-----------------------------------------------
       char iRun_str[70];
       sprintf(iRun_str, "%s/%d/[0-9]*.root", (inputFolder).c_str(), run);
       chain->Add(iRun_str);
       cout << "\nReading:  "<<iRun_str << endl;
-
+    */
       //-----Data loop--------------------------------------------------------
       for(int iEntry=0; iEntry<chain->GetEntries(); iEntry++){
 	//	for(int iEntry=0; iEntry<10; iEntry++){    //RA
@@ -150,12 +172,9 @@ int main (int argc, char** argv)
             }
             //---Read the entry
             chain->GetEntry(iEntry);
-	    //---DAQ bug workaround
-	    //	    	    if(run < 145) goodEvt = 10;
-	    // 	    else goodEvt = 1;
-	    //   if(evtNumber % goodEvt == 0) 
-	    //   {
-            //---Read SciFront ADC value and set the e- multiplicity 
+ 
+	    int spill=spillNumber;
+	    int event=evtNumber;
 
 	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
 		{
@@ -226,11 +245,17 @@ int main (int argc, char** argv)
 	     tdcX = (*TDCreco)[0];
 	     tdcY = (*TDCreco)[1];
 
+	     if (spill!=spillNumber || event!=evtNumber) {
+	       std::cout<<"PROBLEM: non-coherent read"<<std::endl;
+	       continue;
+	     }
+
 	     outTree->Fill();    
 	     //  }
 	}     
         //---Get ready for next run
         chain->Delete();
+	t1->Delete();
     }
 
     //-----close everything-----------------------------------------------------
