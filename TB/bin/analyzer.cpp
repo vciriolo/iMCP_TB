@@ -79,6 +79,7 @@ int main(int argc, char** argv)
   //------Build TCut and draw variables--------------------------------------------------
   char str_cut_sig[200]="";
   char str_cut_trig0[200]="";
+  char str_cut_tdc[200]="";
   char var_sig[100]="";
   char var_base[100]="";
   char var_time[100]="";
@@ -147,10 +148,12 @@ int main(int argc, char** argv)
   //cut strings
   sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
   sprintf(str_cut_trig0, "charge[%d] > %d", trigPos1, treshold.at(trigPos1));
+  sprintf(str_cut_tdc, "tdcX > -9 && tdcX < -1 && tdcY > -2 && tdcY < 8");
 
   //-----construct TCut-----
   TCut cut_sig = str_cut_sig;
   TCut cut_trig0 = str_cut_trig0;
+  TCut cut_tdc = str_cut_tdc;
 
   TGraphErrors *g_eff = new TGraphErrors(ScanList.size());
   g_eff->SetName("eff");
@@ -182,10 +185,11 @@ int main(int argc, char** argv)
       if (strcmp(scanType,"HV")==0)  sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
       else                           sprintf(cut_scan, "X0 > %f && X0 < %f", X0Step.at(i)-0.0001, X0Step.at(i)+0.0001); //"X0==%f" does not work, don't know why 
 
+
       //-----Draw and print infos-----
-      nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan, "goff");
+      nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc, "goff");
       nt->Draw(var_base, cut_scan, "goff");   //number of total events
-      nt->Draw(var_trig0,cut_trig0 && cut_scan, "goff");
+      nt->Draw(var_trig0,cut_trig0 && cut_scan && cut_tdc, "goff");
 
       int acc = 1*(float(h_base->GetEntries())/2000.); //estimated from pedestal run
     
