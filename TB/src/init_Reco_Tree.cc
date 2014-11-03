@@ -26,6 +26,9 @@ void SetOutTree(TTree* outTree)
   outTree->Branch("HV",&HV,"HV[10]/I");
   outTree->Branch("isTrigger",&isTrigger,"isTrigger[10]/I");
   outTree->Branch("X0",&X0,"X0/F");
+
+  outTree->Branch("tdcX",&tdcX,"tdcX/F");
+  outTree->Branch("tdcY",&tdcY,"tdcY/F");
   //    outTree->Branch("MCPName"+nameMCP->at(Ch_1),&baseline_Ch1,"baseline_"+nameMCP->at(Ch_1)+"/F");          
 }
 
@@ -44,5 +47,6 @@ void InitRecoTree(TTree* nt)
   nt->SetBranchAddress("isPCOn", &isPCOn, &b_isPCOn);
   nt->SetBranchAddress("HV", &HV, &b_HV);
   nt->SetBranchAddress("isTrigger", &isTrigger, &b_isTrigger);
-  nt->SetBranchAddress("X0", &X0, &b_X0);
+  nt->SetBranchAddress("tdcX", &tdcX, &b_tdcX);
+  nt->SetBranchAddress("tdcY", &tdcY, &b_tdcY);
 }
