@@ -18,6 +18,8 @@ int                   isPCOn[10]={};
 int                   HV[10]={};   
 int                   isTrigger[10]={};
 float                 X0=0.; 
+float tdcX=-999.;
+float tdcY=-999.;
 
     // List of branches
     TBranch        *b_time_CF;   //!
@@ -33,6 +35,8 @@ float                 X0=0.;
     TBranch        *b_HV;   //!
     TBranch        *b_isTrigger;
     TBranch        *b_X0;
+TBranch *b_tdcX;
+TBranch *b_tdcY;
    
 void InitRecoTree(TTree* nt);
 
