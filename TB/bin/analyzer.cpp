@@ -79,12 +79,10 @@ int main(int argc, char** argv)
   //------Build TCut and draw variables--------------------------------------------------
   char str_cut_sig[200]="";
   char str_cut_trig0[200]="";
-  char str_cut_acc[250]="";
   char var_sig[100]="";
   char var_base[100]="";
   char var_time[100]="";
   char var_trig0[100]="";
-  char var_acc[100]="";
 
   //---open tree and get: run list and corresponding HV/X0-----
   std::vector<int> HVVal;
@@ -149,12 +147,10 @@ int main(int argc, char** argv)
   //cut strings
   sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
   sprintf(str_cut_trig0, "charge[%d] > %d", trigPos1, treshold.at(trigPos1));
-  sprintf(str_cut_acc, "charge[%d] > %d && charge[%d] < %d", MCPNumber, treshold.at(MCPNumber), trigPos1, treshold.at(trigPos1));
 
   //-----construct TCut-----
   TCut cut_sig = str_cut_sig;
   TCut cut_trig0 = str_cut_trig0;
-  TCut cut_acc = str_cut_acc;
 
   TGraphErrors *g_eff = new TGraphErrors(ScanList.size());
   g_eff->SetName("eff");
@@ -163,19 +159,17 @@ int main(int argc, char** argv)
   for(unsigned int i=0; i<ScanList.size(); i++)
     {
 
-      char h_sig_name[20], h_base_name[20], h_trig0_name[20], res_func_name[20], h_time_name[20], h_acc_name[20];
+      char h_sig_name[20], h_base_name[20], h_trig0_name[20], res_func_name[20], h_time_name[20];
       sprintf(h_sig_name, "h_sig_%d", i);
       sprintf(h_base_name, "h_base_%d", i);
       sprintf(h_trig0_name, "h_trig0_%d", i);
       sprintf(h_time_name, "h_time_%d", i);
       sprintf(res_func_name, "res_func_%d", i);
-      sprintf(h_acc_name, "h_acc_%d", i);
 
       TH1F* h_sig= new TH1F(h_sig_name, h_sig_name, 500, -5000, 25000);
       TH1F* h_base = new TH1F(h_base_name, h_base_name, 500, 5000, 25000);
       TH1F* h_trig0 = new TH1F(h_trig0_name, h_trig0_name, 500, -5000, 25000);
       TH1F* h_time = new TH1F(h_time_name, h_time_name, 500, -5, 5);
-      TH1F* h_acc= new TH1F(h_acc_name, h_acc_name, 500, -5000, 25000);
       TF1* res_func = new TF1(res_func_name, "gausn", -10, 10);
 
       //-----Draw variables-----
@@ -183,7 +177,6 @@ int main(int argc, char** argv)
       sprintf(var_base, "baseline[%d]>>%s", MCPNumber, h_base_name);
       sprintf(var_time, "(time_CF[%d]-time_CF[%d])>>%s", MCPNumber, trigPos1, h_time_name);
       sprintf(var_trig0, "charge[%d]>>%s", trigPos1, h_trig0_name);
-      sprintf(var_acc, "charge[%d]>>%s", MCPNumber, h_acc_name);
 
       char cut_scan[100];
       if (strcmp(scanType,"HV")==0)  sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
@@ -191,12 +184,13 @@ int main(int argc, char** argv)
 
       //-----Draw and print infos-----
       nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan, "goff");
-      nt->Draw(var_base, cut_trig0 && cut_sig && cut_scan, "goff");
+      nt->Draw(var_base, cut_scan, "goff");   //number of total events
       nt->Draw(var_trig0,cut_trig0 && cut_scan, "goff");
-      nt->Draw(var_acc, cut_acc && cut_scan, "goff");
+
+      int acc = 1*(float(h_base->GetEntries())/2000.); //estimated from pedestal run
     
-      //            std::cout<<h_sig->GetEntries()<<" "<<h_acc->GetEntries()<<" "<<h_trig0->GetEntries()<<std::endl;
-      float eff = ((h_sig->GetEntries()-h_acc->GetEntries())/h_trig0->GetEntries());
+      //      std::cout<<h_sig->GetEntries()<<" "<<h_acc->GetEntries()<<" "<<h_trig0->GetEntries()<<" "<<h_base->GetEntries()<<std::endl;
+      float eff = h_sig->GetEntries()/h_trig0->GetEntries();
       float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
 
 	    //      float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
