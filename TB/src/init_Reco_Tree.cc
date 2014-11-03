@@ -47,6 +47,7 @@ void InitRecoTree(TTree* nt)
   nt->SetBranchAddress("isPCOn", &isPCOn, &b_isPCOn);
   nt->SetBranchAddress("HV", &HV, &b_HV);
   nt->SetBranchAddress("isTrigger", &isTrigger, &b_isTrigger);
+  nt->SetBranchAddress("X0", &X0, &b_X0);
   nt->SetBranchAddress("tdcX", &tdcX, &b_tdcX);
   nt->SetBranchAddress("tdcY", &tdcY, &b_tdcY);
 }
