@@ -22,3 +22,9 @@
         nt->SetBranchAddress("digiSampleIndex", digiSampleIndex, &b_digiSampleIndex);
         nt->SetBranchAddress("digiSampleValue", digiSampleValue, &b_digiSampleValue);
     }
+
+void InitTree2(TChain* nt2)
+{
+  nt2->SetBranchAddress("TDCreco", &TDCreco);//, &b_TDCreco); 
+        nt2->SetBranchAddress("spillNumber", &spillNumber, &b_spillNumber); 
+}
