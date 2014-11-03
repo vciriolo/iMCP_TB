@@ -79,7 +79,6 @@ int main (int argc, char** argv)
     std::map<int, std::string> MCPName; 
 
     int start=0;
-
     //-------start to read the cfg file--------
     while(!inputCfg.eof())  
     {
@@ -109,17 +108,39 @@ int main (int argc, char** argv)
       float intBase[10], intSignal[10], ampMax[10];
             int goodEvt=1;
       ///int fibreX[8], hodoYchannels[8];
+
+      //--reading wire chamber from other tree --
+      TChain* t1 = new TChain("outputTree");
+      InitTree2(t1);
+      //      sprintf(iRun_tW, "%s/%d/[0-9]*/dqmPlotstotal.root", (inputFolder).c_str(), run);
+      //      t1->Add(iRun_tW);
+
+      char command[300];
+      sprintf(command, "grep -r dqmPlotstotal.root %s/%d/ | grep -v total/dqmPlotstotal.root >> listTemp.txt", (inputFolder).c_str(), run);
+    system(command);
+    ifstream rootList ("listTemp.txt");
+    while (!rootList.eof())
+      {
+	char a[100], b[100], c[100], d[100];
+      char iRun_tW[70];
+      rootList >> a >> b >> c >> iRun_tW >> d;
+      t1->Add(iRun_tW);	
+      }
+    system("rm listTemp.txt");
+
       //---Chain
       TChain* chain = new TChain("H4tree");
       InitTree(chain);
       //-----Read raw data tree-----------------------------------------------
-      char iRun_str[40];
+      char iRun_str[70];
       sprintf(iRun_str, "%s/%d/[0-9]*.root", (inputFolder).c_str(), run);
       chain->Add(iRun_str);
       cout << "\nReading:  "<<iRun_str << endl;
+
       //-----Data loop--------------------------------------------------------
       for(int iEntry=0; iEntry<chain->GetEntries(); iEntry++){
 	//	for(int iEntry=0; iEntry<10; iEntry++){    //RA
+
 	    if(iEntry % 1000 == 0)
 		cout << "read entry: " << iEntry << endl;
             //-----Unpack data--------------------------------------------------
@@ -200,6 +221,11 @@ int main (int argc, char** argv)
 
       	     run_id = run;
 	     X0     = X0temp;
+
+	     t1->GetEntry(iEntry);
+	     tdcX = (*TDCreco)[0];
+	     tdcY = (*TDCreco)[1];
+
 	     outTree->Fill();    
 	     //  }
 	}     
