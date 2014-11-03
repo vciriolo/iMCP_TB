@@ -116,8 +116,8 @@ int main (int argc, char** argv)
       //      t1->Add(iRun_tW);
 
       char command[300];
-      sprintf(command, "grep -r dqmPlotstotal.root %s/%d/ | grep -v total/dqmPlotstotal.root >> listTemp.txt", (inputFolder).c_str(), run);
-    system(command);
+      sprintf(command, "find  %s/%d/*/dqmPlotstotal.root >> listTemp.txt", (inputFolder).c_str(), run);
+      system(command);
     ifstream rootList ("listTemp.txt");
     while (!rootList.eof())
       {
@@ -184,7 +184,7 @@ int main (int argc, char** argv)
                 {
                     SubtractBaseline(5, 25, &digiCh[iCh]);
                     timeCF[iCh]=TimeConstFrac(47, 500, &digiCh[iCh], 0.5);
-		    timeOT[iCh]=TimeOverThreshold(210, 500, &digiCh[iCh], -20.);
+		    timeOT[iCh]=TimeOverThreshold(40, 800, &digiCh[iCh], -30.);
                     int t1 = (int)(timeCF[iCh]/0.2) - 3;
                     int t2 = (int)(timeCF[iCh]/0.2) + 17;
                     intBase[iCh] = ComputeIntegral(26, 46, &digiCh[iCh]);
