@@ -111,20 +111,21 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
   float Sxx = 0.;
   float Sxy = 0.;
   float Chi2 = 0.;
-  int minSample = t1;
+  int startSample = t1;
+  float startValue = 0;
   int otSample = t1;       // first sample over threshold
-  float minValue = 0;
+
 
   for(int iSample=t1; iSample<t2; iSample++){
     //      std::cout << " iSample = " << iSample << " samples->at(iSample) = " << samples->at(iSample) << " threshold = " << threshold << std::endl;
     if(samples->at(iSample) < threshold){
-      minSample = iSample;
+      startSample = iSample;
       break;
     }
   }
-  minValue = samples->at(minSample);
+  startValue = samples->at(startSample);
   
-  for(int iSample=minSample; iSample>t1; iSample--){
+  for(int iSample=startSample; iSample>t1; iSample--){
     if(samples->at(iSample) > threshold){
       otSample = iSample;
       //	    std::cout << " start otSample = " << otSample << " samples->at(iSample) = " << samples->at(iSample) << std::endl;
@@ -153,7 +154,7 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
   } 
 
   // A+Bx = threshold
-  float tStart = (samples->at(minSample) - A) / B;
+  float tStart = (samples->at(startSample) - A) / B;
   // std::cout << " >>> tStart = " << tStart << std::endl;
   // std::cout << " >>> A = " << A << " B = " << B << std::endl;
   
@@ -165,19 +166,20 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
   Sxx = 0.;
   Sxy = 0.;
   Chi2 = 0.;
-  minSample = t1;
+  float stopSample = t1;
+  float stopValue = 0;
   otSample = t1; 
-  minValue = 0;
+
   
   for(int iSample=t2; iSample>t1; iSample--){
     if(samples->at(iSample) < threshold){
-      minSample = iSample;
+      stopSample = iSample;
       break;
     }
   }
-  minValue = samples->at(minSample);
+  stopValue = samples->at(stopSample);
   
-  for(int iSample=minSample; iSample<t2; iSample++){
+  for(int iSample=stopSample; iSample<t2; iSample++){
     if(samples->at(iSample) > threshold){
       otSample = iSample;
       //	    std::cout << " stop otSample = " << otSample <<  " samples->at(iSample) = " << samples->at(iSample) <<std::endl;
@@ -206,11 +208,12 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
   } 
 
   // A+Bx = threshold
-  float tStop = (samples->at(minSample) - A) / B;
+  float tStop = (samples->at(stopSample) - A) / B;
   // std::cout << " >>> tStop = " << tStop << std::endl;
   // std::cout << " >>> A = " << A << " B = " << B << std::endl;
   ///    std::cout << " >>> DT = " << tStop - tStart << std::endl;
-  return (tStop - tStart);
+  //  return (tStop - tStart);
+  return (stopSample - startSample) * step;
 }
 
 //---------------------------------------------------------------------------------------
