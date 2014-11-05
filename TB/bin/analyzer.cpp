@@ -193,7 +193,7 @@ int main(int argc, char** argv)
 
       int acc = 1*(float(h_base->GetEntries())/2000.); //estimated from pedestal run
     
-            std::cout<<h_sig->GetEntries()<<" "<<h_trig0->GetEntries()<<" "<<h_base->GetEntries()<<std::endl;
+      //            std::cout<<h_sig->GetEntries()<<" "<<h_trig0->GetEntries()<<" "<<h_base->GetEntries()<<std::endl;
       float eff = h_sig->GetEntries()/h_trig0->GetEntries();
       float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
 
