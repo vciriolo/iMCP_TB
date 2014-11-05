@@ -80,6 +80,8 @@ int main (int argc, char** argv)
   std::ofstream outputFile ((outputFileName).c_str(), std::ofstream::out);
   std::string outputFileName3s = "cfg/treshold_3s.txt";
   std::ofstream outputFile3s ((outputFileName3s).c_str(), std::ofstream::out);
+  std::string outputFileName5s = "cfg/treshold_5s.txt";
+  std::ofstream outputFile5s ((outputFileName5s).c_str(), std::ofstream::out);
 
   char hBNameFit[100] = "hB_0_Fit";
   TH1F *hBFit = new TH1F(hBNameFit,hBNameFit, 30, -500, 500);
@@ -109,7 +111,7 @@ int main (int argc, char** argv)
 	  sprintf(hBDrawFit, "baseline[%d]>>%s", iCh, hBNameFit);
 
 	  char cut[300];
-	  sprintf(cut, "isPCOn[%d]!=0 && HV[%d]>=%d", iCh, iCh, HVtresh); 
+	  sprintf(cut, "isPCOn[%d]!=2 && HV[%d]>=%d && tdcX > -8 && tdcX < 0 && tdcY >-2 && tdcY < 6", iCh, iCh, HVtresh); 
 
 	  inputTree->Draw(hSDraw,cut,"goff");
 	  inputTree->Draw(hBDraw,cut,"goff");
@@ -120,6 +122,7 @@ int main (int argc, char** argv)
      	  hBFit->Fit(base,"QN");
 	  std::cout<<"sigma baseline: "<<base->GetParameter(2)<<std::endl;
 	  outputFile3s << iCh << "  "<<(int)(base->GetParameter(2)*3)<<std::endl;
+	  outputFile5s << iCh << "  "<<(int)(base->GetParameter(2)*5)<<std::endl;
 
 	  char gName[50];
 	  sprintf(gName, "g_SoB_%d", iCh);
@@ -181,6 +184,7 @@ int main (int argc, char** argv)
   */  
   std::cout<<"\nS/B=1000: treshold values printed in "<<outputFileName<<std::endl;
   std::cout<<"\n3sigma:   treshold values printed in "<<outputFileName3s<<std::endl;
+  std::cout<<"\n5sigma:   treshold values printed in "<<outputFileName5s<<std::endl;
   inputFile->Close();
   return 0;
 }
