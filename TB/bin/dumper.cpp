@@ -65,6 +65,10 @@ int main (int argc, char** argv)
     //---------output tree----------------
     TFile* outROOT = TFile::Open(("ntuples/reco_"+outputFile+".root").c_str(),"recreate");  
     outROOT->cd();
+
+    TProfile** wf_promed = new TProfile*[10];
+    for(int iCh=0; iCh<10; ++iCh) wf_promed[iCh] = new TProfile(Form("wf_promed_%d",iCh), "", 1024, 0., 1024.);
+
     TTree* outTree = new TTree("reco_tree", "reco_tree");
     outTree->SetDirectory(0);
     SetOutTree(outTree);
@@ -169,6 +173,7 @@ int main (int argc, char** argv)
             for(int iCh=0; iCh<nChannels; iCh++)
             {
                 digiCh[iCh].clear();
+
             }
             //---Read the entry
             chain->GetEntry(iEntry);
@@ -190,14 +195,26 @@ int main (int argc, char** argv)
 	    
 
 		//---Read digitizer samples
+	    //	    std::cout << " nDigiSamples = " << nDigiSamples << std::endl;
+	    for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
+	      if(iSample > 1024*10 - 1) break;
+	      if (digiGroup[iSample] == 1 && digiChannel[iSample] == 0)
+		digiCh[9].push_back(digiSampleValue[iSample]);
+	      else
+		digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
+	    }
+
+	    /*
              for(unsigned int iSample=0; iSample<nDigiSamples; iSample++)
 	       {
-		 if (digiGroup[iSample]==1 && digiChannel[iSample]==0)
-                        digiCh[9].push_back(digiSampleValue[iSample]);
+		 //		 std::cout << " iSample = " << iSample << "  >> digiChannel[iSample] = " << digiChannel[iSample] << std::endl;
+		 if(digiGroup[iSample]==1 && digiChannel[iSample]==0)
+		   digiCh[9].push_back(digiSampleValue[iSample]);
 		 else
-                        digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
+		   digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
+		 if(digiGroup[iSample]==1 && digiChannel[iSample]>0) break;
 	       }
-
+	    */
                 //---loop over MPC's channels
              for(int iCh=0; iCh<nChannels; iCh++)
                 {
@@ -211,7 +228,15 @@ int main (int argc, char** argv)
                     {
                         ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
                         intSignal[iCh] = ComputeIntegral(t1, t2, &digiCh[iCh]);
-			//			intSignalCF[iCh] = ComputeIntegral((int)(timeAM[iCh]/0.2)-5, (int)(timeAM[iCh]/0.2), &digiCh[iCh]);
+			//intSignalCF[iCh] = ComputeIntegral((int)(timeAM[iCh]/0.2)-5, (int)(timeAM[iCh]/0.2), &digiCh[iCh]);
+
+			//			std::cout << " digiCh[iCh].size() = " << digiCh[iCh].size() << std::endl;
+			if(ampMax[iCh] < -30.){
+			  for(int iSample=0; iSample<digiCh[iCh].size(); ++iSample){
+			    wf_promed[iCh]->Fill(iSample, -1.*digiCh[iCh].at(iSample)/ampMax[iCh]);
+			//std::cout << " >>> iSample = " << iSample << " sample = " << digiCh[iCh].at(iSample) << " max = " << ampMax[iCh] << std::endl;
+			  }
+			}
                     }
                     else
                     {
@@ -251,6 +276,7 @@ int main (int argc, char** argv)
 	     }
 
 	     outTree->Fill();    
+
 	     //  }
 	}     
         //---Get ready for next run
@@ -259,6 +285,8 @@ int main (int argc, char** argv)
     }
 
     //-----close everything-----------------------------------------------------
+    for(int iCh=0; iCh<nChannels; iCh++)  wf_promed[iCh]->Write();
+
     outTree->Write();
     outROOT->Close();
     
