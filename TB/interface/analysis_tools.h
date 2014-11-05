@@ -68,4 +68,12 @@ float ComputeIntegral(int t1, int t2, const vector<float>* samples);
 //---build signal fitfunc
 TF1* GetFitFunc(TString Ch_n, histoFunc* wave, float t1, float t2); 
 
+
+float TimeStop(int t1, int t2, const vector<float>* samples, float threshold, 
+	       float step=DIGITIZER_SAMPLING_UNIT, int Nsamples = 5);
+
+float TimeStart(int t1, int t2, const vector<float>* samples, float threshold, 
+		float step=DIGITIZER_SAMPLING_UNIT, int Nsamples = 5);
+
+
 #endif

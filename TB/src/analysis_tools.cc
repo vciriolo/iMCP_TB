@@ -1,6 +1,15 @@
 #include "../interface/analysis_tools.h"
 
 using namespace std;
+/*
+// channel 4{
+Minimizer is Linear
+Chi2                      =      638.554
+NDf                       =          410
+p0                        =    0.0851218   +/-   0.0619423   
+p1                        =    0.0566303   +/-   0.000344791
+  }
+*/
 
 //----------------------------------------------------------------------------------------
 void DFT_lowCut(vector<float>* samples, float f_cut)
@@ -104,117 +113,43 @@ float TimeConstFrac(int t1, int t2, const vector<float>* samples, float AmpFract
 float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float threshold, 
 			float step, int Nsamples){
 
-  float xx = 0.;
-  float xy = 0.;
-  float Sx = 0.;
-  float Sy = 0.;
-  float Sxx = 0.;
-  float Sxy = 0.;
-  float Chi2 = 0.;
   int startSample = t1;
-  float startValue = 0;
-  int otSample = t1;       // first sample over threshold
-
+  int minSample = t1;
 
   for(int iSample=t1; iSample<t2; iSample++){
+    if(samples->at(iSample) < samples->at(minSample)) minSample = iSample;
+  }
+
+  for(int iSample=minSample; iSample>t1; --iSample){
     //      std::cout << " iSample = " << iSample << " samples->at(iSample) = " << samples->at(iSample) << " threshold = " << threshold << std::endl;
-    if(samples->at(iSample) < threshold){
+    if(samples->at(iSample) > threshold){
       startSample = iSample;
       break;
     }
   }
-  startValue = samples->at(startSample);
-  
-  for(int iSample=startSample; iSample>t1; iSample--){
-    if(samples->at(iSample) > threshold){
-      otSample = iSample;
-      //	    std::cout << " start otSample = " << otSample << " samples->at(iSample) = " << samples->at(iSample) << std::endl;
-      break;
-    }
-  }
-  for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++){
-    if(otSample+n<0) continue;
-    xx = (otSample+n)*(otSample+n)*step*step;
-    xy = (otSample+n)*step*(samples->at(otSample+n));
-    Sx = Sx + (otSample+n)*step;
-    Sy = Sy + samples->at(otSample+n);
-    Sxx = Sxx + xx;
-    Sxy = Sxy + xy;
-  }
 
-  float Delta = Nsamples*Sxx - Sx*Sx;
-  float A = (Sxx*Sy - Sx*Sxy) / Delta;
-  float B = (Nsamples*Sxy - Sx*Sy) / Delta;
-  
-  float sigma2 = pow(step/sqrt(12)*B,2);
-    
-  for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++){
-    if(otSample+n<0) continue;
-    Chi2 = Chi2 + pow(samples->at(otSample+n) - A - B*((otSample+n)*step),2)/sigma2;
-  } 
-
-  // A+Bx = threshold
-  float tStart = (samples->at(startSample) - A) / B;
+  float tStart = startSample;
   // std::cout << " >>> tStart = " << tStart << std::endl;
   // std::cout << " >>> A = " << A << " B = " << B << std::endl;
   
   ///////compute tStop
-  xx = 0.;
-  xy = 0.;
-  Sx = 0.;
-  Sy = 0.;
-  Sxx = 0.;
-  Sxy = 0.;
-  Chi2 = 0.;
-  float stopSample = t1;
-  float stopValue = 0;
-  otSample = t1; 
-
+  float stopSample = t2;
   
-  for(int iSample=t2; iSample>t1; iSample--){
-    if(samples->at(iSample) < threshold){
+  for(int iSample=minSample; iSample<t2; ++iSample){
+    if(samples->at(iSample) > threshold){
       stopSample = iSample;
       break;
     }
   }
-  stopValue = samples->at(stopSample);
-  
-  for(int iSample=stopSample; iSample<t2; iSample++){
-    if(samples->at(iSample) > threshold){
-      otSample = iSample;
-      //	    std::cout << " stop otSample = " << otSample <<  " samples->at(iSample) = " << samples->at(iSample) <<std::endl;
-      break;
-    }
-  }
-  for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++){
-    if(otSample+n<0) continue;
-    xx = (otSample+n)*(otSample+n)*step*step;
-    xy = (otSample+n)*step*(samples->at(otSample+n));
-    Sx = Sx + (otSample+n)*step;
-    Sy = Sy + samples->at(otSample+n);
-    Sxx = Sxx + xx;
-    Sxy = Sxy + xy;
-  }
-  
-  Delta = Nsamples*Sxx - Sx*Sx;
-  A = (Sxx*Sy - Sx*Sxy) / Delta;
-  B = (Nsamples*Sxy - Sx*Sy) / Delta;
-  
-  sigma2 = pow(step/sqrt(12)*B,2);
-  
-  for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++){
-    if(otSample+n<0) continue;
-    Chi2 = Chi2 + pow(samples->at(otSample+n) - A - B*((otSample+n)*step),2)/sigma2;
-  } 
 
-  // A+Bx = threshold
-  float tStop = (samples->at(stopSample) - A) / B;
+  float tStop = stopSample;
   // std::cout << " >>> tStop = " << tStop << std::endl;
   // std::cout << " >>> A = " << A << " B = " << B << std::endl;
   ///    std::cout << " >>> DT = " << tStop - tStart << std::endl;
   //  return (tStop - tStart);
-  return (stopSample - startSample) * step;
+  return (stopSample - startSample);
 }
+
 
 //---------------------------------------------------------------------------------------
 //---compute the maximum amplitude for negative signals (range selectable)
@@ -253,3 +188,56 @@ TF1* GetFitFunc(TString Ch_n, histoFunc* wave, float t1, float t2)
     
     return fitFunc;
 }
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------------------
+//---estimate time (ns) with CFD, samples must be a negative signal and baseline subtracted
+float TimeStart(int t1, int t2, const vector<float>* samples, float threshold, 
+		float step, int Nsamples){
+
+  int startSample = t1;
+  int minSample = t1;
+
+  for(int iSample=t1; iSample<t2; iSample++){
+    if(samples->at(iSample) < samples->at(minSample)) minSample = iSample;
+  }
+
+  for(int iSample=minSample; iSample>t1; --iSample){
+    //      std::cout << " iSample = " << iSample << " samples->at(iSample) = " << samples->at(iSample) << " threshold = " << threshold << std::endl;
+    if(samples->at(iSample) > threshold){
+      startSample = iSample;
+      break;
+    }
+  }
+
+  float tStart = startSample;
+  return (startSample * step);
+}
+
+//---------------------------------------------------------------------------------------
+//---estimate time (ns) with CFD, samples must be a negative signal and baseline subtracted
+float TimeStop(int t1, int t2, const vector<float>* samples, float threshold, 
+	       float step, int Nsamples){
+  ///////compute tStop
+  float stopSample = t2;
+  float minSample = t1;
+
+  for(int iSample=t1; iSample<t2; iSample++){
+    if(samples->at(iSample) < samples->at(minSample)) minSample = iSample;
+  }
+
+  for(int iSample=minSample; iSample<t2; ++iSample){
+    if(samples->at(iSample) > threshold){
+      stopSample = iSample;
+      break;
+    }
+  }
+
+  return (stopSample * step);
+}
+
