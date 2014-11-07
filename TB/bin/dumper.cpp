@@ -235,9 +235,9 @@ int main (int argc, char** argv)
 		      }
 
 		    //correct for time over threshold
-		    if(ampMax[iCh] > 1000.){
-		      ampMaxcorr[iCh] = getAmplitude_fromTot(iCh, timeOT[iCh]);
-		      intSignalcorr[iCh] = getSignal_fromAmplitude(iCh, ampMaxcorr[iCh]);
+		    if(ampMax[iCh] < -1000.){
+		      ampMaxcorr[iCh] = -1. * getAmplitude_fromTot(iCh, timeOT[iCh]);
+		      intSignalcorr[iCh] = 1. * getSignal_fromAmplitude(iCh, -1. * ampMaxcorr[iCh]);
 		    }
 		    else{
 		      ampMaxcorr[iCh] = ampMax[iCh];
