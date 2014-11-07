@@ -109,7 +109,7 @@ int main (int argc, char** argv)
       vector<float> digiCh[10];
       float timeCF[10];
       float timeOT[10];
-      float intBase[10], intSignal[10], ampMax[10];
+      float intBase[10], intSignal[10], intSignalcorr[10], ampMax[10], ampMaxcorr[10];
             int goodEvt=1;
       ///int fibreX[8], hodoYchannels[8];
 
@@ -128,41 +128,41 @@ int main (int argc, char** argv)
       sprintf(command2, "find  %s/%d/[0-9]*.root > listTemp2.txt", (inputFolder).c_str(), run);
       system(command2);
 
-    ifstream rootList ("listTemp.txt");
-    ifstream rootList2 ("listTemp2.txt");
+      ifstream rootList ("listTemp.txt");
+      ifstream rootList2 ("listTemp2.txt");
 
-    while (!rootList.eof() && !rootList2.eof())
-      {
-	char iRun_tW[70];
-	rootList >> iRun_tW;
-	char iRun_str[70];
-	rootList2 >> iRun_str;
-
-	TChain* tTemp = new TChain("outputTree");
-	tTemp->Add(iRun_tW);
-	TChain* tTempH4 = new TChain("H4tree");
-	tTempH4->Add(iRun_str);
-
-	if (tTemp->GetEntries() == tTempH4->GetEntries())
-	  {
-	    t1->Add(iRun_tW);	
-	    chain->Add(iRun_str);	
-	  }
-	else
-	  std::cout<<"Bad spill found.. Skipped"<<std::endl;
-      }
-
-    system("rm listTemp.txt");
-    system("rm listTemp2.txt");
-
-    std::cout<<"start reading run: "<<run<<std::endl;
-
-    /*      //-----Read raw data tree-----------------------------------------------
-      char iRun_str[70];
-      sprintf(iRun_str, "%s/%d/[0-9]*.root", (inputFolder).c_str(), run);
-      chain->Add(iRun_str);
-      cout << "\nReading:  "<<iRun_str << endl;
-    */
+      while (!rootList.eof() && !rootList2.eof())
+	{
+	  char iRun_tW[70];
+	  rootList >> iRun_tW;
+	  char iRun_str[70];
+	  rootList2 >> iRun_str;
+	  
+	  TChain* tTemp = new TChain("outputTree");
+	  tTemp->Add(iRun_tW);
+	  TChain* tTempH4 = new TChain("H4tree");
+	  tTempH4->Add(iRun_str);
+	  
+	  if (tTemp->GetEntries() == tTempH4->GetEntries())
+	    {
+	      t1->Add(iRun_tW);	
+	      chain->Add(iRun_str);	
+	    }
+	  else
+	    std::cout<<"Bad spill found.. Skipped"<<std::endl;
+	}
+      
+      system("rm listTemp.txt");
+      system("rm listTemp2.txt");
+      
+      std::cout<<"start reading run: "<<run<<std::endl;
+      
+      /*      //-----Read raw data tree-----------------------------------------------
+	      char iRun_str[70];
+	      sprintf(iRun_str, "%s/%d/[0-9]*.root", (inputFolder).c_str(), run);
+	      chain->Add(iRun_str);
+	      cout << "\nReading:  "<<iRun_str << endl;
+      */
       //-----Data loop--------------------------------------------------------
       for(int iEntry=0; iEntry<chain->GetEntries(); iEntry++){
 	//	for(int iEntry=0; iEntry<10; iEntry++){    //RA
@@ -194,7 +194,7 @@ int main (int argc, char** argv)
 		}
 	    
 
-		//---Read digitizer samples
+	    //---Read digitizer samples
 	    //	    std::cout << " nDigiSamples = " << nDigiSamples << std::endl;
 	    for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
 	      if(iSample > 1024*10 - 1) break;
@@ -204,20 +204,9 @@ int main (int argc, char** argv)
 		digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
 	    }
 
-	    /*
-             for(unsigned int iSample=0; iSample<nDigiSamples; iSample++)
-	       {
-		 //		 std::cout << " iSample = " << iSample << "  >> digiChannel[iSample] = " << digiChannel[iSample] << std::endl;
-		 if(digiGroup[iSample]==1 && digiChannel[iSample]==0)
-		   digiCh[9].push_back(digiSampleValue[iSample]);
-		 else
-		   digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
-		 if(digiGroup[iSample]==1 && digiChannel[iSample]>0) break;
-	       }
-	    */
-                //---loop over MPC's channels
-             for(int iCh=0; iCh<nChannels; iCh++)
-                {
+	    //---loop over MPC's channels
+	    for(int iCh=0; iCh<nChannels; iCh++)
+	      {
                     SubtractBaseline(5, 25, &digiCh[iCh]);
                     timeCF[iCh]=TimeConstFrac(47, 500, &digiCh[iCh], 0.5);
 		    timeOT[iCh]=TimeOverThreshold(40, 800, &digiCh[iCh], -30.);
@@ -225,26 +214,36 @@ int main (int argc, char** argv)
                     int t2 = (int)(timeCF[iCh]/0.2) + 17;
                     intBase[iCh] = ComputeIntegral(26, 46, &digiCh[iCh]);
                     if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024)
-                    {
+		      {
                         ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
                         intSignal[iCh] = ComputeIntegral(t1, t2, &digiCh[iCh]);
 			//intSignalCF[iCh] = ComputeIntegral((int)(timeAM[iCh]/0.2)-5, (int)(timeAM[iCh]/0.2), &digiCh[iCh]);
 
-			//			std::cout << " digiCh[iCh].size() = " << digiCh[iCh].size() << std::endl;
-			if(ampMax[iCh] < -30.){
+			if(ampMax[iCh] < -30. && ampMax[iCh] > -2000.){
+			  int timeMax = TimeConstFrac(47, 500, &digiCh[iCh], 1.)/0.2;
 			  for(int iSample=0; iSample<digiCh[iCh].size(); ++iSample){
-			    wf_promed[iCh]->Fill(iSample, -1.*digiCh[iCh].at(iSample)/ampMax[iCh]);
-			//std::cout << " >>> iSample = " << iSample << " sample = " << digiCh[iCh].at(iSample) << " max = " << ampMax[iCh] << std::endl;
+			    if((iSample + 300 - timeMax) < 1024. && (iSample + 300 - timeMax) > 0.)
+			      wf_promed[iCh]->Fill(iSample + 300 - timeMax, -1.*digiCh[iCh].at(iSample)/ampMax[iCh]);
 			  }
 			}
-                    }
+		      }
                     else
-                    {
+		      {
                         ampMax[iCh] = AmpMax(0, 1024, &digiCh[iCh]);
                         intSignal[iCh] = ComputeIntegral(50, 70, &digiCh[iCh]);
 			//			intSignalCF[iCh] = 2000;
-                    }
-                }
+		      }
+
+		    //correct for time over threshold
+		    if(ampMax[iCh] > 1000.){
+		      ampMaxcorr[iCh] = getAmplitude_fromTot(iCh, timeOT[iCh]);
+		      intSignalcorr[iCh] = getSignal_fromAmplitude(iCh, ampMaxcorr[iCh]);
+		    }
+		    else{
+		      ampMaxcorr[iCh] = ampMax[iCh];
+		      intSignalcorr[iCh] = intSignal[iCh];
+		    }
+	      }
 
 	     //--------dump ntuple - impulses are negative, invert the sign
 	     for (int iCh=0; iCh<nChannels; iCh++)
@@ -252,7 +251,9 @@ int main (int argc, char** argv)
 		    time_CF[MCPList.at(MCPName.at(iCh))]   = timeCF[iCh];
 		    time_OT[MCPList.at(MCPName.at(iCh))]   = timeOT[iCh];
 		    amp_max[MCPList.at(MCPName.at(iCh))]   = -ampMax[iCh];
+		    amp_max_corr[MCPList.at(MCPName.at(iCh))]   = -ampMaxcorr[iCh];
 		    charge[MCPList.at(MCPName.at(iCh))]    = -intSignal[iCh];
+		    charge_corr[MCPList.at(MCPName.at(iCh))]    = -intSignalcorr[iCh];
 		    baseline[MCPList.at(MCPName.at(iCh))]  = -intBase[iCh];
 
 		    isPCOn[MCPList.at(MCPName.at(iCh))]      = PCOn.at(iCh);
@@ -283,9 +284,9 @@ int main (int argc, char** argv)
         chain->Delete();
 	t1->Delete();
     }
-
+    
     //-----close everything-----------------------------------------------------
-    for(int iCh=0; iCh<nChannels; iCh++)  wf_promed[iCh]->Write();
+    for(int iCh=0; iCh<nChannels; iCh++) wf_promed[iCh]->Write();
 
     outTree->Write();
     outROOT->Close();

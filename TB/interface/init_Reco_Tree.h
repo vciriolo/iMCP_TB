@@ -8,7 +8,9 @@
 float                 time_CF[10]={};   
 float                 time_OT[10]={};   
 float                 amp_max[10]={};   
+float                 amp_max_corr[10]={};   
 float                 charge[10]={};   
+float                 charge_corr[10]={};   
 float                 baseline[10]={};   
 int                   fibreX[8]={};   
 int                   fibreY[8]={};   
@@ -25,8 +27,10 @@ float tdcY=-999.;
     TBranch        *b_time_CF;   //!
     TBranch        *b_time_OT;   //!
     TBranch        *b_amp_max;   //!
+    TBranch        *b_amp_max_corr;   //!
     TBranch        *b_baseline;   //!
     TBranch        *b_charge;   //!
+    TBranch        *b_charge_corr;   //!
     TBranch        *b_fibreX;   //!
     TBranch        *b_fibreY;   //!
     TBranch        *b_sci_front_adc;   //!

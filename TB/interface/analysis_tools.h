@@ -41,6 +41,8 @@ using namespace std;
 
 double getAmplitude_fromTot(int iCh, float ix);
 
+double getSignal_fromAmplitude(int iCh, float ix);
+
 //----------------------------------------------------------------------------------------
 void DFT_lowCut(vector<float>* samples, float f_cut);
 

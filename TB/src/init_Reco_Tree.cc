@@ -10,7 +10,9 @@ void SetOutTree(TTree* outTree)
   outTree->Branch("time_CF",&time_CF,"time_CF[10]/F");
   outTree->Branch("time_OT",&time_OT,"time_OT[10]/F");
   outTree->Branch("amp_max",&amp_max,"amp_max[10]/F");
-  outTree->Branch("charge",&charge,"charge[10]/F");
+  outTree->Branch("amp_max_corr",&amp_max_corr,"amp_max_corr[10]/F");
+  outTree->Branch("charge",&charge,"charge[10]/F"); 
+  outTree->Branch("charge_corr",&charge_corr,"charge_corr[10]/F");
   outTree->Branch("baseline",&baseline,"baseline[10]/F");
   
   //---hodoscope branches       
@@ -38,7 +40,9 @@ void InitRecoTree(TTree* nt)
   nt->SetBranchAddress("time_CF", &time_CF, &b_time_CF);
   nt->SetBranchAddress("time_OT", &time_OT, &b_time_OT);
   nt->SetBranchAddress("amp_max", &amp_max, &b_amp_max);
+  nt->SetBranchAddress("amp_max_corr", &amp_max_corr, &b_amp_max_corr);
   nt->SetBranchAddress("charge", &charge, &b_charge);
+  nt->SetBranchAddress("charge_corr", &charge_corr, &b_charge_corr);
   nt->SetBranchAddress("baseline", &baseline, &b_baseline);
   nt->SetBranchAddress("fibreX", &fibreX, &b_fibreX);
   nt->SetBranchAddress("fibreY", &fibreY, &b_fibreY);

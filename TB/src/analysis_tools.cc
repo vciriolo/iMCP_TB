@@ -15,6 +15,20 @@ double getAmplitude_fromTot(int iCh, float ix){
   return func->Eval(ix);
 }
 
+double getSignal_fromAmplitude(int iCh, float ix){
+
+  // TF1* func = new TF1("func", "[0] + [1] * x + [2] * x*x + [3] * x*x*x + [4] * x*x*x*x", 0., 1000.);
+
+  // if(iCh == 4) func->SetParameters(1.12648e+03, -2.56113e+01, 1.63616e+00, -3.15637e-02, 2.29793e-04);
+  // if(iCh == 5) func->SetParameters(1.02036e+03, -4.70789e+00, 7.15330e-01, -1.71378e-02, 1.84110e-04);
+  // if(iCh == 6) func->SetParameters(1.01040e+03, -2.92853e+00, 5.80857e-01, -1.14420e-02, 1.28716e-04);
+  // if(iCh == 7) func->SetParameters(1.08410e+03, -1.66636e+01, 1.11720e+00, -1.83232e-02, 1.06718e-04);
+  // if(iCh == 9) func->SetParameters(1.08692e+03, -1.92588e+01, 1.30588e+00, -2.32895e-02, 1.57087e-04);
+  // if(iCh < 4 || iCh == 8) return -1;
+  //  return func->Eval(ix);
+  return -1;
+}
+
 //----------------------------------------------------------------------------------------
 void DFT_lowCut(vector<float>* samples, float f_cut)
 {
