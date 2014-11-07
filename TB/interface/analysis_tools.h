@@ -39,6 +39,8 @@ using namespace std;
 #define HODOY_ADC_MID_CHANNEL 27
 #define HODOY_ADC_END_CHANNEL 31
 
+double getAmplitude_fromTot(int iCh, float ix);
+
 //----------------------------------------------------------------------------------------
 void DFT_lowCut(vector<float>* samples, float f_cut);
 

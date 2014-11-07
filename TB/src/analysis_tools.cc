@@ -1,15 +1,19 @@
 #include "../interface/analysis_tools.h"
 
 using namespace std;
-/*
-// channel 4{
-Minimizer is Linear
-Chi2                      =      638.554
-NDf                       =          410
-p0                        =    0.0851218   +/-   0.0619423   
-p1                        =    0.0566303   +/-   0.000344791
-  }
-*/
+
+double getAmplitude_fromTot(int iCh, float ix){
+
+  TF1* func = new TF1("func", "[0] + [1] * x + [2] * x*x + [3] * x*x*x + [4] * x*x*x*x", 0., 1000.);
+
+  if(iCh == 4) func->SetParameters(1.12648e+03, -2.56113e+01, 1.63616e+00, -3.15637e-02, 2.29793e-04);
+  if(iCh == 5) func->SetParameters(1.02036e+03, -4.70789e+00, 7.15330e-01, -1.71378e-02, 1.84110e-04);
+  if(iCh == 6) func->SetParameters(1.01040e+03, -2.92853e+00, 5.80857e-01, -1.14420e-02, 1.28716e-04);
+  if(iCh == 7) func->SetParameters(1.08410e+03, -1.66636e+01, 1.11720e+00, -1.83232e-02, 1.06718e-04);
+  if(iCh == 9) func->SetParameters(1.08692e+03, -1.92588e+01, 1.30588e+00, -2.32895e-02, 1.57087e-04);
+  if(iCh < 4 || iCh == 8) return -1;
+  return func->Eval(ix);
+}
 
 //----------------------------------------------------------------------------------------
 void DFT_lowCut(vector<float>* samples, float f_cut)
@@ -113,6 +117,13 @@ float TimeConstFrac(int t1, int t2, const vector<float>* samples, float AmpFract
 float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float threshold, 
 			float step, int Nsamples){
 
+  float xx= 0.;
+  float xy= 0.;
+  float Sx = 0.;
+  float Sy = 0.;
+  float Sxx = 0.;
+  float Sxy = 0.;
+  float Chi2 = 0.;
   int startSample = t1;
   int minSample = t1;
 
@@ -127,12 +138,46 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
       break;
     }
   }
+  //interpolation
+  for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
+    {
+      if(startSample+n<0) continue;
+      xx = (startSample+n)*(startSample+n)*step*step;
+      xy = (startSample+n)*step*(samples->at(startSample+n));
+      Sx = Sx + (startSample+n)*step;
+      Sy = Sy + samples->at(startSample+n);
+      Sxx = Sxx + xx;
+      Sxy = Sxy + xy;
+    }
+
+  float Delta = Nsamples*Sxx - Sx*Sx;
+  float A = (Sxx*Sy - Sx*Sxy) / Delta;
+  float B = (Nsamples*Sxy - Sx*Sy) / Delta;
+
+  //  float sigma2 = pow(step/sqrt(12)*B,2);
+
+  // for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
+  //   {
+  //     if(startSample+n<0) continue;
+  //     Chi2 = Chi2 + pow(samples->at(startSample+n) - A - B*((startSample+n)*step),2)/sigma2;
+  //   }
+
+  // A+Bx = threshold
 
   float tStart = startSample;
-  // std::cout << " >>> tStart = " << tStart << std::endl;
-  // std::cout << " >>> A = " << A << " B = " << B << std::endl;
+  float tStart_int = (samples->at(startSample) - A) / B / step;
+  //  std::cout << " >>> tStart = " << tStart << " tStart_int = " << tStart_int << std::endl;
+  //  std::cout << " >>> A = " << A << " B = " << B << std::endl;
   
   ///////compute tStop
+  xx = 0.;
+  xy = 0.;
+  Sx = 0.;
+  Sy = 0.;
+  Sxx = 0.;
+  Sxy = 0.;
+  //  Chi2 = 0.;
+
   float stopSample = t2;
   
   for(int iSample=minSample; iSample<t2; ++iSample){
@@ -142,12 +187,38 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
     }
   }
 
+  for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
+    {
+      if(stopSample+n<0) continue;
+      xx = (stopSample+n)*(stopSample+n)*step*step;
+      xy = (stopSample+n)*step*(samples->at(stopSample+n));
+      Sx = Sx + (stopSample+n)*step;
+      Sy = Sy + samples->at(stopSample+n);
+      Sxx = Sxx + xx;
+      Sxy = Sxy + xy;
+    }
+
+  Delta = Nsamples*Sxx - Sx*Sx;
+  A = (Sxx*Sy - Sx*Sxy) / Delta;
+  B = (Nsamples*Sxy - Sx*Sy) / Delta;
+
+  // sigma2 = pow(step/sqrt(12)*B,2);
+
+  // for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
+  //   {
+  //     if(stopSample+n<0) continue;
+  //     Chi2 = Chi2 + pow(samples->at(stopSample+n) - A - B*((stopSample+n)*step),2)/sigma2;
+  //   }
+
+  // A+Bx = thresh
   float tStop = stopSample;
+  float tStop_int = (samples->at(stopSample) - A) / B / step;
+  //  std::cout << " >>> tStart = " << tStop << " tStop_int = " << tStop_int << std::endl;
   // std::cout << " >>> tStop = " << tStop << std::endl;
   // std::cout << " >>> A = " << A << " B = " << B << std::endl;
   ///    std::cout << " >>> DT = " << tStop - tStart << std::endl;
   //  return (tStop - tStart);
-  return (stopSample - startSample);
+  return (tStop_int - tStart_int) / step;
 }
 
 
