@@ -209,7 +209,7 @@ int main (int argc, char** argv)
 	      {
                     SubtractBaseline(5, 25, &digiCh[iCh]);
                     timeCF[iCh]=TimeConstFrac(47, 500, &digiCh[iCh], 0.5);
-		    timeOT[iCh]=TimeOverThreshold(40, 800, &digiCh[iCh], -30.);
+		    timeOT[iCh]=TimeOverThreshold(40, 800, &digiCh[iCh], -1000.);
                     int t1 = (int)(timeCF[iCh]/0.2) - 3;
                     int t2 = (int)(timeCF[iCh]/0.2) + 17;
                     intBase[iCh] = ComputeIntegral(26, 46, &digiCh[iCh]);
