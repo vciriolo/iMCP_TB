@@ -204,23 +204,48 @@ int main (int argc, char** argv)
 		digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
 	    }
 
+
+	    int triggerTime=100;  //DON'T CHANGE THIS!!!!!
+	    SubtractBaseline(5, 25, &digiCh[4]); //trigger baseline subtraction
+	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[4], 0.5)/0.2); //triggerCF
+	    if (triggerTime<100 || triggerTime >800)  continue;
+
 	    //---loop over MPC's channels
 	    for(int iCh=0; iCh<nChannels; iCh++)
 	      {
-                    SubtractBaseline(5, 25, &digiCh[iCh]);
-                    timeCF[iCh]=TimeConstFrac(47, 500, &digiCh[iCh], 0.5);
-		    timeOT[iCh]=TimeOverThreshold(40, 800, &digiCh[iCh], -1000.);
-                    int t1 = (int)(timeCF[iCh]/0.2) - 3;
-                    int t2 = (int)(timeCF[iCh]/0.2) + 17;
-                    intBase[iCh] = ComputeIntegral(26, 46, &digiCh[iCh]);
+
+		//BEGIN OF CHANGES
+		    int ampMaxTimeTemp = TimeConstFrac(triggerTime-30, triggerTime+40, &digiCh[iCh], 1)/0.2; //time of max sample (window's coincidence:-30,40)
+		    if (iCh!=4)
+		      SubtractBaseline(ampMaxTimeTemp-30, ampMaxTimeTemp-10, &digiCh[iCh]);  //subtract baseline immediately before pulse
+
+		    //window for charge calculation
+		    int t1 = ampMaxTimeTemp-15;
+		    int t2 = ampMaxTimeTemp+25;
+
+		    //CF calculation:
+		    if (iCh==4)		      timeCF[iCh]=triggerTime*0.2;
+		    else                      timeCF[iCh]=TimeConstFrac(t1, t2, &digiCh[iCh], 0.5);
+
+		    timeOT[iCh]=TimeOverThreshold(t1, t2, &digiCh[iCh], -30); //LUCA: CHECK IF THIS IS OK!!!
+		    //		    timeOT[iCh]=TimeOverThreshold(40, 800, &digiCh[iCh], -1000.);
+
+		    intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
+
+		    //IS IT OK TO CHANGE THIS??
+		    //                    int t1 = (int)(timeCF[iCh]/0.2) - 3;
+		    //                    int t2 = (int)(timeCF[iCh]/0.2) + 17;
+
+		    //END OF CHANGES
+		    
                     if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024)
 		      {
                         ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
                         intSignal[iCh] = ComputeIntegral(t1, t2, &digiCh[iCh]);
 			//intSignalCF[iCh] = ComputeIntegral((int)(timeAM[iCh]/0.2)-5, (int)(timeAM[iCh]/0.2), &digiCh[iCh]);
 
-			if(ampMax[iCh] < -30. && ampMax[iCh] > -2000.){
-			  int timeMax = TimeConstFrac(47, 500, &digiCh[iCh], 1.)/0.2;
+			if(ampMax[iCh] < -30. && ampMax[iCh] > -2000.){			
+			  int timeMax = TimeConstFrac(47, 500, &digiCh[iCh], 1.)/0.2; //LUCA: maybe for this we can use ampMaxTimeTemp...
 			  for(int iSample=0; iSample<digiCh[iCh].size(); ++iSample){
 			    if((iSample + 300 - timeMax) < 1024. && (iSample + 300 - timeMax) > 0.)
 			      wf_promed[iCh]->Fill(iSample + 300 - timeMax, -1.*digiCh[iCh].at(iSample)/ampMax[iCh]);
