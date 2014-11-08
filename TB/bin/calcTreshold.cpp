@@ -120,6 +120,8 @@ int main (int argc, char** argv)
 	  base->SetParameter(1,0);
 	  base->SetParameter(2,0);
      	  hBFit->Fit(base,"QN");
+	  base->SetParameter(1,base->GetParameter(1));
+	  hBFit->Fit(base,"QN","",base->GetParameter(1)-2*base->GetParameter(2), base->GetParameter(1)+2*base->GetParameter(2));
 	  std::cout<<"sigma baseline: "<<base->GetParameter(2)<<std::endl;
 	  outputFile3s << iCh << "  "<<(int)(base->GetParameter(2)*3)<<std::endl;
 	  outputFile5s << iCh << "  "<<(int)(base->GetParameter(2)*5)<<std::endl;
