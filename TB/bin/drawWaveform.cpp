@@ -161,20 +161,12 @@ int main (int argc, char** argv)
 	    SubtractBaseline(5, 25, &digiCh[4]);
 	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[4], 0.5)/0.2);
 	    if (triggerTime<100 || triggerTime >800)  continue;
-	    //---loop over MPC's channels                                                                                                                     
 
-		ampMaxTimeTemp = TimeConstFrac(triggerTime-30, triggerTime+40, &digiCh[channel], 1)/0.2;
-		int intBefore = ComputeIntegral(ampMaxTimeTemp-30, ampMaxTimeTemp-10, &digiCh[channel]);              
-		    SubtractBaseline(ampMaxTimeTemp-30, ampMaxTimeTemp-10, &digiCh[channel]);
-                               
-		    //		    std::cout<<ampMaxTimeTemp+te1<<std::endl;
+		ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[channel], 1)/0.2;
+		    SubtractBaseline(ampMaxTimeTemp-35, ampMaxTimeTemp-15, &digiCh[channel]);
 
-		  int timeCF=TimeConstFrac(triggerTime-20, triggerTime+30, &digiCh[channel], 0.5);
-		  te1 = (int)(timeCF/0.2) - 8;
-		  te2 = (int)(timeCF/0.2) + 22;
-
-		  //		  		  std::cout<<iEntry<<std::endl;
-		  //		  if (AmpMax(5, 25, &digiCh[channel]) >50)  getchar();
+		    //		int intBefore = ComputeIntegral(26, 50, &digiCh[channel]);              
+		    
 
 	  for(unsigned int iSample=0; iSample<digiCh[channel].size(); iSample++){
 	    gWF->SetPoint(i, i, digiCh[channel].at(iSample));
