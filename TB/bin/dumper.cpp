@@ -150,6 +150,8 @@ int main (int argc, char** argv)
 	    }
 	  else
 	    std::cout<<"Bad spill found.. Skipped"<<std::endl;
+	  tTemp->Delete();
+	  tTempH4->Delete();
 	}
       
       system("rm listTemp.txt");
@@ -260,14 +262,14 @@ int main (int argc, char** argv)
 		      }
 
 		    //correct for time over threshold
-		    if(ampMax[iCh] < -1000.){
-		      ampMaxcorr[iCh] = -1. * getAmplitude_fromTot(iCh, timeOT[iCh]);
-		      intSignalcorr[iCh] = 1. * getSignal_fromAmplitude(iCh, -1. * ampMaxcorr[iCh]);
-		    }
-		    else{
+		     if(ampMax[iCh] < -1000.){
+		    		      ampMaxcorr[iCh] = -1. * getAmplitude_fromTot(iCh, timeOT[iCh]);
+		    		      intSignalcorr[iCh] = 1. * getSignal_fromAmplitude(iCh, -1. * ampMaxcorr[iCh]);
+		      }
+		     else{
 		      ampMaxcorr[iCh] = ampMax[iCh];
 		      intSignalcorr[iCh] = intSignal[iCh];
-		    }
+		      }
 	      }
 
 	     //--------dump ntuple - impulses are negative, invert the sign
