@@ -209,7 +209,7 @@ int main (int argc, char** argv)
 
 	    int triggerTime=100;  //DON'T CHANGE THIS!!!!!
 	    SubtractBaseline(5, 25, &digiCh[4]); //trigger baseline subtraction
-	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[4], 0.5)/0.2); //triggerCF
+	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[4], 1.)/0.2); //trigger
 	    if (triggerTime<100 || triggerTime >800)  continue;
 
 	    //---loop over MPC's channels
@@ -217,19 +217,19 @@ int main (int argc, char** argv)
 	      {
 
 		//BEGIN OF CHANGES
-		    int ampMaxTimeTemp = TimeConstFrac(triggerTime-30, triggerTime+40, &digiCh[iCh], 1)/0.2; //time of max sample (window's coincidence:-30,40)
-		    if (iCh!=4)
-		      SubtractBaseline(ampMaxTimeTemp-30, ampMaxTimeTemp-10, &digiCh[iCh]);  //subtract baseline immediately before pulse
-
+		    int ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[iCh], 1)/0.2; //time of max sample (window's coincidence:-30,40)
 		    //window for charge calculation
-		    int t1 = ampMaxTimeTemp-15;
-		    int t2 = ampMaxTimeTemp+25;
+		    int t1 = ampMaxTimeTemp-10;
+		    int t2 = ampMaxTimeTemp+20;
+
+		    if (iCh!=4)
+		      SubtractBaseline(t1-25, t1-5, &digiCh[iCh]);  //subtract baseline immediately before pulse
 
 		    //CF calculation:
 		    if (iCh==4)		      timeCF[iCh]=triggerTime*0.2;
-		    else                      timeCF[iCh]=TimeConstFrac(t1, t2, &digiCh[iCh], 0.5);
+		    else                      timeCF[iCh]=TimeConstFrac(t1-10, t2+10, &digiCh[iCh], 0.5);
 
-		    timeOT[iCh]=TimeOverThreshold(t1, t2, &digiCh[iCh], -30); //LUCA: CHECK IF THIS IS OK!!!
+		    timeOT[iCh]=TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -1000.); //LUCA: CHECK IF THIS IS OK!!!
 		    //		    timeOT[iCh]=TimeOverThreshold(40, 800, &digiCh[iCh], -1000.);
 
 		    intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
