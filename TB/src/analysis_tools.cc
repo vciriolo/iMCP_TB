@@ -11,9 +11,12 @@ double getAmplitude_fromTot(int iCh, float ix){
   if(iCh == 6) func->SetParameters(1.01040e+03, -2.92853e+00, 5.80857e-01, -1.14420e-02, 1.28716e-04);
   if(iCh == 7) func->SetParameters(1.08410e+03, -1.66636e+01, 1.11720e+00, -1.83232e-02, 1.06718e-04);
   if(iCh == 9) func->SetParameters(1.08692e+03, -1.92588e+01, 1.30588e+00, -2.32895e-02, 1.57087e-04);
+
+  float y=func->Eval(ix);
+  delete func;
   
   if(iCh < 4 || iCh == 8) return -1;
-  return func->Eval(ix);
+  return y;
 }
 
 double getSignal_fromAmplitude(int iCh, float ix){
@@ -26,8 +29,11 @@ double getSignal_fromAmplitude(int iCh, float ix){
   if(iCh == 7) func->SetParameters(-3.48622e+01, 1.34139e+01);
   if(iCh == 9) func->SetParameters(-4.96490e+01, 1.26266e+01);
 
+  float y=func->Eval(ix);
+  delete func;
+
   if(iCh < 4 || iCh == 8) return -1;
-  return func->Eval(ix);
+  return y;
 }
 
 //----------------------------------------------------------------------------------------
@@ -256,8 +262,8 @@ float ComputeIntegral(int t1, int t2, const vector<float>* samples)
 {
     float integral=0;
     for(int bin=t1; bin<t2; bin++)
-      if (samples->at(bin)>0)    integral+=0;
-      else                       integral += samples->at(bin);
+      //      if (samples->at(bin)>0)    integral+=0;
+                             integral += samples->at(bin);
 
     return integral;
 }
