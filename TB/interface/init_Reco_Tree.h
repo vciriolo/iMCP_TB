@@ -6,6 +6,7 @@
 
     // Declaration of leaf types
 float                 time_CF[10]={};   
+float                 time_CF_corr[10]={};   
 float                 time_OT[10]={};   
 float                 amp_max[10]={};   
 float                 amp_max_corr[10]={};   
@@ -25,6 +26,7 @@ float tdcY=-999.;
 
     // List of branches
     TBranch        *b_time_CF;   //!
+    TBranch        *b_time_CF_corr;   //!
     TBranch        *b_time_OT;   //!
     TBranch        *b_amp_max;   //!
     TBranch        *b_amp_max_corr;   //!
