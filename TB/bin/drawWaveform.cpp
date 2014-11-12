@@ -164,11 +164,13 @@ int main (int argc, char** argv)
 	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[4], 1.)/0.2);
 	    if (triggerTime<100 || triggerTime >800)  continue;
 
-		  int intTrigger = -ComputeIntegral(triggerTime-13, triggerTime+12, &digiCh[4]);              
+		  int intTrigger = -ComputeIntegral(triggerTime-18, triggerTime+12, &digiCh[4]);              
 		  if (intTrigger<125) continue;
 
 		ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[channel], 1)/0.2;
-		    SubtractBaseline(ampMaxTimeTemp-35, ampMaxTimeTemp-15, &digiCh[channel]);
+		    SubtractBaseline(ampMaxTimeTemp-40, ampMaxTimeTemp-20, &digiCh[channel]);
+		    
+		    //		    if (-AmpMax(5, 25, &digiCh[channel])<-200)  std::cout<<iEntry<<" "<<-AmpMax(5, 25, &digiCh[channel])<<std::endl;
 		    
 
 	  for(unsigned int iSample=0; iSample<digiCh[channel].size(); iSample++){
@@ -184,22 +186,22 @@ int main (int argc, char** argv)
 	  // else gWF->Draw("PL,same");      
       }
 
-      line = new TLine(ampMaxTimeTemp-13, -2000, ampMaxTimeTemp-13, 200);
+      line = new TLine(ampMaxTimeTemp-18, -2000, ampMaxTimeTemp-18, 200);
       line2 = new TLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
-      line3 = new TLine(ampMaxTimeTemp-15, -2000, ampMaxTimeTemp-15, 200);
-      line4 = new TLine(ampMaxTimeTemp-35, -2000, ampMaxTimeTemp-35, 200);
+      line3 = new TLine(ampMaxTimeTemp-20, -2000, ampMaxTimeTemp-20, 200);
+      line4 = new TLine(ampMaxTimeTemp-40, -2000, ampMaxTimeTemp-40, 200);
       
       mgWF->Draw("apl");
-      line->DrawLine(ampMaxTimeTemp-13, -2000, ampMaxTimeTemp-13, 200);
+      line->DrawLine(ampMaxTimeTemp-18, -2000, ampMaxTimeTemp-18, 200);
       line->SetLineColor(2);
       line->Draw("same");
       line2->DrawLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
       line2->SetLineColor(2);
       line2->Draw("same");
-      line3->DrawLine(ampMaxTimeTemp-15, -2000, ampMaxTimeTemp-15, 200);
+      line3->DrawLine(ampMaxTimeTemp-20, -2000, ampMaxTimeTemp-20, 200);
       line3->SetLineColor(4);
       line3->Draw("same");
-      line4->DrawLine(ampMaxTimeTemp-35, -2000, ampMaxTimeTemp-35, 200);
+      line4->DrawLine(ampMaxTimeTemp-40, -2000, ampMaxTimeTemp-40, 200);
       line4->SetLineColor(4);
       line4->Draw("same");
 
