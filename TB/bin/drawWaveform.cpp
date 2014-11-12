@@ -169,8 +169,6 @@ int main (int argc, char** argv)
 
 		ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[channel], 1)/0.2;
 		    SubtractBaseline(ampMaxTimeTemp-35, ampMaxTimeTemp-15, &digiCh[channel]);
-
-		    if (
 		    
 
 	  for(unsigned int iSample=0; iSample<digiCh[channel].size(); iSample++){
