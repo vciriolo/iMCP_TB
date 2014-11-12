@@ -221,7 +221,7 @@ int main (int argc, char** argv)
 		int t1 = ampMaxTimeTemp-13;
 		int t2 = ampMaxTimeTemp+12;
 		
-		if (iCh!=4)SubtractBaseline(t1-22, t1-2, &digiCh[iCh]);  //subtract baseline immediately before pulse
+		if (iCh!=4)SubtractBaseline(t1-27, t1-7, &digiCh[iCh]);  //subtract baseline immediately before pulse
 		
 		intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
 		
