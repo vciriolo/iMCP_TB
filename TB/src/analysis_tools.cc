@@ -135,6 +135,66 @@ float TimeConstFrac(int t1, int t2, const vector<float>* samples, float AmpFract
 
 //---------------------------------------------------------------------------------------
 //---estimate time (ns) with CFD, samples must be a negative signal and baseline subtracted
+float TimeConstFracAbs(int t1, int t2, const vector<float>* samples, float AmpFraction, float AmpMax, 
+                    float step, int Nsamples)
+{
+    float xx= 0.;
+    float xy= 0.;
+    float Sx = 0.;
+    float Sy = 0.;
+    float Sxx = 0.;
+    float Sxy = 0.;
+    float Chi2 = 0.;
+    int minSample=t1;
+    int cfSample=t1; // first sample over AmpMax*CF 
+    float minValue = AmpFraction * AmpMax;
+
+    for(int iSample=t1; iSample<t2; iSample++){
+      if(samples->at(iSample) < minValue) minSample = iSample;
+      break;
+    }
+    minValue = samples->at(minSample);
+
+    for(int iSample=minSample; iSample>t1; iSample--)
+    {
+        if(samples->at(iSample) > minValue) 
+        {
+            cfSample = iSample;
+	    //	    std::cout << " CF cfSample = " << cfSample << " samples->at(iSample) = " << samples->at(iSample) << std::endl;
+            break;
+        }
+    }
+    for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
+    {
+        if(cfSample+n<0) continue;
+        xx = (cfSample+n)*(cfSample+n)*step*step;
+        xy = (cfSample+n)*step*(samples->at(cfSample+n));
+        Sx = Sx + (cfSample+n)*step;
+        Sy = Sy + samples->at(cfSample+n);
+        Sxx = Sxx + xx;
+        Sxy = Sxy + xy;
+    }
+
+    float Delta = Nsamples*Sxx - Sx*Sx;
+    float A = (Sxx*Sy - Sx*Sxy) / Delta;
+    float B = (Nsamples*Sxy - Sx*Sy) / Delta;
+
+    float sigma2 = pow(step/sqrt(12)*B,2);
+ 
+    for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
+    {
+        if(cfSample+n<0) continue;
+        Chi2 = Chi2 + pow(samples->at(cfSample+n) - A - B*((cfSample+n)*step),2)/sigma2;
+    } 
+    // A+Bx = AmpFraction * amp
+    float interpolation = (minValue - A) / B;
+    //    std::cout << " >>> interp = " << interpolation << " A = " << A << " B = " << B << std::endl;
+    return interpolation;
+
+}
+
+//---------------------------------------------------------------------------------------
+//---estimate time (ns) with CFD, samples must be a negative signal and baseline subtracted
 float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float threshold, 
 			float step, int Nsamples){
 
