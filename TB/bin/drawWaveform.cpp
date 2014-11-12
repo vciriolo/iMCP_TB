@@ -122,6 +122,8 @@ int main (int argc, char** argv)
     int te1,te2;
     TLine *line;    
     TLine *line2;
+    TLine *line3;    
+    TLine *line4;
       //-----Read raw data tree-----------------------------------------------
       std::string iRun_str = inputFolder+Form("/%d/[0-9]*.root", run);
       chain->Add(iRun_str.c_str());
@@ -159,13 +161,16 @@ int main (int argc, char** argv)
 
 
 	    SubtractBaseline(5, 25, &digiCh[4]);
-	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[4], 0.5)/0.2);
+	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[4], 1.)/0.2);
 	    if (triggerTime<100 || triggerTime >800)  continue;
+
+		  int intTrigger = -ComputeIntegral(triggerTime-13, triggerTime+12, &digiCh[4]);              
+		  if (intTrigger<125) continue;
 
 		ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[channel], 1)/0.2;
 		    SubtractBaseline(ampMaxTimeTemp-35, ampMaxTimeTemp-15, &digiCh[channel]);
 
-		    //		int intBefore = ComputeIntegral(26, 50, &digiCh[channel]);              
+		    if (
 		    
 
 	  for(unsigned int iSample=0; iSample<digiCh[channel].size(); iSample++){
@@ -181,15 +186,26 @@ int main (int argc, char** argv)
 	  // else gWF->Draw("PL,same");      
       }
 
-	  line = new TLine(ampMaxTimeTemp-10, -3000, ampMaxTimeTemp-10, 100);
-	  line2 = new TLine(ampMaxTimeTemp+20, -3000, ampMaxTimeTemp+20, 100);
+      line = new TLine(ampMaxTimeTemp-13, -2000, ampMaxTimeTemp-13, 200);
+      line2 = new TLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
+      line3 = new TLine(ampMaxTimeTemp-15, -2000, ampMaxTimeTemp-15, 200);
+      line4 = new TLine(ampMaxTimeTemp-35, -2000, ampMaxTimeTemp-35, 200);
       
       mgWF->Draw("apl");
-                              line->DrawLine(ampMaxTimeTemp-10, -3000, ampMaxTimeTemp-10, 100);
-          line->Draw("same");
-       line2->DrawLine(ampMaxTimeTemp+20, -3000, ampMaxTimeTemp+20, 100);
-           line2->Draw("same");
-             char plot_name[100];
+      line->DrawLine(ampMaxTimeTemp-13, -2000, ampMaxTimeTemp-13, 200);
+      line->SetLineColor(2);
+      line->Draw("same");
+      line2->DrawLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
+      line2->SetLineColor(2);
+      line2->Draw("same");
+      line3->DrawLine(ampMaxTimeTemp-15, -2000, ampMaxTimeTemp-15, 200);
+      line3->SetLineColor(4);
+      line3->Draw("same");
+      line4->DrawLine(ampMaxTimeTemp-35, -2000, ampMaxTimeTemp-35, 200);
+      line4->SetLineColor(4);
+      line4->Draw("same");
+
+      char plot_name[100];
       sprintf(plot_name, "plots/waveform/run_%d_nEvents_%d_ch_%d.png", run, totEvents, channel);
       c->Print(plot_name, ".png");
       std::cout << plot_name << "created" << std::endl;
