@@ -83,27 +83,29 @@ int main (int argc, char** argv)
   std::string outputFileName5s = "cfg/treshold_5s.txt";
   std::ofstream outputFile5s ((outputFileName5s).c_str(), std::ofstream::out);
 
-  char hBNameFit[100] = "hB_0_Fit";
-  TH1F *hBFit = new TH1F(hBNameFit,hBNameFit, 30, -500, 500);
-  TF1 *base = new TF1("gaus","gaus",-1000,1000);
   //-----get the run list and the list of channel to analyze------
 
-  TCanvas* SoB = new TCanvas("SoB", "SoB", 800, 800);  
-  TGraph* g_SoB[20];
   TLegend* leg = new TLegend(0.88,0.45,0.98,0.65);
-  leg->SetFillColor(0);
-  SoB->cd();
+  TGraph* g_SoB[20];
 
+  TF1* base[10];
+
+  TCanvas* baseFit[10];
   //------analyze the good channels and compute the charge tresholds--------
   std::cout<<"\n--------------------------------\n-->OK, now computing tresholds:"<<std::endl;
   for (int iCh=0; iCh<nChannels; iCh++)
 	{
-	  char hSName[100], hBName[100];
+	  char hSName[100], hBName[100], hBNameFit[100], fitName[100];
 	  sprintf(hSName, "hS_%d", iCh);
 	  sprintf(hBName, "hB_%d", iCh);
+	  sprintf(hBNameFit, "hBFit_%d", iCh);
+	  sprintf(fitName, "gausFit_%d", iCh);
 
 	  TH1F *hS = new TH1F(hSName,hSName, 30000, 0, 30000);
 	  TH1F *hB = new TH1F(hBName,hBName, 30000, 0, 30000);
+	  TH1F *hBFit = new TH1F(hBNameFit,hBNameFit, 100, -500, 500);
+
+	  base[iCh] = new TF1(fitName,"gaus",-1000,1000);
 	      
 	  char hSDraw[100], hBDraw[100], hBDrawFit[100];
 	  sprintf(hSDraw, "charge[%d]>>%s", iCh, hSName);
@@ -114,17 +116,26 @@ int main (int argc, char** argv)
 	  sprintf(cut, "isPCOn[%d]!=2 && HV[%d]>=%d && tdcX > -8 && tdcX < 0 && tdcY >-2 && tdcY < 6", iCh, iCh, HVtresh); 
 
 	  inputTree->Draw(hSDraw,cut,"goff");
-	  inputTree->Draw(hBDraw,cut,"goff");
-	  inputTree->Draw(hBDrawFit,cut,"goff");
+	  inputTree->Draw(hBDraw,cut);
+	  inputTree->Draw(hBDrawFit,cut);
 
-	  base->SetParameter(1,0);
-	  base->SetParameter(2,0);
-     	  hBFit->Fit(base,"QN");
-	  base->SetParameter(1,base->GetParameter(1));
-	  hBFit->Fit(base,"QN","",base->GetParameter(1)-2*base->GetParameter(2), base->GetParameter(1)+2*base->GetParameter(2));
-	  std::cout<<"sigma baseline: "<<base->GetParameter(2)<<std::endl;
-	  outputFile3s << iCh << "  "<<(int)(base->GetParameter(2)*3)<<std::endl;
-	  outputFile5s << iCh << "  "<<(int)(base->GetParameter(2)*5)<<std::endl;
+	  char canvasName[50];
+	  sprintf(canvasName, "plots/baseline/baseFit_%d.pdf", iCh);
+	  baseFit[iCh] = new TCanvas();
+	  baseFit[iCh]->cd();
+
+	  base[iCh]->SetParameter(1,0);
+	  base[iCh]->SetParameter(2,0);
+     	  hBFit->Fit(base[iCh],"QN");
+	  base[iCh]->SetParameter(1,base[iCh]->GetParameter(1));
+	  hBFit->Fit(base[iCh],"Q","",base[iCh]->GetParameter(1)-2*base[iCh]->GetParameter(2), base[iCh]->GetParameter(1)+2*base[iCh]->GetParameter(2));
+	  std::cout<<"sigma baseline: "<<base[iCh]->GetParameter(2)<<std::endl;
+	  outputFile3s << iCh << "  "<<(int)(base[iCh]->GetParameter(2)*3)<<std::endl;
+	  outputFile5s << iCh << "  "<<(int)(base[iCh]->GetParameter(2)*5)<<std::endl;
+
+	  hBFit->Draw();
+	  base[iCh]->Draw("same");
+	  baseFit[iCh]->Print(canvasName,"pdf");
 
 	  char gName[50];
 	  sprintf(gName, "g_SoB_%d", iCh);
@@ -174,6 +185,9 @@ int main (int argc, char** argv)
 	  leg->AddEntry(g_SoB[iCh],inverted_MCPList.at(iCh).c_str(),"l");
 
 	}
+  TCanvas* SoB = new TCanvas("SoB", "SoB", 800, 800);  
+  leg->SetFillColor(0);
+  SoB->cd();
 
   leg->Draw("same");
   SoB->Print("plots/SoverB.pdf","pdf");
