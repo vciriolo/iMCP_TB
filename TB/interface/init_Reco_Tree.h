@@ -8,6 +8,7 @@
 float                 time_CF[10]={};   
 float                 time_CF_corr[10]={};   
 float                 time_OT[10]={};   
+float                 time_Max[10]={};   
 float                 amp_max[10]={};   
 float                 amp_max_corr[10]={};   
 float                 charge[10]={};   
@@ -28,6 +29,7 @@ float tdcY=-999.;
     TBranch        *b_time_CF;   //!
     TBranch        *b_time_CF_corr;   //!
     TBranch        *b_time_OT;   //!
+    TBranch        *b_time_Max;   //!
     TBranch        *b_amp_max;   //!
     TBranch        *b_amp_max_corr;   //!
     TBranch        *b_baseline;   //!

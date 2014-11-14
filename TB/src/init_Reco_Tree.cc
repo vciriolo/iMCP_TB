@@ -10,6 +10,7 @@ void SetOutTree(TTree* outTree)
   outTree->Branch("time_CF",&time_CF,"time_CF[10]/F");
   outTree->Branch("time_CF_corr",&time_CF_corr,"time_CF_corr[10]/F");
   outTree->Branch("time_OT",&time_OT,"time_OT[10]/F");
+  outTree->Branch("time_Max",&time_Max,"time_Max[10]/F");
   outTree->Branch("amp_max",&amp_max,"amp_max[10]/F");
   outTree->Branch("amp_max_corr",&amp_max_corr,"amp_max_corr[10]/F");
   outTree->Branch("charge",&charge,"charge[10]/F"); 
@@ -41,6 +42,7 @@ void InitRecoTree(TTree* nt)
   nt->SetBranchAddress("time_CF", &time_CF, &b_time_CF);
   nt->SetBranchAddress("time_CF_corr", &time_CF_corr, &b_time_CF_corr);
   nt->SetBranchAddress("time_OT", &time_OT, &b_time_OT);
+  nt->SetBranchAddress("time_Max", &time_Max, &b_time_Max);
   nt->SetBranchAddress("amp_max", &amp_max, &b_amp_max);
   nt->SetBranchAddress("amp_max_corr", &amp_max_corr, &b_amp_max_corr);
   nt->SetBranchAddress("charge", &charge, &b_charge);

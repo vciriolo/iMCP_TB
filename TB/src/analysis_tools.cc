@@ -74,6 +74,69 @@ void SubtractBaseline(int tb1, int tb2, vector<float>* samples)
 
 //---------------------------------------------------------------------------------------
 //---estimate time (ns) with CFD, samples must be a negative signal and baseline subtracted
+void TimeConstFrac_ProMedio(TH1F* samples, double& AmpFraction, double& tCF, 
+			    float step, int Nsamples)
+{
+    float xx= 0.;
+    float xy= 0.;
+    float Sx = 0.;
+    float Sy = 0.;
+    float Sxx = 0.;
+    float Sxy = 0.;
+    float Chi2 = 0.;
+    int minSample = 1;
+    float minValue = -1.;
+    int cfSample = 1; // first sample over AmpMax*CF 
+
+    for(int iS=0; iS<samples->GetNbinsX(); ++iS){
+      if(samples->GetBinContent(iS+1) < samples->GetBinContent(minSample+1)) minSample = iS;
+    }
+    minValue = samples->GetBinContent(minSample+1);
+    tCF = minSample;
+    if(AmpFraction == 1) return;
+    //    std::cout << " >>> minValue = " << minValue << " minSample = " << minSample << std::endl;
+
+    for(int iS=minSample; iS>0; --iS){
+      //      std::cout << " CF cfSample = " << cfSample << " samples->at(iSample) = " << samples->GetBinContent(iS+1) << std::endl;
+      if(samples->GetBinContent(iS+1) > minValue * AmpFraction){
+	cfSample = iS;	
+	break;
+      }
+    }
+    //    std::cout << " >>> cfSample = " << cfSample << std::endl;
+
+    for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++){
+      if(cfSample+n<0) continue;
+      xx = (cfSample+n)*(cfSample+n);
+      xy = (cfSample+n)*(samples->GetBinContent(cfSample+n+1));
+      Sx = Sx + (cfSample+n);
+      Sy = Sy + samples->GetBinContent(cfSample+n+1);
+      Sxx = Sxx + xx;
+      Sxy = Sxy + xy;
+    }
+
+    float Delta = Nsamples*Sxx - Sx*Sx;
+    float A = (Sxx*Sy - Sx*Sxy) / Delta;
+    float B = (Nsamples*Sxy - Sx*Sy) / Delta;
+    
+    float sigma2 = pow(1./sqrt(12)*B,2);
+    
+    for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
+      {
+        if(cfSample+n<0) continue;
+        Chi2 = Chi2 + pow(samples->GetBinContent(cfSample+n+1) - A - B*((cfSample+n)),2)/sigma2;
+      } 
+    // A+Bx = AmpFraction * amp
+    float interpolation = (samples->GetBinContent(minSample+1) * AmpFraction - A) / B;
+    //    std::cout << " >>> interp = " << interpolation << " cfSample = " << cfSample << " tMax = " << tMax << std::endl;
+    tCF = interpolation;
+    return;
+    //    return ;
+
+}
+
+//---------------------------------------------------------------------------------------
+//---estimate time (ns) with CFD, samples must be a negative signal and baseline subtracted
 float TimeConstFrac(int t1, int t2, const vector<float>* samples, float AmpFraction, 
                     float step, int Nsamples)
 {

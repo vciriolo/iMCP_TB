@@ -61,6 +61,11 @@ float TimeConstFracAbs(int t1, int t2, const vector<float>* samples, float AmpFr
 
 //---------------------------------------------------------------------------------------
 //---estimate time (ns) with CFD, samples must be a negative signal and baseline subtracted
+void TimeConstFrac_ProMedio(TH1F* samples, double& AmpFraction, double& tCF, 
+			    float step=DIGITIZER_SAMPLING_UNIT, int Nsamples = 5);
+
+//---------------------------------------------------------------------------------------
+//---estimate time (ns) with CFD, samples must be a negative signal and baseline subtracted
 float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float threshold, 
 			float step=DIGITIZER_SAMPLING_UNIT, int Nsamples = 5);
 
