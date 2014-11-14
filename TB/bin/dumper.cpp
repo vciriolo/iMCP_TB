@@ -215,66 +215,67 @@ int main (int argc, char** argv)
 	    //---loop over MPC's channels
 	    for(int iCh=0; iCh<nChannels; iCh++)
 	      {
-		//BEGIN OF CHANGES
-		int ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[iCh], 1)/0.2; //time of max sample (window's coincidence:-30,40)
-		//window for charge calculation
-		int t1 = ampMaxTimeTemp-13;
-		int t2 = ampMaxTimeTemp+12;
-		
-		if (iCh!=4)SubtractBaseline(t1-27, t1-7, &digiCh[iCh]);  //subtract baseline immediately before pulse
-		
-		intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
-		
-		//IS IT OK TO CHANGE THIS??
-		//                    int t1 = (int)(timeCF[iCh]/0.2) - 3;
-		//                    int t2 = (int)(timeCF[iCh]/0.2) + 17;
-		//END OF CHANGES
-		
-		//fill pro-medio
-		if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024) ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
-		//		ampMax[iCh] = AmpMax(47, 500, &digiCh[iCh]);
-		if(ampMax[iCh] < -30. && ampMax[iCh] > -2000.){			
-		  int timeMax = TimeConstFrac(47, 500, &digiCh[iCh], 1.)/0.2; //LUCA: maybe for this we can use ampMaxTimeTemp...
-		  for(int iSample=0; iSample<digiCh[iCh].size(); ++iSample){
-		    if((iSample + 300 - timeMax) < 1024. && (iSample + 300 - timeMax) > 0.)
-		      wf_promed[iCh]->Fill(iSample + 300 - timeMax, -1.*digiCh[iCh].at(iSample)/ampMax[iCh]);
-		  }
+		//Save infos for CeF3
+		if (iCh<4) {
+		  SubtractBaseline(5, 25, &digiCh[iCh]);  //baseline subtraction
+		  ampMax[iCh] = AmpMax(51, 1000, &digiCh[iCh]);
+		  intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
+		  intSignal[iCh] = ComputeIntegral(51, 1000, &digiCh[iCh]);
+		  timeCF[iCh] = TimeConstFrac(51, 1000, &digiCh[iCh], 0.5, ampMax[iCh]);
+		  timeOT[iCh] = TimeOverThreshold(51, 1000, &digiCh[iCh], -1000.);
 		}
-		
 
-		if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024){
-		  ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
-		  intSignal[iCh] = ComputeIntegral(t1, t2, &digiCh[iCh]);
-		}
-		else{
-		  intSignal[iCh] = ComputeIntegral(50, 70, &digiCh[iCh]);
-		  ampMax[iCh] = AmpMax(0, 1024, &digiCh[iCh]);
-		}
-		
-		//time OT
-		timeOT[iCh] = TimeOverThreshold(40, 800, &digiCh[iCh], -1000.);
-		
-		//correct ampMax & charge
-		if(ampMax[iCh] < -1000.) {
-		  ampMaxcorr[iCh] = -1. * getAmplitude_fromTot(iCh, timeOT[iCh]);
-		  intSignalcorr[iCh] = -1. * getSignal_fromAmplitude(iCh, -1. * ampMaxcorr[iCh]);
-		}
+		//save infos for MCPs
 		else {
-		  ampMaxcorr[iCh] = ampMax[iCh];
-		  intSignalcorr[iCh] = intSignal[iCh];
-		}
+
+		  int ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[iCh], 1)/0.2; //time of max sample (window's coincidence:-30,40)
+		  //window for charge calculation
+		  int t1 = ampMaxTimeTemp-13;
+		  int t2 = ampMaxTimeTemp+12;
 		
-		//CF calculation and correction
-		/*
-		  if (iCh==4)		      timeCF[iCh]=triggerTime*0.2;
-		  else                      timeCF[iCh]=TimeConstFrac(t1-10, t2+10, &digiCh[iCh], 0.5);
-		*/
-		timeCF[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMax[iCh]);
-		if(ampMax[iCh] < -1000.){
-		  if(ampMaxcorr[iCh]*0.5 > -6000.) timeCFcorr[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMaxcorr[iCh]);
-		  else timeCFcorr[iCh] = -999.;
+		  if (iCh!=4)SubtractBaseline(t1-27, t1-7, &digiCh[iCh]);  //subtract baseline immediately before pulse		
+		  intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
+				
+		  //fill pro-medio
+		  if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024) ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
+		  //		ampMax[iCh] = AmpMax(47, 500, &digiCh[iCh]);
+		  if(ampMax[iCh] < -30. && ampMax[iCh] > -2000.){			
+		    int timeMax = TimeConstFrac(47, 500, &digiCh[iCh], 1.)/0.2; //LUCA: maybe for this we can use ampMaxTimeTemp...
+		    for(int iSample=0; iSample<digiCh[iCh].size(); ++iSample){
+		      if((iSample + 300 - timeMax) < 1024. && (iSample + 300 - timeMax) > 0.)
+			wf_promed[iCh]->Fill(iSample + 300 - timeMax, -1.*digiCh[iCh].at(iSample)/ampMax[iCh]);
+		    }
+		  }
+		
+		  if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024){
+		    ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
+		    intSignal[iCh] = ComputeIntegral(t1, t2, &digiCh[iCh]);
+		  }
+		  else{
+		    intSignal[iCh] = ComputeIntegral(50, 70, &digiCh[iCh]);
+		    ampMax[iCh] = AmpMax(0, 1024, &digiCh[iCh]);
+		  }
+		
+		  //time OT
+		  timeOT[iCh] = TimeOverThreshold(40, 800, &digiCh[iCh], -1000.);
+		
+		  //correct ampMax & charge
+		  if(ampMax[iCh] < -1000.) {
+		    ampMaxcorr[iCh] = -1. * getAmplitude_fromTot(iCh, timeOT[iCh]);
+		    intSignalcorr[iCh] = -1. * getSignal_fromAmplitude(iCh, -1. * ampMaxcorr[iCh]);
+		  }
+		  else {
+		    ampMaxcorr[iCh] = ampMax[iCh];
+		    intSignalcorr[iCh] = intSignal[iCh];
+		  }
+		
+		  timeCF[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMax[iCh]);
+		  if(ampMax[iCh] < -1000.){
+		    if(ampMaxcorr[iCh]*0.5 > -6000.) timeCFcorr[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMaxcorr[iCh]);
+		    else timeCFcorr[iCh] = -999.;
+		  }
+		  else timeCFcorr[iCh] = timeCF[iCh];
 		}
-		else timeCFcorr[iCh] = timeCF[iCh];
 	      }
 	    
 	    //--------dump ntuple - impulses are negative, invert the sign

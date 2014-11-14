@@ -124,6 +124,8 @@ int main (int argc, char** argv)
     TLine *line2;
     TLine *line3;    
     TLine *line4;
+    TLine *line5;    
+    TLine *line6;
       //-----Read raw data tree-----------------------------------------------
       std::string iRun_str = inputFolder+Form("/%d/[0-9]*.root", run);
       chain->Add(iRun_str.c_str());
@@ -168,7 +170,7 @@ int main (int argc, char** argv)
 		  if (intTrigger<125) continue;
 
 		ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[channel], 1)/0.2;
-		    SubtractBaseline(ampMaxTimeTemp-40, ampMaxTimeTemp-20, &digiCh[channel]);
+		if (channel!=4)  SubtractBaseline(ampMaxTimeTemp-40, ampMaxTimeTemp-20, &digiCh[channel]);
 		    
 		    //		    if (-AmpMax(5, 25, &digiCh[channel])<-200)  std::cout<<iEntry<<" "<<-AmpMax(5, 25, &digiCh[channel])<<std::endl;
 		    
@@ -186,10 +188,13 @@ int main (int argc, char** argv)
 	  // else gWF->Draw("PL,same");      
       }
 
+      if (channel!=4) {
       line = new TLine(ampMaxTimeTemp-18, -2000, ampMaxTimeTemp-18, 200);
       line2 = new TLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
       line3 = new TLine(ampMaxTimeTemp-20, -2000, ampMaxTimeTemp-20, 200);
       line4 = new TLine(ampMaxTimeTemp-40, -2000, ampMaxTimeTemp-40, 200);
+      line5 = new TLine(triggerTime-50, -2000, triggerTime-50, 200);
+      line6 = new TLine(triggerTime+50, -2000, triggerTime+50, 200);
       
       mgWF->Draw("apl");
       line->DrawLine(ampMaxTimeTemp-18, -2000, ampMaxTimeTemp-18, 200);
@@ -204,7 +209,44 @@ int main (int argc, char** argv)
       line4->DrawLine(ampMaxTimeTemp-40, -2000, ampMaxTimeTemp-40, 200);
       line4->SetLineColor(4);
       line4->Draw("same");
+      /*      line5->DrawLine(triggerTime-50, -2000, triggerTime-50, 200);
+      line5->SetLineColor(1);
+      line5->Draw("same");
+      line6->DrawLine(triggerTime+50, -2000, triggerTime+50, 200);
+      line6->SetLineColor(1);
+      line6->Draw("same");
+      */
+      }
 
+      else {
+      line = new TLine(ampMaxTimeTemp-18, -2000, ampMaxTimeTemp-18, 200);
+      line2 = new TLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
+      line3 = new TLine(5, -2000, 5, 200);
+      line4 = new TLine(25, -2000, 25, 200);
+      line5 = new TLine(triggerTime-50, -2000, triggerTime-50, 200);
+      line6 = new TLine(triggerTime+50, -2000, triggerTime+50, 200);
+      
+      mgWF->Draw("apl");
+      /*      line->DrawLine(ampMaxTimeTemp-18, -2000, ampMaxTimeTemp-18, 200);
+      line->SetLineColor(2);
+      line->Draw("same");
+      line2->DrawLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
+      line2->SetLineColor(2);
+      line2->Draw("same");
+      line3->DrawLine(5, -2000, 5, 200);
+      line3->SetLineColor(4);
+      line3->Draw("same");
+      line4->DrawLine(25, -2000, 25, 200);
+      line4->SetLineColor(4);
+      line4->Draw("same");
+      */      line5->DrawLine(triggerTime-50, -2000, triggerTime-50, 200);
+      line5->SetLineColor(1);
+      line5->Draw("same");
+      line6->DrawLine(triggerTime+50, -2000, triggerTime+50, 200);
+      line6->SetLineColor(1);
+      line6->Draw("same");
+
+      }
       char plot_name[100];
       sprintf(plot_name, "plots/waveform/run_%d_nEvents_%d_ch_%d.png", run, totEvents, channel);
       c->Print(plot_name, ".png");
