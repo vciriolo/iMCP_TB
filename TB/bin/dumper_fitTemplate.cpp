@@ -68,6 +68,7 @@ int main (int argc, char** argv)
     TProfile** wf_promed = new TProfile*[10];
     TH1F** templateHisto = new TH1F*[10];
     double pro_medio_CF[10] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};
+    double pro_medio_Charge[10] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};
     TFile* inF = TFile::Open(ProMedioFile.c_str(),"read");                                                                
     for(int iCh=0; iCh<10; ++iCh) {
       wf_promed[iCh] = (TProfile*)inF->Get(Form("wf_promed_%d",iCh));                                                        
@@ -84,13 +85,14 @@ int main (int argc, char** argv)
       }
       double amp = 0.5;
       TimeConstFrac_ProMedio(templateHisto[iCh], amp, pro_medio_CF[iCh]);
+      pro_medio_Charge[iCh] = templateHisto[iCh]->Integral(pro_medio_CF[iCh]-5, pro_medio_CF[iCh]+20);
       wf_promed[iCh]->Delete();                                                                                              
-      //std::cout << " iCh = " << iCh << " pro_medio_CF[iCh] = " << pro_medio_CF[iCh] << std::endl;
+      //      std::cout << " iCh = " << iCh << " pro_medio_CF[iCh] = " << pro_medio_CF[iCh] << " pro_medio_Charge[iCh] = " << pro_medio_Charge[iCh] << std::endl;
     }                                                                                                                     
 
 
     // for(int iCh=0; iCh<10; ++iCh) std::cout << " templateHisto[iCh]->GetEntries() = " << templateHisto[iCh]->GetEntries() << std::endl;
-    //  return 500;                                                                                            
+    //    return 500;                                                                                            
 
 
     //---------output tree----------------
@@ -194,10 +196,8 @@ int main (int argc, char** argv)
       
       //-----Data loop--------------------------------------------------------
       for(int iEntry=0; iEntry<chain->GetEntries(); iEntry++){
-      //      for(int iEntry=7; iEntry<8; iEntry++){    //RA
-
-	//	    if(iEntry % 1000 == 0)
-		cout << "read entry: " << iEntry << endl;
+	//      for(int iEntry=7; iEntry<8; iEntry++){    //RA
+	if(iEntry % 1000 == 0)	cout << "read entry: " << iEntry << endl;
             //-----Unpack data--------------------------------------------------
             for(int iCh=0; iCh<nChannels; iCh++)
             {
@@ -281,14 +281,21 @@ int main (int argc, char** argv)
 	      
 	      FindTemplateFit(scale, scaleErr, baseL, baseLErr, xTime, xTimeErr, tStart[iCh], tStop[iCh], tMax[iCh], aMax[iCh], bLine[iCh], templateHisto[iCh], wfHisto[iCh], &(f_templateFit[iCh]));
 
-	      ampMax[iCh] = f_templateFit[iCh]->GetParameter(0);
+	      float par0 = f_templateFit[iCh]->GetParameter(0);
+	      float par1 = f_templateFit[iCh]->GetParameter(1);
+	      float par2 = f_templateFit[iCh]->GetParameter(2);
+	      float par3 = f_templateFit[iCh]->GetParameter(3);
+
+	      ampMax[iCh] = par0;
 	      //tMax
-	      timeMax[iCh] = (300. / f_templateFit[iCh]->GetParameter(1)) + f_templateFit[iCh]->GetParameter(2);
-	      timeCF[iCh] = (pro_medio_CF[iCh] / f_templateFit[iCh]->GetParameter(1)) + f_templateFit[iCh]->GetParameter(2);
-	      
-	      intBase[iCh] = f_templateFit[iCh]->GetParameter(3);
-	      timeOT[iCh] = f_templateFit[iCh]->GetParameter(2);
-	      intSignal[iCh] = f_templateFit[iCh]->GetParameter(1);
+	      timeMax[iCh] = (300. / par1) + par2;
+	      timeCF[iCh] = (pro_medio_CF[iCh] / par1) + par2;
+	      intSignal[iCh] = pro_medio_Charge[iCh] * par0/par1 + par3/par1 * 25;
+	      intBase[iCh] = par3;
+
+	      timeOT[iCh] = par2;
+	      intSignalcorr[iCh] = par1;
+	      timeCFcorr[iCh] = timeCF[iCh];
 
 	      // std::cout << " >> timeMax[iCh] = " << timeMax[iCh] << std::endl;
 	      // std::cout << " >> timeCF[iCh] = " << timeCF[iCh] << std::endl;
@@ -336,13 +343,13 @@ int main (int argc, char** argv)
 	    for (int iCh=0; iCh<nChannels; iCh++)
 	      {
 		    time_CF[MCPList.at(MCPName.at(iCh))]   = timeCF[iCh];
-		    time_CF_corr[MCPList.at(MCPName.at(iCh))]   = timeCF[iCh];
+		    time_CF_corr[MCPList.at(MCPName.at(iCh))]   = timeCFcorr[iCh];
 		    time_OT[MCPList.at(MCPName.at(iCh))]   = timeOT[iCh];
 		    time_Max[MCPList.at(MCPName.at(iCh))]   = timeMax[iCh];
 		    amp_max[MCPList.at(MCPName.at(iCh))]   = ampMax[iCh];
 		    amp_max_corr[MCPList.at(MCPName.at(iCh))]   = ampMax[iCh];
 		    charge[MCPList.at(MCPName.at(iCh))]    = intSignal[iCh];
-		    charge_corr[MCPList.at(MCPName.at(iCh))]    = intSignal[iCh];
+		    charge_corr[MCPList.at(MCPName.at(iCh))]    = intSignalcorr[iCh];
 		    baseline[MCPList.at(MCPName.at(iCh))]  = intBase[iCh];
 
 		    isPCOn[MCPList.at(MCPName.at(iCh))]      = PCOn.at(iCh);

@@ -36,12 +36,13 @@ void FindTemplateFit(double& scale, double& scaleErr, double& baseL, double& bas
     
   //  (*f_template)->FixParameter(3, bLine);
 
-  //  TFumili::SetPrintLevel(0);  
+  gErrorIgnoreLevel = kError;
+
   TFitResultPtr rp = h_DA->Fit(funcName,"QERLS+");
   //TFitResultPtr rp = h_DA->Fit(funcName,"RQ");
   int fStatus = rp;
   int nTrials = 0;
-  while( (fStatus != 0) && (nTrials < 5) )
+  while( (fStatus != 0) && (nTrials < 2) )
   {
     rp = h_DA->Fit(funcName,"QNERLS+");
     //rp = h_DA->Fit(funcName,"RQ");
@@ -50,7 +51,7 @@ void FindTemplateFit(double& scale, double& scaleErr, double& baseL, double& bas
     ++nTrials;
   }
 
-  std::cout << " fStatus = " << fStatus << std::endl;
+  //  std::cout << " fStatus = " << fStatus << std::endl;
   
   //  (*f_template)->GetParameter(0)
   scale = (*f_template)->GetParameter(0);
