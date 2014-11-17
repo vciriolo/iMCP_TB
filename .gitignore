@@ -4,3 +4,5 @@
 *root
 *pdf
 *txt
+*.o
+*.exe
