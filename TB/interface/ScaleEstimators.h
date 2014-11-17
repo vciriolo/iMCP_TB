@@ -6,6 +6,7 @@
 
 #include "histoFuncT.h"
 //#include "histo_func.h"
+#include "TError.h"
 
 #include <iostream>
 #include <vector>

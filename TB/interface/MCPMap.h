@@ -4,8 +4,8 @@
 #include<iostream>
 #include<map>
 
-std::map<std::string,int> MCPList;
-std::map<int,std::string> inverted_MCPList;
+extern std::map<std::string,int> MCPList;
+extern std::map<int,std::string> inverted_MCPList;
    
 void Fill_MCPList (void);
 
