@@ -1,5 +1,46 @@
 #include "../interface/init_Reco_Tree.h"
 
+float                 time_CF[10];
+float                 time_CF_corr[10];
+float                 time_OT[10];
+float                 time_Max[10];
+float                 amp_max[10];
+float                 amp_max_corr[10];
+float                 charge[10];
+float                 charge_corr[10];
+float                 baseline[10];
+int                   fibreX[8];
+int                   fibreY[8];
+int                   sci_front_adc;
+int                   run_id;
+int                   isPCOn[10];
+int                   HV[10];
+int                   isTrigger[10];
+float                 X0;
+float tdcX;
+float tdcY;
+
+// List of branches                                                                                                                                           
+TBranch        *b_time_CF;   //!                                                                                                                              
+TBranch        *b_time_CF_corr;   //!                                                                                                                         
+TBranch        *b_time_OT;   //!                                                                                                                              
+TBranch        *b_time_Max;   //!                                                                                                                             
+TBranch        *b_amp_max;   //!                                                                                                                              
+TBranch        *b_amp_max_corr;   //!                                                                                                                         
+TBranch        *b_baseline;   //!                                                                                                                             
+TBranch        *b_charge;   //!                                                                                                                               
+TBranch        *b_charge_corr;   //!                                                                                                                          
+TBranch        *b_fibreX;   //!                                                                                                                               
+TBranch        *b_fibreY;   //!                                                                                                                               
+TBranch        *b_sci_front_adc;   //!                                                                                                                        
+TBranch        *b_run_id;   //!                                                                                                                               
+TBranch        *b_isPCOn;   //!                                                                                                                               
+TBranch        *b_HV;   //!                                                                                                                                   
+TBranch        *b_isTrigger;
+TBranch        *b_X0;
+TBranch *b_tdcX;
+TBranch *b_tdcY;
+
 void init()
 {
 }

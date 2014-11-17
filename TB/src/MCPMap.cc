@@ -1,4 +1,7 @@
 #include "../interface/MCPMap.h"
+
+std::map<std::string,int> MCPList;
+std::map<int,std::string> inverted_MCPList;
    
 void Fill_MCPList (void)
     {
