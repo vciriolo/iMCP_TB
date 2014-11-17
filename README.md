@@ -3,12 +3,13 @@ iMCP_TB
 
 Code for iMCP analysis (test beam)
 
-instruction for download and compiling:
+instruction for download and compiling (hercules):
 
-	git clone git@github.com:lbrianza/iMCP_TB.git
+	cmsrel CMSSW_6_1_1
+	cd CMSSW_6_1_1/src; cmsenv;
+	git clone https://github.com/lbrianza/iMCP_TB
 	cd iMCP_TB/TB/
-	source thisroot.sh
-	sh compile.sh
+	make
 
 ..and start to use it!
 
