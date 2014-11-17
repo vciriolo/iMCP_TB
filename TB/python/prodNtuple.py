@@ -21,7 +21,7 @@ for i in range(len(name)):
     outScript.write("\n"+'cd '+CMSSWDir);
     outScript.write("\n"+'eval `scram runtime -sh`');
     outScript.write("\n"+'cd '+currentDir);
-    outScript.write("\n"+"unbuffer "+command+" > Job/"+fn+".txt");
+    outScript.write("\n"+"unbuffer "+command+" > "+fn+".txt");
     outScript.close();
 
     os.system("chmod 777 "+currentDir+"/"+fn+".sh");
