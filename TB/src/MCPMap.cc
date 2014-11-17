@@ -28,5 +28,5 @@ void Fill_inverted_MCPList (void)
       inverted_MCPList.insert(std::make_pair(6,"Off2"));
       inverted_MCPList.insert(std::make_pair(7,"Off3"));
       inverted_MCPList.insert(std::make_pair(8,"Off4"));
-      inverted_MCPList.insert(std::make_pair(8,"Off5"));
+      inverted_MCPList.insert(std::make_pair(9,"Off5"));
     }
