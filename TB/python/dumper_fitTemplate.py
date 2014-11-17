@@ -15,5 +15,5 @@ if __name__ == '__main__':
     parser.add_argument ('-f', '--promedioFile' , default = '/gwteray/users/martelli/iMCP_H4_CERN14/promedio.root', help='suffix of reco output file')
     args = parser.parse_args ()
     print 'dumper_fitTemplate '+args.cfg+' '+args.dir+' '+args.chNumber+' '+args.name+' '+args.promedioFile
-    os.system('./dumper_fitTemplate '+args.cfg+' '+args.dir+' '+args.chNumber+' '+args.name+' '+args.promedioFile)
+    os.system('./dumper_fitTemplate.exe '+args.cfg+' '+args.dir+' '+args.chNumber+' '+args.name+' '+args.promedioFile)
     

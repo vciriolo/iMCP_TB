@@ -14,5 +14,5 @@ if __name__ == '__main__':
     parser.add_argument ('-HV', '--HV' , default = '2700', help='analyze only channels with HV>treshold')
     args = parser.parse_args ()
     print 'calcTreshold '+args.inputFile+' '+args.tresholdValue+' '+args.chNumber+' '+args.HV
-    os.system('./calcTreshold '+args.inputFile+' '+args.tresholdValue+' '+args.chNumber+' '+args.HV)
+    os.system('./calcTreshold.exe '+args.inputFile+' '+args.tresholdValue+' '+args.chNumber+' '+args.HV)
     

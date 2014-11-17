@@ -14,5 +14,5 @@ if __name__ == '__main__':
     parser.add_argument ('-n', '--name' , default = 'HVScan1', help='suffix of reco output file')
     args = parser.parse_args ()
     print 'dumper '+args.cfg+' '+args.dir+' '+args.chNumber+' '+args.name
-    os.system('./dumper '+args.cfg+' '+args.dir+' '+args.chNumber+' '+args.name)
+    os.system('./dumper.exe '+args.cfg+' '+args.dir+' '+args.chNumber+' '+args.name)
     

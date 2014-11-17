@@ -15,5 +15,5 @@ if __name__ == '__main__':
     parser.add_argument ('-n', '--name' , default = "HVScan1", help='suffix of the reco file in input')
     args = parser.parse_args ()
     print 'analyzer '+args.cfg+' '+args.MCP+' '+args.analysis+' '+args.scan+' '+args.name
-    os.system('./analyzer '+args.cfg+' '+args.MCP+' '+args.analysis+' '+args.scan+' '+args.name)
+    os.system('./analyzer.exe '+args.cfg+' '+args.MCP+' '+args.analysis+' '+args.scan+' '+args.name)
     

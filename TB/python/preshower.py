@@ -15,5 +15,5 @@ if __name__ == '__main__':
     parser.add_argument ('-n2', '--name2' , default = "CeF3", help='suffix of the 2nd reco file in input- CeF3 only')
     args = parser.parse_args ()
     print 'preshower '+args.cfg+' '+args.MCP1+' '+args.MCP3+' '+args.name1+' '+args.name2
-    os.system('./preshower '+args.cfg+' '+args.MCP1+' '+args.MCP3+' '+args.name1+' '+args.name2)
+    os.system('./preshower.exe '+args.cfg+' '+args.MCP1+' '+args.MCP3+' '+args.name1+' '+args.name2)
     
