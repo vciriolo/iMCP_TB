@@ -44,9 +44,9 @@ THIS PROGRAM COMPUTES THE TRESHOLDS FOR EACH MCP USING A FIXED S/B VALUE (IN INP
 #include "TLine.h"
 
 //#include "../include/analysis_tools.h"
-#include "../src/init_Reco_Tree.cc"
+#include "../interface/init_Reco_Tree.h"
 #include "../interface/histo_func.h"
-#include "../src/MCPMap.cc"
+#include "../interface/MCPMap.h"
 
 using namespace std;
 
@@ -59,7 +59,6 @@ int main (int argc, char** argv)
   int SBTreshold=1000;
   int nChannels=9;
   int HVtresh=2000;
-  int doPlot=0;
 
   std::string inputFileName = argv[1];  
   std::cout<<"\nReading file: "<<inputFileName<<std::endl;

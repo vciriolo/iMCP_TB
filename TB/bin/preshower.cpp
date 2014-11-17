@@ -25,8 +25,8 @@ Program to analize scan in preshower configuration
 #include "TPad.h"
 #include "TMultiGraph.h"
 
-#include "../src/init_Reco_Tree.cc"
-#include "../src/MCPMap.cc"
+#include "../interface/init_Reco_Tree.h"
+#include "../interface/MCPMap.h"
 
 using namespace std;
 
@@ -56,7 +56,7 @@ int main(int argc, char** argv)
   std::map <int,int> treshold;
   int ch, tresh;
   int nChannels=0;
-  int trigPos1 = -1, trigPos2 = -1;  //positions of the two trigger chambers in the reco tree
+  int trigPos1 = -1;  //positions of the two trigger chambers in the reco tree
  
   //---open cfg file and fill map with treshold for each channel----
   while(!inputCfg.eof())

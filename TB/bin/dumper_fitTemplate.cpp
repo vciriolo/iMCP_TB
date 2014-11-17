@@ -42,12 +42,12 @@ BE CAREFUL: the number of channels MUST coincide with the number of channel in t
 #include "TCanvas.h"
 #include "TApplication.h"
 
-#include "../src/ScaleEstimators.cc"
-#include "../src/analysis_tools.cc"
-#include "../src/init_tree_H4.cc"
-#include "../src/init_Reco_Tree.cc"
+#include "../interface/ScaleEstimators.h"
+#include "../interface/analysis_tools.h"
+#include "../interface/init_tree_H4.h"
+#include "../interface/init_Reco_Tree.h"
 //#include "../interface/histo_func.h"
-#include "../src/MCPMap.cc"
+#include "../interface/MCPMap.h"
 
 //*******MAIN*******************************************************************
 int main (int argc, char** argv)
@@ -141,8 +141,7 @@ int main (int argc, char** argv)
       float timeCF[10], timeCFcorr[10];
       float timeOT[10];
       float timeMax[10];
-      float intBase[10], intSignal[10], intSignalcorr[10], ampMax[10], ampMaxcorr[10];
-      int goodEvt=1;
+      float intBase[10], intSignal[10], intSignalcorr[10], ampMax[10];
       ///int fibreX[8], hodoYchannels[8];
       
       TH1F** wfHisto = new TH1F*[10];
@@ -208,8 +207,8 @@ int main (int argc, char** argv)
             //---Read the entry
             chain->GetEntry(iEntry);
  
-	    int spill=spillNumber;
-	    int event=evtNumber;
+	    unsigned int spill=spillNumber;
+	    unsigned int event=evtNumber;
 
 	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
 		{

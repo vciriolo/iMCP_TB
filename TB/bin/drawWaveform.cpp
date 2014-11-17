@@ -42,11 +42,11 @@ THIS PROGRAM READ THE RAW DATA AND DRAW 10 WAVEFORMS
 #include "TCanvas.h"
 #include "TLine.h"
 
-#include "../src/analysis_tools.cc"
-#include "../src/init_tree_H4.cc"
-#include "../src/init_Reco_Tree.cc"
+#include "../interface/analysis_tools.h"
+#include "../interface/init_tree_H4.h"
+#include "../interface/init_Reco_Tree.h"
 #include "../interface/histo_func.h"
-#include "../src/MCPMap.cc"
+#include "../interface/MCPMap.h"
 
 //*******MAIN*******************************************************************
 int main (int argc, char** argv)
@@ -119,7 +119,6 @@ int main (int argc, char** argv)
     system("rm listTemp2.txt");
 
     int ampMaxTimeTemp;
-    int te1,te2;
     TLine *line;    
     TLine *line2;
     TLine *line3;    

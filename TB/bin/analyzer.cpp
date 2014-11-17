@@ -28,8 +28,8 @@
 #include "TGraphErrors.h"
 #include "TPad.h"
 
-#include "../src/init_Reco_Tree.cc"
-#include "../src/MCPMap.cc"
+#include "../interface/init_Reco_Tree.h"
+#include "../interface/MCPMap.h"
 
 #define RES_TRIG 85.3
 #define RES_TRIG_ERR 0.3
@@ -56,7 +56,7 @@ int main(int argc, char** argv)
   std::map <int,int> treshold;
   int ch, tresh;
   int nChannels=0;
-  int trigPos1 = -1, trigPos2 = -1;  //positions of the two trigger chambers in the reco tree
+  int trigPos1 = -1;  //positions of the two trigger chambers in the reco tree
  
   //---open cfg file and fill map with treshold for each channel----
   while(!inputCfg.eof())
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
   char str_cut_trig0[200]="";
   char str_cut_tdc[200]="";
   char var_sig[100]="";
-  char var_base[100]="";
+  //  char var_base[100]="";
   char var_time[100]="";
   char var_trig0[100]="";
 
@@ -109,7 +109,6 @@ int main(int argc, char** argv)
 	    for (int i=0; i<nChannels; i++)  //save trigger position!
 	      {
 		if (isTrigger[i]==1)       trigPos1 = i;
-		else if (isTrigger[i]==2)  trigPos2 = i; 
 	      }
 	  }
 	}
@@ -130,7 +129,6 @@ int main(int argc, char** argv)
 	    for (int i=0; i<nChannels; i++)  //save trigger position!!
 	      {
 		if (isTrigger[i]==1)       trigPos1 = i;
-		else if (isTrigger[i]==2)  trigPos2 = i; 
 	      }
 	  }
 
@@ -162,22 +160,23 @@ int main(int argc, char** argv)
   for(unsigned int i=0; i<ScanList.size(); i++)
     {
 
-      char h_sig_name[20], h_base_name[20], h_trig0_name[20], res_func_name[20], h_time_name[20];
+      char h_sig_name[20], h_trig0_name[20], res_func_name[20], h_time_name[20];
+      //      char h_sig_name[20], h_base_name[20], h_trig0_name[20], res_func_name[20], h_time_name[20];
       sprintf(h_sig_name, "h_sig_%d", i);
-      sprintf(h_base_name, "h_base_%d", i);
+      //      sprintf(h_base_name, "h_base_%d", i);
       sprintf(h_trig0_name, "h_trig0_%d", i);
       sprintf(h_time_name, "h_time_%d", i);
       sprintf(res_func_name, "res_func_%d", i);
 
       TH1F* h_sig= new TH1F(h_sig_name, h_sig_name, 500, -5000, 25000);
-      TH1F* h_base = new TH1F(h_base_name, h_base_name, 500, 5000, 25000);
+      //      TH1F* h_base = new TH1F(h_base_name, h_base_name, 500, 5000, 25000);
       TH1F* h_trig0 = new TH1F(h_trig0_name, h_trig0_name, 500, -5000, 25000);
       TH1F* h_time = new TH1F(h_time_name, h_time_name, 500, -5, 5);
       TF1* res_func = new TF1(res_func_name, "gausn", -10, 10);
 
       //-----Draw variables-----
       sprintf(var_sig, "charge[%d]>>%s", MCPNumber, h_sig_name);
-      sprintf(var_base, "baseline[%d]>>%s", MCPNumber, h_base_name);
+      //      sprintf(var_base, "baseline[%d]>>%s", MCPNumber, h_base_name);
       sprintf(var_time, "(time_CF[%d]-time_CF[%d])>>%s", MCPNumber, trigPos1, h_time_name);
       sprintf(var_trig0, "charge[%d]>>%s", trigPos1, h_trig0_name);
 
@@ -188,10 +187,10 @@ int main(int argc, char** argv)
 
       //-----Draw and print infos-----
       nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc, "goff");
-      nt->Draw(var_base, cut_scan, "goff");   //number of total events
+      //      nt->Draw(var_base, cut_scan, "goff");   //number of total events
       nt->Draw(var_trig0,cut_trig0 && cut_scan && cut_tdc, "goff");
 
-      int acc = 1*(float(h_base->GetEntries())/2000.); //estimated from pedestal run
+      //      int acc = 1*(float(h_base->GetEntries())/2000.); //estimated from pedestal run
     
       //            std::cout<<h_sig->GetEntries()<<" "<<h_trig0->GetEntries()<<" "<<h_base->GetEntries()<<std::endl;
       float eff = h_sig->GetEntries()/h_trig0->GetEntries();
