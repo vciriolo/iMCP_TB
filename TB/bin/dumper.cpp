@@ -121,14 +121,19 @@ int main (int argc, char** argv)
       InitTree(chain);
 
       char command1[300];
-      sprintf(command1, "find  %s/%d/*/dqmPlotstotal.root > listTemp.txt", (inputFolder).c_str(), run);
+      sprintf(command1, "find  %s/%d/*/dqmPlotstotal.root > listTemp_%s_%d.txt", (inputFolder).c_str(), run, outputFile.c_str(), run);
       system(command1);
       char command2[300];
-      sprintf(command2, "find  %s/%d/[0-9]*.root > listTemp2.txt", (inputFolder).c_str(), run);
+      sprintf(command2, "find  %s/%d/[0-9]*.root > listTemp2_%s_%d.txt", (inputFolder).c_str(), run, outputFile.c_str(), run);
       system(command2);
 
-      ifstream rootList ("listTemp.txt");
-      ifstream rootList2 ("listTemp2.txt");
+      char list1[200];
+      char list2[200];
+      sprintf (list1, "listTemp_%s_%d.txt", outputFile.c_str(), run);
+      sprintf (list2, "listTemp2_%s_%d.txt", outputFile.c_str(), run);
+
+      ifstream rootList (list1);
+      ifstream rootList2 (list2);
 
       while (!rootList.eof() && !rootList2.eof())
 	{
@@ -152,9 +157,14 @@ int main (int argc, char** argv)
 	  tTemp->Delete();
 	  tTempH4->Delete();
 	}
+
+      char command3[300];
+      sprintf(command3, "rm listTemp_%s_%d.txt", outputFile.c_str(), run);
+      char command4[300];
+      sprintf(command4, "rm listTemp2_%s_%d.txt", outputFile.c_str(), run);
       
-      system("rm listTemp.txt");
-      system("rm listTemp2.txt");
+      system(command3);
+      system(command4);
       
       std::cout<<"start reading run: "<<run<<std::endl;
       
