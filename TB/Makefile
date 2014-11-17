@@ -3,47 +3,36 @@ ROOT_LIB:=`root-config --libs --glibs`
 ROOT_FLAGS:=`root-config --cflags --ldflags`
 ROOT_INCLUDE:=`root-config --incdir`
 
-# Boost
-BOOST = /afs/cern.ch/cms/slc5_amd64_gcc434/external/boost/1.47.0
-#BOOST=/afs/cern.ch/cms/slc5_amd64_gcc472/external/boost/1.50.0
+DEPS= interface/MCPMap.h interface/init_Reco_Tree.h interface/init_tree_H4.h interface/analysis_tools.h interface/histoFuncT.h interface/ScaleEstimators.h
+DEPS_OBJ= lib/MCPMap.o lib/init_Reco_Tree.o lib/init_tree_H4.o lib/analysis_tools.o lib/histoFuncT.o lib/ScaleEstimators.o
 
-ROOSTAT_LIB="-lRooStats"
-INCLUDEDIR=./interface
-SRCDIR=./src
-BUILDDIR=./bin
-OBJ_DIR=./lib
+CC = g++
+CFLAGS = -Wall
 
-#EoPNtupleDir:=../NtuplePackage
+lib/%.o: src/%.cc $(DEPS)
+	$(CC) $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -c -o $@ $<
 
-#################
-INCLUDE=-I$(INCLUDEDIR) -isystem$(ROOT_INCLUDE) -I$(ROOFIT_INCLUDE) -I$(BOOST)/include
-LIB=-L$(BOOST)/lib -L/usr/lib64 # -L/usr/lib
+all: dumper.exe analyzer.exe calcTreshold.exe preshower.exe drawWaveform.exe dumper_fitTemplate.exe
 
-#### Make the list of modules from the list of .cc files in the SRC directory
-MODULES=$(shell ls $(SRCDIR)/*.cc | sed "s|.cc|.o|;s|$(SRCDIR)|$(OBJ_DIR)|g")
+dumper.exe: bin/dumper.cpp $(DEPS_OBJ)
+	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
 
-#### Make the list of dependencies for a particular module
-default: $(MODULES) dumper.exe
+analyzer.exe: bin/analyzer.cpp $(DEPS_OBJ)
+	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
 
-#------------------------------ MODULES (static libraries)
-MAKEDEPEND = -MMD -MT '$@ lib/$*.d'
-# $<: first prerequisite -> put always the .cc as first
-#### General rule for classes (libraries) compiled statically
-### Generate also a .d file with prerequisites
-lib/%.o: $(SRCDIR)/%.cc
-	@echo "--> Making $@"
-	@$(COMPILE.cc) $(CXXFLAGS) $(INCLUDE) $(MAKEDEPEND) -o $@ $<
+calcTreshold.exe: bin/calcTreshold.cpp $(DEPS_OBJ)
+	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
 
--include $(MODULES:.o=.d)
+drawWaveform.exe: bin/drawWaveform.cpp $(DEPS_OBJ)
+	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
 
-###### Main program
-dumper.exe: $(BUILDDIR)/dumper.exe
-$(BUILDDIR)/dumper.exe: $(BUILDDIR)/dumper.cpp
-	@echo "---> Making iMCP_TB $(COMPILE.exe)"
-	@g++ $(CXXFLAGS) $(INCLUDE) $(MAKEDEPEND) -o $@ $< $(MODULES) $(LIB) $(ROOT_LIB) $(ROOSTAT_LIB) $(ROOT_FLAGS) \
--lboost_program_options -lTreePlayer
+dumper_fitTemplate.exe: bin/dumper_fitTemplate.cpp $(DEPS_OBJ)
+	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
+
+preshower.exe: bin/preshower.cpp $(DEPS_OBJ)
+	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
 
 clean:
-	rm -f $(OBJ_DIR)/*.o
-	rm -f $(OBJ_DIR)/*.d
-	rm -f $(BUILDDIR)/*.exe
+	rm -f lib/*.o
+	rm -f lib/*.d
+	rm -f *.exe
