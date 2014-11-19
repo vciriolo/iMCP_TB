@@ -12,7 +12,7 @@ CFLAGS = -Wall
 lib/%.o: src/%.cc $(DEPS)
 	$(CC) $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -c -o $@ $<
 
-all: dumper.exe analyzer.exe calcTreshold.exe preshower.exe drawWaveform.exe dumper_fitTemplate.exe
+all: dumper.exe analyzer.exe calcTreshold.exe preshower.exe drawWaveform.exe dumper_fitTemplate.exe calcTreshold_fitTemplate.exe
 
 dumper.exe: bin/dumper.cpp $(DEPS_OBJ)
 	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
@@ -21,6 +21,9 @@ analyzer.exe: bin/analyzer.cpp $(DEPS_OBJ)
 	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
 
 calcTreshold.exe: bin/calcTreshold.cpp $(DEPS_OBJ)
+	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
+
+calcTreshold_fitTemplate.exe: bin/calcTreshold_fitTemplate.cpp $(DEPS_OBJ)
 	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
 
 drawWaveform.exe: bin/drawWaveform.cpp $(DEPS_OBJ)
