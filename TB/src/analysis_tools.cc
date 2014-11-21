@@ -257,7 +257,7 @@ float TimeConstFracAbs(int t1, int t2, const vector<float>* samples, float AmpFr
         Chi2 = Chi2 + pow(samples->at(cfSample+n) - A - B*((cfSample+n)*step),2)/sigma2;
     } 
     // A+Bx = AmpFraction * amp
-    float interpolation = (minValue - A) / B;
+    float interpolation = (minValue - A) / B /step;
     //        std::cout << " >>> interp = " << interpolation << "minValue = "<<minValue<<" A = " << A << " B = " << B << std::endl;
     return interpolation;
 
@@ -321,7 +321,7 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
   // A+Bx = threshold
 
   //  float tStart = startSample;
-  float tStart_int = (threshold*1. - A) / B; // /step;
+  float tStart_int = (threshold*1. - A) / B /step;
 
   //  std::cout << " >>> interpStart = " << tStart_int << "minValue = "<<threshold*1.<<" A = " << A << " B = " << B << std::endl;
   //  std::cout << " >>> tStart = " << tStart << " tStart_int = " << tStart_int << std::endl;
@@ -370,7 +370,7 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
 
   // A+Bx = thresh
   //  float tStop = stopSample;
-  float tStop_int = (threshold*1. - A) / B;// / step;
+  float tStop_int = (threshold*1. - A) / B / step;
   //  std::cout << " >>> tStart = " << tStop << " tStop_int = " << tStop_int << std::endl;
   // std::cout << " >>> tStop = " << tStop << std::endl;
   // std::cout << " >>> A = " << A << " B = " << B << std::endl;
@@ -379,7 +379,7 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
   start=tStart_int; //SAVE T_START
   stop =tStop_int; //SAVE T_STOP
 
-  return (tStop_int - tStart_int)/ step;
+  return (tStop_int - tStart_int);
 }
 
 
