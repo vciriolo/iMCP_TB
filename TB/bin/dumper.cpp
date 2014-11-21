@@ -67,7 +67,7 @@ int main (int argc, char** argv)
     outROOT->cd();
 
     TProfile** wf_promed = new TProfile*[10];
-    for(int iCh=0; iCh<10; ++iCh) wf_promed[iCh] = new TProfile(Form("wf_promed_%d",iCh), "", 1024, 0., 1024.);
+    for(int iCh=0; iCh<10; ++iCh) wf_promed[iCh] = new TProfile(Form("wf_promed_%d",iCh), "", 102400, 0., 1024.);
 
     TTree* outTree = new TTree("reco_tree", "reco_tree");
     outTree->SetDirectory(0);
@@ -250,13 +250,12 @@ int main (int argc, char** argv)
 		  //fill pro-medio
 		  if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024) ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
 		  ampMax[iCh] = AmpMax(47, 500, &digiCh[iCh]);
-		  if(ampMax[iCh] < -30. && ampMax[iCh] > -2000.){			
-		    int timeMax = TimeConstFrac(47, 500, &digiCh[iCh], 1.)/0.2; //LUCA: maybe for this we can use ampMaxTimeTemp...
-		    for(unsigned int iSample=0; iSample<digiCh[iCh].size(); ++iSample){
-		      if((iSample + 300 - timeMax) < 1024. && (iSample + 300 - timeMax) > 0.)
-			wf_promed[iCh]->Fill(iSample + 300 - timeMax, -1.*digiCh[iCh].at(iSample)/ampMax[iCh]);
+		  if(ampMax[iCh] < -30. && ampMax[iCh] > -3000.){			
+		    double timeCFpm = TimeConstFracAbs(47, 800, &digiCh[iCh], 0.5, ampMax[iCh]);
+		    for(unsigned int iSample=0; iSample<digiCh[iCh].size(); ++iSample) {
+		      if(timeCFpm > 80. && timeCFpm < 220.) wf_promed[iCh]->Fill( (iSample + 300 - timeCFpm) , (-1.*digiCh[iCh].at(iSample)/ampMax[iCh]));
 		    }
-		  }
+		  }//unsaturated
 		
 		  if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024){
 		    ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
