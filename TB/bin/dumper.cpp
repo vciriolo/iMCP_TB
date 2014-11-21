@@ -108,9 +108,10 @@ int main (int argc, char** argv)
       //-----Definitions
       vector<float> digiCh[10];
       float timeCF[10], timeCFcorr[10];
-      float timeOT[10];
+      float timeOT[10], timeStart[10], timeStop[10], ampMaxT[10];
       float intBase[10], intSignal[10], intSignalcorr[10], ampMax[10], ampMaxcorr[10];
       ///int fibreX[8], hodoYchannels[8];
+      float tStart, tStop;
 
       //--reading wire chamber from other tree --
       TChain* t1 = new TChain("outputTree");
@@ -230,24 +231,25 @@ int main (int argc, char** argv)
 		  ampMax[iCh] = AmpMax(51, 1000, &digiCh[iCh]);
 		  intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
 		  intSignal[iCh] = ComputeIntegral(51, 1000, &digiCh[iCh]);
-		  timeCF[iCh] = TimeConstFrac(51, 1000, &digiCh[iCh], 0.5, ampMax[iCh]);
-		  timeOT[iCh] = TimeOverThreshold(51, 1000, &digiCh[iCh], -1000.);
+		  timeCF[iCh] = TimeConstFracAbs(51, 1000, &digiCh[iCh], 0.5, ampMax[iCh]);
+		  timeOT[iCh] = TimeOverThreshold(51, 1000, &digiCh[iCh], -1000., tStart, tStop);
 		}
 
 		//save infos for MCPs
 		else {
 
-		  int ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[iCh], 1)/0.2; //time of max sample (window's coincidence:-30,40)
+		  int ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[iCh], 1)/0.2; //time of max sample (window's coincidence:-50,50)
 		  //window for charge calculation
 		  int t1 = ampMaxTimeTemp-13;
 		  int t2 = ampMaxTimeTemp+12;
+		  ampMaxT[iCh]=ampMaxTimeTemp;
 		
 		  if (iCh!=4)SubtractBaseline(t1-27, t1-7, &digiCh[iCh]);  //subtract baseline immediately before pulse		
 		  intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
-				
+
 		  //fill pro-medio
 		  if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024) ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
-		  //		ampMax[iCh] = AmpMax(47, 500, &digiCh[iCh]);
+		  ampMax[iCh] = AmpMax(47, 500, &digiCh[iCh]);
 		  if(ampMax[iCh] < -30. && ampMax[iCh] > -2000.){			
 		    int timeMax = TimeConstFrac(47, 500, &digiCh[iCh], 1.)/0.2; //LUCA: maybe for this we can use ampMaxTimeTemp...
 		    for(unsigned int iSample=0; iSample<digiCh[iCh].size(); ++iSample){
@@ -261,13 +263,16 @@ int main (int argc, char** argv)
 		    intSignal[iCh] = ComputeIntegral(t1, t2, &digiCh[iCh]);
 		  }
 		  else{
-		    intSignal[iCh] = ComputeIntegral(50, 70, &digiCh[iCh]);
+		    intSignal[iCh] = ComputeIntegral(50, 70, &digiCh[iCh]);	
 		    ampMax[iCh] = AmpMax(0, 1024, &digiCh[iCh]);
 		  }
-		
-		  //time OT
-		  timeOT[iCh] = TimeOverThreshold(40, 800, &digiCh[iCh], -1000.);
-		
+
+
+		  /*		  if (iCh==4) {
+		  std::cout<<tStart<<" "<<timeOT[iCh]<<std::endl;
+		  getchar();
+		  }
+		  */
 		  //correct ampMax & charge
 		  if(ampMax[iCh] < -1000.) {
 		    ampMaxcorr[iCh] = -1. * getAmplitude_fromTot(iCh, timeOT[iCh]);
@@ -277,8 +282,19 @@ int main (int argc, char** argv)
 		    ampMaxcorr[iCh] = ampMax[iCh];
 		    intSignalcorr[iCh] = intSignal[iCh];
 		  }
+
+		  //time OT
+		  timeOT[iCh] = TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -1000., tStart, tStop);
+
+		  timeStart[iCh]=tStart;
+		  timeStop[iCh]=tStop;
 		
 		  timeCF[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMax[iCh]);
+		  //		  std::cout<<iEntry<<" "<<iCh<<" "<<t1<<" "<<t2<<" "<<ampMax[iCh]<<" "<<timeCF[iCh]<<" "<<timeStart[iCh]<<std::endl;
+		  //		  if (timeCF[iCh]<0 || timeCF[iCh]>1024) {  std::cout<<iEntry<<" "<<iCh<<" "<<timeCF[iCh]<<std::endl; getchar();}
+		  //		  if (ampMax[iCh]<-1000.)  {std::cout<<amp_max[iCh]<<std::endl; getchar(); }
+		  //		  		  if(iCh==7 && ampMax[iCh]<-1000.) { std::cout<<timeCF[iCh]<<" "<<tStart<<" "<<std::endl; getchar();}
+		  		  
 		  if(ampMax[iCh] < -1000.){
 		    if(ampMaxcorr[iCh]*0.5 > -6000.) timeCFcorr[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMaxcorr[iCh]);
 		    else timeCFcorr[iCh] = -999.;
@@ -293,8 +309,11 @@ int main (int argc, char** argv)
 		    time_CF[MCPList.at(MCPName.at(iCh))]   = timeCF[iCh];
 		    time_CF_corr[MCPList.at(MCPName.at(iCh))]   = timeCFcorr[iCh];
 		    time_OT[MCPList.at(MCPName.at(iCh))]   = timeOT[iCh];
+		    time_start[MCPList.at(MCPName.at(iCh))]   = timeStart[iCh];
+		    time_stop[MCPList.at(MCPName.at(iCh))]   = timeStop[iCh];
 		    amp_max[MCPList.at(MCPName.at(iCh))]   = -ampMax[iCh];
 		    amp_max_corr[MCPList.at(MCPName.at(iCh))]   = -ampMaxcorr[iCh];
+		    amp_max_time[MCPList.at(MCPName.at(iCh))]   = ampMaxT[iCh];
 		    charge[MCPList.at(MCPName.at(iCh))]    = -intSignal[iCh];
 		    charge_corr[MCPList.at(MCPName.at(iCh))]    = -intSignalcorr[iCh];
 		    baseline[MCPList.at(MCPName.at(iCh))]  = -intBase[iCh];
