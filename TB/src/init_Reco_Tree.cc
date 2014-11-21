@@ -3,9 +3,12 @@
 float                 time_CF[10];
 float                 time_CF_corr[10];
 float                 time_OT[10];
+float                 time_start[10];
+float                 time_stop[10];
 float                 time_Max[10];
 float                 amp_max[10];
 float                 amp_max_corr[10];
+float                 amp_max_time[10];
 float                 charge[10];
 float                 charge_corr[10];
 float                 baseline[10];
@@ -23,10 +26,13 @@ float tdcY;
 // List of branches                                                                                                                                           
 TBranch        *b_time_CF;   //!                                                                                                                              
 TBranch        *b_time_CF_corr;   //!                                                                                                                         
-TBranch        *b_time_OT;   //!                                                                                                                              
+TBranch        *b_time_OT;   //!     
+TBranch        *b_time_start;                                                                                                                         
+TBranch        *b_time_stop;                                
 TBranch        *b_time_Max;   //!                                                                                                                             
 TBranch        *b_amp_max;   //!                                                                                                                              
 TBranch        *b_amp_max_corr;   //!                                                                                                                         
+TBranch        *b_amp_max_time;   //!                                                                                                                         
 TBranch        *b_baseline;   //!                                                                                                                             
 TBranch        *b_charge;   //!                                                                                                                               
 TBranch        *b_charge_corr;   //!                                                                                                                          
@@ -51,9 +57,12 @@ void SetOutTree(TTree* outTree)
   outTree->Branch("time_CF",&time_CF,"time_CF[10]/F");
   outTree->Branch("time_CF_corr",&time_CF_corr,"time_CF_corr[10]/F");
   outTree->Branch("time_OT",&time_OT,"time_OT[10]/F");
+  outTree->Branch("time_start",&time_start,"time_start[10]/F");
+  outTree->Branch("time_stop",&time_stop,"time_stop[10]/F");
   outTree->Branch("time_Max",&time_Max,"time_Max[10]/F");
   outTree->Branch("amp_max",&amp_max,"amp_max[10]/F");
   outTree->Branch("amp_max_corr",&amp_max_corr,"amp_max_corr[10]/F");
+  outTree->Branch("amp_max_time",&amp_max_time,"amp_max_time[10]/F");
   outTree->Branch("charge",&charge,"charge[10]/F"); 
   outTree->Branch("charge_corr",&charge_corr,"charge_corr[10]/F");
   outTree->Branch("baseline",&baseline,"baseline[10]/F");
@@ -83,9 +92,12 @@ void InitRecoTree(TTree* nt)
   nt->SetBranchAddress("time_CF", &time_CF, &b_time_CF);
   nt->SetBranchAddress("time_CF_corr", &time_CF_corr, &b_time_CF_corr);
   nt->SetBranchAddress("time_OT", &time_OT, &b_time_OT);
+  nt->SetBranchAddress("time_start", &time_start, &b_time_start);
+  nt->SetBranchAddress("time_stop", &time_stop, &b_time_stop);
   nt->SetBranchAddress("time_Max", &time_Max, &b_time_Max);
   nt->SetBranchAddress("amp_max", &amp_max, &b_amp_max);
   nt->SetBranchAddress("amp_max_corr", &amp_max_corr, &b_amp_max_corr);
+  nt->SetBranchAddress("amp_max_time", &amp_max_time, &b_amp_max_time);
   nt->SetBranchAddress("charge", &charge, &b_charge);
   nt->SetBranchAddress("charge_corr", &charge_corr, &b_charge_corr);
   nt->SetBranchAddress("baseline", &baseline, &b_baseline);
