@@ -154,16 +154,19 @@ float TimeConstFrac(int t1, int t2, const vector<float>* samples, float AmpFract
     for(int iSample=t1; iSample<t2; iSample++)
     {
         if(samples->at(iSample) < samples->at(minSample)) minSample = iSample;
+	//	std::cout<<"CF: "<<iSample<<" "<<samples->at(iSample)<<" "<<minSample<<std::endl;	
     }
+    //    getchar();
+
     minValue = samples->at(minSample);
     if(AmpFraction == 1) 
         return minSample*step;
     for(int iSample=minSample; iSample>t1; iSample--)
     {
-        if(samples->at(iSample) > minValue*AmpFraction) 
+      if(samples->at(iSample) > minValue*AmpFraction) 
         {
             cfSample = iSample;
-	    //	    std::cout << " CF cfSample = " << cfSample << " samples->at(iSample) = " << samples->at(iSample) << std::endl;
+	    //	      	    std::cout << " CF cfSample = " << cfSample << " samples->at(iSample) = " << samples->at(iSample) << std::endl;
             break;
         }
     }
@@ -182,6 +185,8 @@ float TimeConstFrac(int t1, int t2, const vector<float>* samples, float AmpFract
     float A = (Sxx*Sy - Sx*Sxy) / Delta;
     float B = (Nsamples*Sxy - Sx*Sy) / Delta;
 
+    //    std::cout<<Nsamples<<" "<<Sxx<<" "<<Sx<<" "<<Sy<<" "<<Delta<<" "<<step<<std::endl;
+
     float sigma2 = pow(step/sqrt(12)*B,2);
  
     for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
@@ -190,8 +195,8 @@ float TimeConstFrac(int t1, int t2, const vector<float>* samples, float AmpFract
         Chi2 = Chi2 + pow(samples->at(cfSample+n) - A - B*((cfSample+n)*step),2)/sigma2;
     } 
     // A+Bx = AmpFraction * amp
-    float interpolation = (samples->at(minSample) * AmpFraction - A) / B;
-    //    std::cout << " >>> interp = " << interpolation << " A = " << A << " B = " << B << std::endl;
+    float interpolation = (samples->at(minSample) * 1. - A) / B;
+    //            std::cout << " >>> interp = " << interpolation << " A = " << A << " B = " << B << std::endl;
     return interpolation;
 
 }
@@ -214,16 +219,17 @@ float TimeConstFracAbs(int t1, int t2, const vector<float>* samples, float AmpFr
 
     for(int iSample=t1; iSample<t2; iSample++){
       if(samples->at(iSample) < minValue) minSample = iSample;
-      break;
+      //        std::cout<<"CF: "<<iSample<<" "<<samples->at(iSample)<<" "<<minSample<<std::endl;
+	//      break;
     }
-    minValue = samples->at(minSample);
+    //    std::cout<<"minSample: "<<minSample<<std::endl;
 
     for(int iSample=minSample; iSample>t1; iSample--)
     {
         if(samples->at(iSample) > minValue) 
         {
             cfSample = iSample;
-	    //	    std::cout << " CF cfSample = " << cfSample << " samples->at(iSample) = " << samples->at(iSample) << std::endl;
+	    //            	    std::cout << " CF cfSample = " << cfSample << " samples->at(iSample) = " << samples->at(iSample) << std::endl;
             break;
         }
     }
@@ -241,6 +247,7 @@ float TimeConstFracAbs(int t1, int t2, const vector<float>* samples, float AmpFr
     float Delta = Nsamples*Sxx - Sx*Sx;
     float A = (Sxx*Sy - Sx*Sxy) / Delta;
     float B = (Nsamples*Sxy - Sx*Sy) / Delta;
+    //      std::cout<<Nsamples<<" "<<Sxx<<" "<<Sx<<" "<<Sy<<" "<<Delta<<" "<<step<<std::endl;
 
     float sigma2 = pow(step/sqrt(12)*B,2);
  
@@ -251,14 +258,14 @@ float TimeConstFracAbs(int t1, int t2, const vector<float>* samples, float AmpFr
     } 
     // A+Bx = AmpFraction * amp
     float interpolation = (minValue - A) / B;
-    //    std::cout << " >>> interp = " << interpolation << " A = " << A << " B = " << B << std::endl;
+    //        std::cout << " >>> interp = " << interpolation << "minValue = "<<minValue<<" A = " << A << " B = " << B << std::endl;
     return interpolation;
 
 }
 
 //---------------------------------------------------------------------------------------
 //---estimate time (ns) with CFD, samples must be a negative signal and baseline subtracted
-float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float threshold, 
+float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float threshold, float &start, float &stop, 
 			float step, int Nsamples){
 
   float xx= 0.;
@@ -272,16 +279,20 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
   int minSample = t1;
 
   for(int iSample=t1; iSample<t2; iSample++){
-    if(samples->at(iSample) < samples->at(minSample)) minSample = iSample;
+    //    if(samples->at(iSample) < samples->at(minSample)) minSample = iSample;
+        if(samples->at(iSample) < threshold) minSample = iSample;
+	//    std::cout<<"OT: "<<iSample<<" "<<samples->at(iSample)<<" "<<minSample<<std::endl;
   }
 
   for(int iSample=minSample; iSample>t1; --iSample){
     //      std::cout << " iSample = " << iSample << " samples->at(iSample) = " << samples->at(iSample) << " threshold = " << threshold << std::endl;
     if(samples->at(iSample) > threshold){
       startSample = iSample;
+      //        	    std::cout << " OT startSample = " << startSample << " samples->at(iSample) = " << samples->at(iSample) << std::endl;
       break;
     }
   }
+
   //interpolation
   for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
     {
@@ -297,6 +308,7 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
   float Delta = Nsamples*Sxx - Sx*Sx;
   float A = (Sxx*Sy - Sx*Sxy) / Delta;
   float B = (Nsamples*Sxy - Sx*Sy) / Delta;
+  //    std::cout<<Nsamples<<" "<<Sxx<<" "<<Sx<<" "<<Sy<<" "<<Delta<<" "<<step<<std::endl;
 
   //  float sigma2 = pow(step/sqrt(12)*B,2);
 
@@ -309,7 +321,9 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
   // A+Bx = threshold
 
   //  float tStart = startSample;
-  float tStart_int = (samples->at(startSample) - A) / B / step;
+  float tStart_int = (threshold*1. - A) / B; // /step;
+
+  //  std::cout << " >>> interpStart = " << tStart_int << "minValue = "<<threshold*1.<<" A = " << A << " B = " << B << std::endl;
   //  std::cout << " >>> tStart = " << tStart << " tStart_int = " << tStart_int << std::endl;
   //  std::cout << " >>> A = " << A << " B = " << B << std::endl;
   
@@ -356,13 +370,16 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
 
   // A+Bx = thresh
   //  float tStop = stopSample;
-  float tStop_int = (samples->at(stopSample) - A) / B / step;
+  float tStop_int = (threshold*1. - A) / B;// / step;
   //  std::cout << " >>> tStart = " << tStop << " tStop_int = " << tStop_int << std::endl;
   // std::cout << " >>> tStop = " << tStop << std::endl;
   // std::cout << " >>> A = " << A << " B = " << B << std::endl;
   ///    std::cout << " >>> DT = " << tStop - tStart << std::endl;
   //  return (tStop - tStart);
-  return (tStop_int - tStart_int) / step;
+  start=tStart_int; //SAVE T_START
+  stop =tStop_int; //SAVE T_STOP
+
+  return (tStop_int - tStart_int)/ step;
 }
 
 
