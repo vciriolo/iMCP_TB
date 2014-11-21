@@ -15,7 +15,7 @@ name = ["HVScan1","HVScan2","HVScan3","HVScan4","HVScan5","HVScan6","HVScan7","H
 for i in range(len(name)):
     fn = "Job/Job_"+name[i];
     outScript = open(fn+".sh","w");
-    command = "python python/dumper_fitTemplate.py -cfg cfg/"+name[i]+".cfg -n "+name[i];
+    command = "python python/dumper.py -cfg cfg/"+name[i]+".cfg -n "+name[i];
 
     outScript.write('#!/bin/bash');
     outScript.write("\n"+'cd '+CMSSWDir);
