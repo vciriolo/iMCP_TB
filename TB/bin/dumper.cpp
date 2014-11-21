@@ -311,7 +311,7 @@ int main (int argc, char** argv)
 		    time_stop[MCPList.at(MCPName.at(iCh))]   = timeStop[iCh]*0.2;
 		    amp_max[MCPList.at(MCPName.at(iCh))]   = -ampMax[iCh];
 		    amp_max_corr[MCPList.at(MCPName.at(iCh))]   = -ampMaxcorr[iCh];
-		    amp_max_time[MCPList.at(MCPName.at(iCh))]   = ampMaxT[iCh];
+		    amp_max_time[MCPList.at(MCPName.at(iCh))]   = ampMaxT[iCh]*0.2;
 		    charge[MCPList.at(MCPName.at(iCh))]    = -intSignal[iCh];
 		    charge_corr[MCPList.at(MCPName.at(iCh))]    = -intSignalcorr[iCh];
 		    baseline[MCPList.at(MCPName.at(iCh))]  = -intBase[iCh];
