@@ -267,6 +267,11 @@ int main (int argc, char** argv)
 		    ampMax[iCh] = AmpMax(0, 1024, &digiCh[iCh]);
 		  }
 
+		  //time OT
+		  timeOT[iCh] = TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -1000., tStart, tStop);
+
+		  timeStart[iCh]=tStart;
+		  timeStop[iCh]=tStop;
 
 		  /*		  if (iCh==4) {
 		  std::cout<<tStart<<" "<<timeOT[iCh]<<std::endl;
@@ -283,12 +288,6 @@ int main (int argc, char** argv)
 		    intSignalcorr[iCh] = intSignal[iCh];
 		  }
 
-		  //time OT
-		  timeOT[iCh] = TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -1000., tStart, tStop);
-
-		  timeStart[iCh]=tStart;
-		  timeStop[iCh]=tStop;
-		
 		  timeCF[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMax[iCh]);
 		  //		  std::cout<<iEntry<<" "<<iCh<<" "<<t1<<" "<<t2<<" "<<ampMax[iCh]<<" "<<timeCF[iCh]<<" "<<timeStart[iCh]<<std::endl;
 		  //		  if (timeCF[iCh]<0 || timeCF[iCh]>1024) {  std::cout<<iEntry<<" "<<iCh<<" "<<timeCF[iCh]<<std::endl; getchar();}
@@ -306,11 +305,11 @@ int main (int argc, char** argv)
 	    //--------dump ntuple - impulses are negative, invert the sign
 	    for (int iCh=0; iCh<nChannels; iCh++)
 	      {
-		    time_CF[MCPList.at(MCPName.at(iCh))]   = timeCF[iCh];
-		    time_CF_corr[MCPList.at(MCPName.at(iCh))]   = timeCFcorr[iCh];
-		    time_OT[MCPList.at(MCPName.at(iCh))]   = timeOT[iCh];
-		    time_start[MCPList.at(MCPName.at(iCh))]   = timeStart[iCh];
-		    time_stop[MCPList.at(MCPName.at(iCh))]   = timeStop[iCh];
+		    time_CF[MCPList.at(MCPName.at(iCh))]   = timeCF[iCh]*0.2;
+		    time_CF_corr[MCPList.at(MCPName.at(iCh))]   = timeCFcorr[iCh]*0.2;
+		    time_OT[MCPList.at(MCPName.at(iCh))]   = timeOT[iCh]*0.2;
+		    time_start[MCPList.at(MCPName.at(iCh))]   = timeStart[iCh]*0.2;
+		    time_stop[MCPList.at(MCPName.at(iCh))]   = timeStop[iCh]*0.2;
 		    amp_max[MCPList.at(MCPName.at(iCh))]   = -ampMax[iCh];
 		    amp_max_corr[MCPList.at(MCPName.at(iCh))]   = -ampMaxcorr[iCh];
 		    amp_max_time[MCPList.at(MCPName.at(iCh))]   = ampMaxT[iCh];
