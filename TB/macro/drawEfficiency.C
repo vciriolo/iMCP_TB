@@ -124,28 +124,28 @@
   }
 
   if(HVE == "HVH_50"){
-  inF_MiB3 = TFile::Open("plots/efficiency/efficiency_MiB3_eff_X0_X0Scan_HVHigh_50GeV.root");
-  inF_enSEE = TFile::Open("plots/efficiency/efficiency_enSEE_eff_X0_X0Scan_HVHigh_50GeV.root");
-  inF_ZStack2 = TFile::Open("plots/efficiency/efficiency_ZStack2_eff_X0_X0Scan_HVHigh_50GeV.root");
-  inF_ZStack1 = TFile::Open("plots/efficiency/efficiency_ZStack1_eff_X0_X0Scan_HVHigh_50GeV.root");
+  inF_MiB3 = TFile::Open("plots/efficiency/efficiency_MiB3_eff_X0_scanX0_HVHigh50GeV.root");
+  inF_enSEE = TFile::Open("plots/efficiency/efficiency_enSEE_eff_X0_scanX0_HVHigh50GeV.root");
+  inF_ZStack2 = TFile::Open("plots/efficiency/efficiency_ZStack2_eff_X0_scanX0_HVHigh50GeV.root");
+  inF_ZStack1 = TFile::Open("plots/efficiency/efficiency_ZStack1_eff_X0_scanX0_HVHigh50GeV.root");
   }
   if(HVE == "HVH_20"){
-  inF_MiB3 = TFile::Open("plots/efficiency/efficiency_MiB3_eff_X0_X0Scan_HVHigh_20GeV.root");
-  inF_enSEE = TFile::Open("plots/efficiency/efficiency_enSEE_eff_X0_X0Scan_HVHigh_20GeV.root");
-  inF_ZStack2 = TFile::Open("plots/efficiency/efficiency_ZStack2_eff_X0_X0Scan_HVHigh_20GeV.root");
-  inF_ZStack1 = TFile::Open("plots/efficiency/efficiency_ZStack1_eff_X0_X0Scan_HVHigh_20GeV.root");
+  inF_MiB3 = TFile::Open("plots/efficiency/efficiency_MiB3_eff_X0_scanX0_HVHigh20GeV.root");
+  inF_enSEE = TFile::Open("plots/efficiency/efficiency_enSEE_eff_X0_scanX0_HVHigh20GeV.root");
+  inF_ZStack2 = TFile::Open("plots/efficiency/efficiency_ZStack2_eff_X0_scanX0_HVHigh20GeV.root");
+  inF_ZStack1 = TFile::Open("plots/efficiency/efficiency_ZStack1_eff_X0_scanX0_HVHigh20GeV.root");
   }
   if(HVE == "HVL_50"){
-  inF_MiB3 = TFile::Open("plots/efficiency/efficiency_MiB3_eff_X0_X0Scan_HVLow_50GeV.root");
-  inF_enSEE = TFile::Open("plots/efficiency/efficiency_enSEE_eff_X0_X0Scan_HVLow_50GeV.root");
-  inF_ZStack2 = TFile::Open("plots/efficiency/efficiency_ZStack2_eff_X0_X0Scan_HVLow_50GeV.root");
-  inF_ZStack1 = TFile::Open("plots/efficiency/efficiency_ZStack1_eff_X0_X0Scan_HVLow_50GeV.root");
+  inF_MiB3 = TFile::Open("plots/efficiency/efficiency_MiB3_eff_X0_scanX0_HVLow50GeV.root");
+  inF_enSEE = TFile::Open("plots/efficiency/efficiency_enSEE_eff_X0_scanX0_HVLow50GeV.root");
+  inF_ZStack2 = TFile::Open("plots/efficiency/efficiency_ZStack2_eff_X0_scanX0_HVLow50GeV.root");
+  inF_ZStack1 = TFile::Open("plots/efficiency/efficiency_ZStack1_eff_X0_scanX0_HVLow50GeV.root");
   }
   if(HVE == "HVL_20"){
-  inF_MiB3 = TFile::Open("plots/efficiency/efficiency_MiB3_eff_X0_X0Scan_HVLow_20GeV.root");
-  inF_enSEE = TFile::Open("plots/efficiency/efficiency_enSEE_eff_X0_X0Scan_HVLow_20GeV.root");
-  inF_ZStack2 = TFile::Open("plots/efficiency/efficiency_ZStack2_eff_X0_X0Scan_HVLow_20GeV.root");
-  inF_ZStack1 = TFile::Open("plots/efficiency/efficiency_ZStack1_eff_X0_X0Scan_HVLow_20GeV.root");
+  inF_MiB3 = TFile::Open("plots/efficiency/efficiency_MiB3_eff_X0_scanX0_HVLow20GeV.root");
+  inF_enSEE = TFile::Open("plots/efficiency/efficiency_enSEE_eff_X0_scanX0_HVLow20GeV.root");
+  inF_ZStack2 = TFile::Open("plots/efficiency/efficiency_ZStack2_eff_X0_scanX0_HVLow20GeV.root");
+  inF_ZStack1 = TFile::Open("plots/efficiency/efficiency_ZStack1_eff_X0_scanX0_HVLow20GeV.root");
   }
 
 
