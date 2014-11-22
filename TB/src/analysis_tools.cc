@@ -2,6 +2,112 @@
 
 using namespace std;
 
+////////////////////////////////
+float get_amp_max_from_time_OT(int iCh, float ix, int PC, int run) {
+
+  TF1* func = new TF1("func", "[0] + [1] * x + [2] * x*x + [3] * x*x*x + [4] * x*x*x*x", 0., 1000.);
+
+  if(iCh == 4) func->SetParameters(1000, -52.94, 305.443, -152.454, 41.9803);
+  if(iCh == 5) 
+    {
+      if (PC==1)       func->SetParameters(1000, 73.6578, 99.83, -36.9063, 33.7668);
+      else             func->SetParameters(1000, -38.154, 233.842, -80.6531, 12.8032);
+    }
+  if(iCh == 6) 
+    {
+      if (run<814)     func->SetParameters(1000, 229.573, -238.61, 225.771, -21.8069);
+      else             func->SetParameters(1000, 199.071, 80.5514, 98.8197, 13.8348);
+    }
+  if(iCh == 7) 
+    {
+      if (PC==1)                   func->SetParameters(1000, 83.5196, -6.21453, 20.6892, 8.57441);
+      else if (PC==0 && run<727)   func->SetParameters(1000, -70.3132, 297.532, -128.166, 22.7222);
+      else                         func->SetParameters(1000, -29.4327, 222.072, -82.052, 16.54);
+    }
+  if(iCh == 9) 
+    {
+      if (PC==1)       func->SetParameters(1000, 83.0385, 102.869, -57.5386, 33.8739);
+      else             func->SetParameters(1000, 67.7006, 192.817, -87.4701, 22.9615);
+    }
+
+  float y=func->Eval(ix);
+  delete func;
+  
+  if(iCh < 4 || iCh == 8) return -1;
+  return y;
+}
+
+//////////////////////////////////////////
+float get_time_CF_from_time_OT(int iCh, float ix, int PC, int run, float t_start) {
+
+  TF1* func = new TF1("func", "[0] + [1] * x ", 0., 10000.);
+
+  if(iCh == 4) func->SetParameters(-1.02056+t_start, 0.411869);
+  if(iCh == 5) 
+    {
+      if (PC==1)       func->SetParameters(-0.974679+t_start, 0.450735);
+      else             func->SetParameters(-0.941685+t_start, 0.289897);
+    }
+  if(iCh == 6) 
+    {
+      if (run<814)     func->SetParameters(-0.805311+t_start, 0.404084);
+      else             func->SetParameters(-0.558887+t_start, 0.35465);
+    }
+  if(iCh == 7) 
+    {
+      if (PC==1)                   func->SetParameters(-1.03487+t_start, 0.390875);
+      else if (PC==0 && run<727)   func->SetParameters(-1.37413+t_start, 0.428468);
+      else                         func->SetParameters(-1.01822+t_start, 0.346153);
+    }
+  if(iCh == 9) 
+    {
+      if (PC==1)       func->SetParameters(-1.09973+t_start, 0.476794);
+      else             func->SetParameters(-1.05614+t_start, 0.40859);
+    }
+
+  float y=func->Eval(ix);
+  delete func;
+  
+  if(iCh < 4 || iCh == 8) return -1;
+  return y;
+}
+
+//////////////////////////////////////////
+float get_charge_from_amp_max(int iCh, float ix, int PC, int run) {
+
+  TF1* func = new TF1("func", "[0] + [1] * x ", 0., 10000.);
+
+  if(iCh == 4) func->SetParameters(0, 12.2536);
+  if(iCh == 5) 
+    {
+      if (PC==1)       func->SetParameters(0, 10.9988);
+      else             func->SetParameters(0, 14.5069);
+    }
+  if(iCh == 6) 
+    {
+      if (run<814)     func->SetParameters(0, 10.4325);
+      else             func->SetParameters(-2913.14, 9.49739);
+    }
+  if(iCh == 7) 
+    {
+      if (PC==1)                   func->SetParameters(0, 13.5061);
+      else if (PC==0 && run<727)   func->SetParameters(0, 15.008);
+      else                         func->SetParameters(0, 14.3031);
+    }
+  if(iCh == 9) 
+    {
+      if (PC==1)       func->SetParameters(0, 11.4501);
+      else             func->SetParameters(0, 12.8507);
+    }
+
+  float y=func->Eval(ix);
+  delete func;
+  
+  if(iCh < 4 || iCh == 8) return -1;
+  return y;
+}
+
+////////////////////////////////////////
 double getAmplitude_fromTot(int iCh, float ix){
 
   TF1* func = new TF1("func", "[0] + [1] * x + [2] * x*x + [3] * x*x*x + [4] * x*x*x*x", 0., 1000.);
@@ -18,6 +124,7 @@ double getAmplitude_fromTot(int iCh, float ix){
   if(iCh < 4 || iCh == 8) return -1;
   return y;
 }
+
 
 double getSignal_fromAmplitude(int iCh, float ix){
 
