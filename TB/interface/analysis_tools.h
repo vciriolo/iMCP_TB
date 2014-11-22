@@ -39,6 +39,12 @@ using namespace std;
 #define HODOY_ADC_MID_CHANNEL 27
 #define HODOY_ADC_END_CHANNEL 31
 
+float get_amp_max_from_time_OT(int iCh, float ix, int PC, int run);
+
+float get_time_CF_from_time_OT(int iCh, float ix, int PC, int run, float t_start);
+
+float get_charge_from_amp_max(int iCh, float ix, int PC, int run);
+
 double getAmplitude_fromTot(int iCh, float ix);
 
 double getSignal_fromAmplitude(int iCh, float ix);
