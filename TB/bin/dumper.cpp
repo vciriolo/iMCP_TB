@@ -261,10 +261,10 @@ int main (int argc, char** argv)
 		    ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
 		    intSignal[iCh] = ComputeIntegral(t1, t2, &digiCh[iCh]);
 		  }
-		  else{
+		  /*		  else{    //A COSA SERVE????
 		    intSignal[iCh] = ComputeIntegral(50, 70, &digiCh[iCh]);	
 		    ampMax[iCh] = AmpMax(0, 1024, &digiCh[iCh]);
-		  }
+		    }*/
 
 		  //time OT
 		  timeOT[iCh] = TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -1000., tStart, tStop);
@@ -272,32 +272,40 @@ int main (int argc, char** argv)
 		  timeStart[iCh]=tStart;
 		  timeStop[iCh]=tStop;
 
+		  timeCF[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMax[iCh]);
+
 		  /*		  if (iCh==4) {
 		  std::cout<<tStart<<" "<<timeOT[iCh]<<std::endl;
 		  getchar();
 		  }
 		  */
 		  //correct ampMax & charge
-		  if(ampMax[iCh] < -1000.) {
-		    ampMaxcorr[iCh] = -1. * getAmplitude_fromTot(iCh, timeOT[iCh]);
-		    intSignalcorr[iCh] = -1. * getSignal_fromAmplitude(iCh, -1. * ampMaxcorr[iCh]);
+
+		  if(ampMax[iCh] < -2000.) {
+		    ampMaxcorr[iCh] = get_amp_max_from_time_OT(iCh, timeOT[iCh]*0.2, PCOn.at(iCh), run);
+		    intSignalcorr[iCh] = get_charge_from_amp_max(iCh, ampMaxcorr[iCh], PCOn.at(iCh), run);
+		    timeCFcorr[iCh] = get_time_CF_from_time_OT(iCh, timeOT[iCh]*0.2, PCOn.at(iCh), run, tStart*0.2)/0.2; //the function works in ns
+		    //		    std::cout<<iCh<<" "<<timeOT[iCh]*0.2<<" "<<-1.*ampMax[iCh]<<" "<<ampMaxcorr[iCh]<<" "<<-1.*intSignal[iCh]<<" "<<intSignalcorr[iCh]<<" "<<timeCF[iCh]*0.2-timeStart[iCh]*0.2<<" "<<timeCFcorr[iCh]*0.2-timeStart[iCh]*0.2<<std::endl;
+		    //getchar();
 		  }
 		  else {
-		    ampMaxcorr[iCh] = ampMax[iCh];
-		    intSignalcorr[iCh] = intSignal[iCh];
+		    ampMaxcorr[iCh] = -1.*ampMax[iCh];
+		    intSignalcorr[iCh] = -1.*intSignal[iCh];
+		    timeCFcorr[iCh] = timeCF[iCh];
 		  }
 
-		  timeCF[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMax[iCh]);
 		  //		  std::cout<<iEntry<<" "<<iCh<<" "<<t1<<" "<<t2<<" "<<ampMax[iCh]<<" "<<timeCF[iCh]<<" "<<timeStart[iCh]<<std::endl;
 		  //		  if (timeCF[iCh]<0 || timeCF[iCh]>1024) {  std::cout<<iEntry<<" "<<iCh<<" "<<timeCF[iCh]<<std::endl; getchar();}
 		  //		  if (ampMax[iCh]<-1000.)  {std::cout<<amp_max[iCh]<<std::endl; getchar(); }
 		  //		  		  if(iCh==7 && ampMax[iCh]<-1000.) { std::cout<<timeCF[iCh]<<" "<<tStart<<" "<<std::endl; getchar();}
 		  		  
-		  if(ampMax[iCh] < -1000.){
+		  /*		  if(ampMax[iCh] < -1000.){
 		    if(ampMaxcorr[iCh]*0.5 > -6000.) timeCFcorr[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMaxcorr[iCh]);
 		    else timeCFcorr[iCh] = -999.;
 		  }
+		  
 		  else timeCFcorr[iCh] = timeCF[iCh];
+		  */
 		}
 	      }
 	    
@@ -310,10 +318,10 @@ int main (int argc, char** argv)
 		    time_start[MCPList.at(MCPName.at(iCh))]   = timeStart[iCh]*0.2;
 		    time_stop[MCPList.at(MCPName.at(iCh))]   = timeStop[iCh]*0.2;
 		    amp_max[MCPList.at(MCPName.at(iCh))]   = -ampMax[iCh];
-		    amp_max_corr[MCPList.at(MCPName.at(iCh))]   = -ampMaxcorr[iCh];
+		    amp_max_corr[MCPList.at(MCPName.at(iCh))]   = ampMaxcorr[iCh];
 		    amp_max_time[MCPList.at(MCPName.at(iCh))]   = ampMaxT[iCh]*0.2;
 		    charge[MCPList.at(MCPName.at(iCh))]    = -intSignal[iCh];
-		    charge_corr[MCPList.at(MCPName.at(iCh))]    = -intSignalcorr[iCh];
+		    charge_corr[MCPList.at(MCPName.at(iCh))]    = intSignalcorr[iCh];
 		    baseline[MCPList.at(MCPName.at(iCh))]  = -intBase[iCh];
 
 		    isPCOn[MCPList.at(MCPName.at(iCh))]      = PCOn.at(iCh);
