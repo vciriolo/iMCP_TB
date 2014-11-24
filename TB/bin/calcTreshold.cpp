@@ -88,26 +88,28 @@ int main (int argc, char** argv)
   TGraph* g_SoB[20];
 
   TF1* base[10];
+  TF1* base2sig[10];
 
   TCanvas* baseFit[10];
   //------analyze the good channels and compute the charge tresholds--------
   std::cout<<"\n--------------------------------\n-->OK, now computing tresholds:"<<std::endl;
   for (int iCh=0; iCh<nChannels; iCh++)
 	{
-	  char hSName[100], hBName[100], hBNameFit[100], fitName[100];
+	  char hSName[100], hBName[100], hBNameFit[100], fitName2sig[100], fitName[100];
 	  sprintf(hSName, "hS_%d", iCh);
 	  sprintf(hBName, "hB_%d", iCh);
 	  sprintf(hBNameFit, "hBFit_%d", iCh);
 	  sprintf(fitName, "gausFit_%d", iCh);
+	  sprintf(fitName2sig, "gausFit2sig_%d", iCh);
 
 	  TH1F *hS = new TH1F(hSName,hSName, 30000, 0, 30000);
 	  TH1F *hB = new TH1F(hBName,hBName, 30000, 0, 30000);
-	  TH1F *hBFit = new TH1F(hBNameFit,hBNameFit, 100, -500, 500);
+	  TH1F *hBFit = new TH1F(hBNameFit,hBNameFit, 200, -300, 300);
 
 	  base[iCh] = new TF1(fitName,"gaus",-1000,1000);
 	      
 	  char hSDraw[100], hBDraw[100], hBDrawFit[100];
-	  sprintf(hSDraw, "charge[%d]>>%s", iCh, hSName);
+	  sprintf(hSDraw, "charge_corr[%d]>>%s", iCh, hSName);
 	  sprintf(hBDraw, "baseline[%d]>>%s", iCh, hBName);
 	  sprintf(hBDrawFit, "baseline[%d]>>%s", iCh, hBNameFit);
 
@@ -126,14 +128,16 @@ int main (int argc, char** argv)
 	  base[iCh]->SetParameter(1,0);
 	  base[iCh]->SetParameter(2,0);
      	  hBFit->Fit(base[iCh],"QN");
-	  base[iCh]->SetParameter(1,base[iCh]->GetParameter(1));
-	  hBFit->Fit(base[iCh],"Q","",base[iCh]->GetParameter(1)-2*base[iCh]->GetParameter(2), base[iCh]->GetParameter(1)+2*base[iCh]->GetParameter(2));
-	  std::cout<<"sigma baseline: "<<base[iCh]->GetParameter(2)<<std::endl;
-	  outputFile3s << iCh << "  "<<(int)(base[iCh]->GetParameter(2)*3)<<std::endl;
-	  outputFile5s << iCh << "  "<<(int)(base[iCh]->GetParameter(2)*5)<<std::endl;
+
+	  base2sig[iCh] = new TF1(fitName2sig,"gaus",base[iCh]->GetParameter(1)-2*base[iCh]->GetParameter(2), base[iCh]->GetParameter(1)+2*base[iCh]->GetParameter(2));
+	  base2sig[iCh]->SetParameter(1,base[iCh]->GetParameter(1));
+	  hBFit->Fit(base2sig[iCh],"Q","",base[iCh]->GetParameter(1)-2*base[iCh]->GetParameter(2), base[iCh]->GetParameter(1)+2*base[iCh]->GetParameter(2));
+	  std::cout<<"sigma baseline: "<<base2sig[iCh]->GetParameter(2)<<std::endl;
+	  outputFile3s << iCh << "  "<<(int)(base2sig[iCh]->GetParameter(2)*3)<<std::endl;
+	  outputFile5s << iCh << "  "<<(int)(base2sig[iCh]->GetParameter(2)*5)<<std::endl;
 
 	  hBFit->Draw();
-	  base[iCh]->Draw("same");
+	  base2sig[iCh]->Draw("same");
 	  baseFit[iCh]->Print(canvasName,"pdf");
 
 	  char gName[50];
