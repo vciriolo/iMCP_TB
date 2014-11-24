@@ -310,7 +310,8 @@ int main(int argc, char** argv)
 	    sprintf(plot_name, "plots/time_resolution/%s/%s_%d.pdf", label, MCP.c_str(), i);
 	    h_time->Draw();
 	    res_func_2sig->Draw("same");
-	    gStyle->SetOptFit(1111);
+	    //	    gStyle->SetOptFit(1111);
+	    gStyle->SetOptStat(0000);
 	    c->Print(plot_name, "pdf");
 	}
     }    
