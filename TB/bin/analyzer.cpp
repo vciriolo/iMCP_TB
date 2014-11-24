@@ -161,19 +161,25 @@ int main(int argc, char** argv)
   for(unsigned int i=0; i<ScanList.size(); i++)
     {
 
-      char h_sig_name[20], h_trig0_name[20], res_func_name[20], h_time_name[20];
+      char h_sig_name[20], h_trig0_name[20], res_func_name[20], res_func_name_2sig[20], h_time_name[20];
       //      char h_sig_name[20], h_base_name[20], h_trig0_name[20], res_func_name[20], h_time_name[20];
       sprintf(h_sig_name, "h_sig_%d", i);
       //      sprintf(h_base_name, "h_base_%d", i);
       sprintf(h_trig0_name, "h_trig0_%d", i);
       sprintf(h_time_name, "h_time_%d", i);
       sprintf(res_func_name, "res_func_%d", i);
+      sprintf(res_func_name_2sig, "res_func_2sig_%d", i);
 
       TH1F* h_sig= new TH1F(h_sig_name, h_sig_name, 500, -5000, 25000);
       //      TH1F* h_base = new TH1F(h_base_name, h_base_name, 500, 5000, 25000);
       TH1F* h_trig0 = new TH1F(h_trig0_name, h_trig0_name, 500, -5000, 25000);
-      TH1F* h_time = new TH1F(h_time_name, h_time_name, 500, -5, 5);
+      TH1F* h_time;
+      if (MCPList.at(MCP)==4)
+	h_time = new TH1F(h_time_name, h_time_name, 1000, -5, -2);
+      else
+        h_time = new TH1F(h_time_name, h_time_name, 1000, -2, 1);
       TF1* res_func = new TF1(res_func_name, "gausn", -10, 10);
+      TF1* res_func_2sig = new TF1(res_func_name_2sig, "gausn", -10, 10);
 
       //-----Draw variables-----
       sprintf(var_sig, "charge_corr[%d]>>%s", MCPNumber, h_sig_name);
@@ -259,17 +265,23 @@ int main(int argc, char** argv)
 	    res_func->SetParLimits(0, 0, h_time->GetEntries()*2);
 	    res_func->SetParLimits(2, 0, h_time->GetRMS());
 	    res_func->SetRange(h_time->GetMean()-2*h_time->GetRMS(), h_time->GetMean()+2*h_time->GetRMS());
-	    h_time->Fit(res_func, "R+");
+	    h_time->Fit(res_func, "QRN+");
+
+	    res_func_2sig->SetParameter(0,res_func->GetParameter(0));
+	    res_func_2sig->SetParameter(1,res_func->GetParameter(1));
+	    res_func_2sig->SetParameter(2,res_func->GetParameter(2));
+	    res_func_2sig->SetRange(res_func->GetParameter(1)-2*res_func->GetParameter(2), res_func->GetParameter(1)+2*res_func->GetParameter(2));
+	    h_time->Fit(res_func_2sig, "QR+");
 
 	    //	    std::cout<<h_time->GetEntries()<<std::endl;
 
-	    float err_time = res_func->GetParError(2)*1000;
-	    //   	    float t_res = sqrt(pow(res_func->GetParameter(2)*1000, 2) - pow(float(RES_TRIG), 2));
-	    //	    float e_t_res = sqrt(pow(err_time*res_func->GetParameter(2)*1000, 2) + pow(float(RES_TRIG_ERR)*RES_TRIG, 2))/t_res;
+	    float err_time = res_func_2sig->GetParError(2)*1000.;
+	    //   	    float t_res = sqrt(pow(res_func_2sig->GetParameter(2)*1000, 2) - pow(float(RES_TRIG), 2));
+	    //	    float e_t_res = sqrt(pow(err_time*res_func_2sig->GetParameter(2)*1000, 2) + pow(float(RES_TRIG_ERR)*RES_TRIG, 2))/t_res;
 
-	    float t_res = res_func->GetParameter(2)*1000/sqrt(2);
-	    float e_t_res = err_time*res_func->GetParameter(2)*1000/(sqrt(2)*t_res);
-	    float prob = res_func->GetProb();
+	    float t_res = res_func_2sig->GetParameter(2)*1000;///sqrt(2);
+	    float e_t_res = err_time*res_func_2sig->GetParameter(2)*1000/(t_res);//*sqrt(2));
+	    float prob = res_func_2sig->GetProb();
 	    if(i == 0)
 	    {
 		printf("----------Time Resolution(ps)----------\n");
@@ -283,7 +295,7 @@ int main(int argc, char** argv)
 	      g_eff->SetPointError(i, 0, e_t_res);
 	    }
 	    else {
-	      printf("%.3f\t%.0f\t%.3f\t%.0f\t%.3f\n", X0Step.at(i), t_res, 0., e_t_res, prob);
+	      printf("%.3f\t%.1f\t%.1f\t%.1f\t%.3f\n", X0Step.at(i), t_res, 0., e_t_res, prob);
 	      outputFile << X0Step.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
 	      g_eff->SetPoint(i, X0Step.at(i), t_res);
 	      g_eff->SetPointError(i, 0, e_t_res);
@@ -297,7 +309,7 @@ int main(int argc, char** argv)
 
 	    sprintf(plot_name, "plots/time_resolution/%s/%s_%d.pdf", label, MCP.c_str(), i);
 	    h_time->Draw();
-	    res_func->Draw("same");
+	    res_func_2sig->Draw("same");
 	    gStyle->SetOptFit(1111);
 	    c->Print(plot_name, "pdf");
 	}
