@@ -268,7 +268,7 @@ int main(int argc, char** argv)
 	    //	    float e_t_res = sqrt(pow(err_time*res_func->GetParameter(2)*1000, 2) + pow(float(RES_TRIG_ERR)*RES_TRIG, 2))/t_res;
 
 	    float t_res = res_func->GetParameter(2)*1000/sqrt(2);
-		     float e_t_res = err_time*res_func->GetParameter(2)*1000/(sqrt(2)*t_res);
+	    float e_t_res = err_time*res_func->GetParameter(2)*1000/(sqrt(2)*t_res);
 	    float prob = res_func->GetProb();
 	    if(i == 0)
 	    {
@@ -279,13 +279,17 @@ int main(int argc, char** argv)
 	    if(TString(scanType).Contains("HV") == 1) {
 	      printf("%d\t%.1f\t%.0f\t%.1f\t%.3f\n", HVVal.at(i), t_res, 0., e_t_res, prob);
 	      outputFile << HVVal.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
+	      g_eff->SetPoint(i, HVVal.at(i), t_res);
+	      g_eff->SetPointError(i, 0, e_t_res);
 	    }
 	    else {
 	      printf("%.3f\t%.0f\t%.3f\t%.0f\t%.3f\n", X0Step.at(i), t_res, 0., e_t_res, prob);
 	      outputFile << X0Step.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
+	      g_eff->SetPoint(i, X0Step.at(i), t_res);
+	      g_eff->SetPointError(i, 0, e_t_res);
 	    }
 	    if(i == (ScanList.size()-1))    
-		printf("---------------------------------------\n");
+	      printf("---------------------------------------\n");
 	    TCanvas* c = new TCanvas();
 	    char plot_name[100];
 	    std::string command = "if [ ! -e plots/time_resolution/"+string(label)+" ] ; then mkdir plots/time_resolution/"+label+" ; fi";
@@ -317,14 +321,17 @@ int main(int argc, char** argv)
       char effPlotName[200]="";
       sprintf(effPlotName, "plots/efficiency/efficiency_%s_%s_%s_%s.pdf", MCP.c_str(), doWhat, scanType, label);
       c2->Print(effPlotName,"pdf");
-
-            char effRootName[200]="";
-            sprintf(effRootName, "plots/efficiency/efficiency_%s_%s_%s_%s.root", MCP.c_str(), doWhat, scanType, label);
-
-	    TFile *out = new TFile (TString(effRootName),"RECREATE");
-      out->cd();
-      g_eff->Write();
     }
+
+  char effRootName[200]="";
+  sprintf(effRootName, "plots/efficiency/efficiency_%s_%s_%s_%s.root", MCP.c_str(), doWhat, scanType, label);
+  if(strcmp(doWhat,"time") == 0) sprintf(effRootName, "plots/time_resolution/time_%s_%s_%s_%s.root", MCP.c_str(), doWhat, scanType, label);
+  TFile* out = new TFile(TString(effRootName), "recreate");
+  out->cd();
+  g_eff->Write();
+  out->Close();
+
+
 
   std::cout<<"results printed in results/"<<std::endl;
   //  outputFile.close();
