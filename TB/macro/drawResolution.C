@@ -1,11 +1,11 @@
 {
 
-  //    std::string HVE = "EffAll";
-  //      std::string HVE = "AngScanLow";
-  //  std::string HVE = "HVL_50";
+  //      std::string HVE = "EffAll";
+        std::string HVE = "AngScanLow";
+  //      std::string HVE = "HVL_50";
   //  std::string HVE = "HVL_20";
   //  std::string HVE = "HVH_20";
-  std::string HVE = "HVH_50";
+  //  std::string HVE = "EffAll";
 
   TFile* inF_MiB3_ON;
   TFile* inF_MiB3_OFF;
@@ -79,13 +79,13 @@
 
 
   legC->AddEntry(eff_MiB3_ON, "MiB3 chevron-ON", "p");
-  legC->AddEntry(eff_MiB3_OFF, "MiB3 chevron-OFF", "p");
   legC->AddEntry(eff_ZStack2_ON, "ZStack2 ON", "p");
-  legC->AddEntry(eff_ZStack2_OFF, "ZStack2 OFF", "p");
   legC->AddEntry(eff_ZStack1_ON, "ZStack1 ON", "p");
+  /*  legC->AddEntry(eff_MiB3_OFF, "MiB3 chevron-OFF", "p");
+  legC->AddEntry(eff_ZStack2_OFF, "ZStack2 OFF", "p");
   legC->AddEntry(eff_ZStack1_OFF, "ZStack1 OFF", "p");
   legC->AddEntry(eff_enSEE, "SEE OFF", "p");
-
+  */
   gPad->SetTicks();
   if(HVE == "HVH_50" || "HVL_50" || "EffAll")  eff_enSEE->SetTitle("50 GeV");
   if(HVE == "HVH_20" || "HVL_20")  eff_enSEE->SetTitle("50 GeV");
@@ -98,19 +98,18 @@
   eff_ZStack1_OFF->GetYaxis()->SetTitle("Time_Res (Ps)");
   
   mg->Add(eff_MiB3_ON);
-  mg->Add(eff_MiB3_OFF);
   mg->Add(eff_ZStack1_ON);
+  mg->Add(eff_ZStack2_ON);
+  /*  mg->Add(eff_MiB3_OFF);
   mg->Add(eff_ZStack1_OFF);
   mg->Add(eff_ZStack2_OFF);
-  mg->Add(eff_ZStack2_ON);
-  mg->Add(eff_ZStack2_OFF);
   mg->Add(eff_enSEE);
-
-  mg->Draw("APL");
+  */
+  mg->Draw("AP");
   mg->GetXaxis()->SetRangeUser(-0.1,5.1);
-  mg->SetMaximum(1);
+  mg->SetMaximum(200);
   mg->SetMinimum(0);
-  mg->Draw("APL");  
+  mg->Draw("AP");  
   legC->Draw("same");
   }
 
@@ -226,12 +225,12 @@
   if (HVE=="HVL_20" || HVE=="HVH_20" || HVE=="HVH_50" || HVE=="HVL_50") 
    mg->Add(eff_ZStack2);
 
-  mg->Draw("APL");
+  mg->Draw("AP");
     if (HVE=="HVL_20" || HVE=="HVH_20" || HVE=="HVH_50" || HVE=="HVL_50")
   mg->GetXaxis()->SetRangeUser(-0.1,7.1);
-  mg->SetMaximum(1);
+  mg->SetMaximum(200);
   mg->SetMinimum(0);
-  mg->Draw("APL");
+  mg->Draw("AP");
 
   legC->Draw("same");
   //  c_HVH_50->Print("plots/X0scan/");
