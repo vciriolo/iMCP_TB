@@ -18,6 +18,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1F.h"
+#include "TH2F.h"
 #include "TF1.h"
 #include "TString.h"
 #include "TCut.h"
@@ -82,6 +83,7 @@ int main(int argc, char** argv)
   char str_cut_trig0[200]="";
   char str_cut_tdc[200]="";
   char var_sig[100]="";
+  char var_ampM_vs_dt[100]="";
   //  char var_base[100]="";
   char var_time[100]="";
   char var_trig0[100]="";
@@ -157,18 +159,22 @@ int main(int argc, char** argv)
   TGraphErrors *g_eff = new TGraphErrors(ScanList.size());
   g_eff->SetName("eff");
   
+  //  TH2F* ampM_vs_dt = new TH2F("ampM_vs_dt", "", 1000, -5., 5., 10000, 0., 10000.);
+
   //-------Runs loop---------------------------------------------------------------------
   for(unsigned int i=0; i<ScanList.size(); i++)
     {
 
-      char h_sig_name[20], h_trig0_name[20], res_func_name[20], res_func_name_2sig[20], h_time_name[20];
+      char h_sig_name[20], h_trig0_name[20], res_func_name[20], res_func_name_2sig[20], h_time_name[20], h_ampM_vs_dt_name[20];
       //      char h_sig_name[20], h_base_name[20], h_trig0_name[20], res_func_name[20], h_time_name[20];
       sprintf(h_sig_name, "h_sig_%d", i);
       //      sprintf(h_base_name, "h_base_%d", i);
       sprintf(h_trig0_name, "h_trig0_%d", i);
       sprintf(h_time_name, "h_time_%d", i);
+      sprintf(h_ampM_vs_dt_name, "h_ampM_vs_dt_%d", i);
       sprintf(res_func_name, "res_func_%d", i);
       sprintf(res_func_name_2sig, "res_func_2sig_%d", i);
+
 
       TH1F* h_sig= new TH1F(h_sig_name, h_sig_name, 500, -5000, 25000);
       //      TH1F* h_base = new TH1F(h_base_name, h_base_name, 500, 5000, 25000);
@@ -178,6 +184,7 @@ int main(int argc, char** argv)
 	h_time = new TH1F(h_time_name, h_time_name, 1000, -5, -2);
       else
         h_time = new TH1F(h_time_name, h_time_name, 1000, -2, 1);
+      TH2F* h_ampM_vs_dt = new TH2F(h_ampM_vs_dt_name, h_ampM_vs_dt_name, 1000, -5., 5., 10000, 0., 10000.);
       TF1* res_func = new TF1(res_func_name, "gausn", -10, 10);
       TF1* res_func_2sig = new TF1(res_func_name_2sig, "gausn", -10, 10);
 
@@ -186,6 +193,7 @@ int main(int argc, char** argv)
       //      sprintf(var_base, "baseline[%d]>>%s", MCPNumber, h_base_name);
       sprintf(var_time, "(time_CF_corr[%d]-time_CF_corr[%d])>>%s", MCPNumber, trigPos1, h_time_name);
       sprintf(var_trig0, "charge_corr[%d]>>%s", trigPos1, h_trig0_name);
+      sprintf(var_ampM_vs_dt, "amp_max_corr[%d]:(time_CF_corr[%d]-time_CF_corr[%d])>>%s", MCPNumber, trigPos1, MCPNumber, h_ampM_vs_dt_name);
 
       char cut_scan[100];
       if (strcmp(scanType,"HV")==0)  sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
@@ -202,6 +210,9 @@ int main(int argc, char** argv)
       //            std::cout<<h_sig->GetEntries()<<" "<<h_trig0->GetEntries()<<" "<<h_base->GetEntries()<<std::endl;
       float eff = h_sig->GetEntries()/h_trig0->GetEntries();
       float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
+      //float dt = h_time->GetMean
+
+      //      eff_vs_dt->Fill();
 
 	    //      float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
 	    //     float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig1->GetEntries());
@@ -259,6 +270,7 @@ int main(int argc, char** argv)
       //---Time study 
       else if(strcmp(doWhat,"time") == 0)
 	{
+	  nt->Draw(var_ampM_vs_dt, cut_trig0 && cut_sig && cut_scan);
 
 	    nt->Draw(var_time, cut_trig0 && cut_sig && cut_scan);
 	    res_func->SetParameters(h_time->GetEntries()/2, h_time->GetMean(), h_time->GetRMS()/2);
@@ -313,6 +325,15 @@ int main(int argc, char** argv)
 	    //	    gStyle->SetOptFit(1111);
 	    gStyle->SetOptStat(0000);
 	    c->Print(plot_name, "pdf");
+	    sprintf(plot_name, "plots/time_resolution/%s/%s_%d.png", label, MCP.c_str(), i);
+	    c->Print(plot_name, "png");
+
+	    TFile pippi(Form("plots/time_resolution/%s/%s_%d.root", label, MCP.c_str(), i), "recreate");
+	    pippi.cd();
+	    h_time->Write();
+	    h_ampM_vs_dt->Write();
+	    res_func_2sig->Write("same");
+	    pippi.Close();
 	}
     }    
 
