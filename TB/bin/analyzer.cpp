@@ -27,6 +27,7 @@
 #include "TCanvas.h"
 #include "TGraphErrors.h"
 #include "TPad.h"
+#include "TStyle.h"
 
 #include "../interface/init_Reco_Tree.h"
 #include "../interface/MCPMap.h"
@@ -144,8 +145,8 @@ int main(int argc, char** argv)
     std::cout<<"TRIGGER INFO: --> \ntrigger 1 = "<<inverted_MCPList.at(trigPos1)<<"\n----------"<<std::endl;
 
   //cut strings
-  sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
-  sprintf(str_cut_trig0, "charge[%d] > %d", trigPos1, treshold.at(trigPos1));
+  sprintf(str_cut_sig, "charge_corr[%d] > %d", MCPNumber, treshold.at(MCPNumber));
+  sprintf(str_cut_trig0, "charge_corr[%d] > %d", trigPos1, treshold.at(trigPos1));
   sprintf(str_cut_tdc, "tdcX > -8 && tdcX < 0 && tdcY >-2 && tdcY < 6");
 
   //-----construct TCut-----
@@ -175,10 +176,10 @@ int main(int argc, char** argv)
       TF1* res_func = new TF1(res_func_name, "gausn", -10, 10);
 
       //-----Draw variables-----
-      sprintf(var_sig, "charge[%d]>>%s", MCPNumber, h_sig_name);
+      sprintf(var_sig, "charge_corr[%d]>>%s", MCPNumber, h_sig_name);
       //      sprintf(var_base, "baseline[%d]>>%s", MCPNumber, h_base_name);
-      sprintf(var_time, "(time_CF[%d]-time_CF[%d])>>%s", MCPNumber, trigPos1, h_time_name);
-      sprintf(var_trig0, "charge[%d]>>%s", trigPos1, h_trig0_name);
+      sprintf(var_time, "(time_CF_corr[%d]-time_CF_corr[%d])>>%s", MCPNumber, trigPos1, h_time_name);
+      sprintf(var_trig0, "charge_corr[%d]>>%s", trigPos1, h_trig0_name);
 
       char cut_scan[100];
       if (strcmp(scanType,"HV")==0)  sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
@@ -258,7 +259,7 @@ int main(int argc, char** argv)
 	    res_func->SetParLimits(0, 0, h_time->GetEntries()*2);
 	    res_func->SetParLimits(2, 0, h_time->GetRMS());
 	    res_func->SetRange(h_time->GetMean()-2*h_time->GetRMS(), h_time->GetMean()+2*h_time->GetRMS());
-	    h_time->Fit(res_func, "QR+");
+	    h_time->Fit(res_func, "R+");
 
 	    //	    std::cout<<h_time->GetEntries()<<std::endl;
 
@@ -266,7 +267,7 @@ int main(int argc, char** argv)
 	    //   	    float t_res = sqrt(pow(res_func->GetParameter(2)*1000, 2) - pow(float(RES_TRIG), 2));
 	    //	    float e_t_res = sqrt(pow(err_time*res_func->GetParameter(2)*1000, 2) + pow(float(RES_TRIG_ERR)*RES_TRIG, 2))/t_res;
 
-		      float t_res = res_func->GetParameter(2)*1000/sqrt(2);
+	    float t_res = res_func->GetParameter(2)*1000/sqrt(2);
 		     float e_t_res = err_time*res_func->GetParameter(2)*1000/(sqrt(2)*t_res);
 	    float prob = res_func->GetProb();
 	    if(i == 0)
@@ -292,6 +293,8 @@ int main(int argc, char** argv)
 
 	    sprintf(plot_name, "plots/time_resolution/%s/%s_%d.pdf", label, MCP.c_str(), i);
 	    h_time->Draw();
+	    res_func->Draw("same");
+	    gStyle->SetOptFit(1111);
 	    c->Print(plot_name, "pdf");
 	}
     }    
