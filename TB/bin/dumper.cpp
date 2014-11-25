@@ -281,7 +281,7 @@ int main (int argc, char** argv)
 		  */
 		  //correct ampMax & charge
 
-		  if(ampMax[iCh] < -2000.) {
+		  if(ampMax[iCh] < -3300.) {
 		    ampMaxcorr[iCh] = get_amp_max_from_time_OT(iCh, timeOT[iCh]*0.2, PCOn.at(iCh), run);
 		    intSignalcorr[iCh] = get_charge_from_amp_max(iCh, ampMaxcorr[iCh], PCOn.at(iCh), run);
 		    timeCFcorr[iCh] = get_time_CF_from_time_OT(iCh, timeOT[iCh]*0.2, PCOn.at(iCh), run, tStart*0.2)/0.2; //the function works in ns
