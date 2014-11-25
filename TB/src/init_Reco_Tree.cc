@@ -22,6 +22,10 @@ int                   isTrigger[10];
 float                 X0;
 float tdcX;
 float tdcY;
+bool hodoX1[64];
+bool hodoY1[64];
+bool hodoX2[64];
+bool hodoY2[64];
 
 // List of branches                                                                                                                                           
 TBranch        *b_time_CF;   //!                                                                                                                              
@@ -46,6 +50,10 @@ TBranch        *b_isTrigger;
 TBranch        *b_X0;
 TBranch *b_tdcX;
 TBranch *b_tdcY;
+TBranch *b_hodoX1;
+TBranch *b_hodoY1;
+TBranch *b_hodoX2;
+TBranch *b_hodoY2;
 
 void init()
 {
@@ -83,6 +91,11 @@ void SetOutTree(TTree* outTree)
 
   outTree->Branch("tdcX",&tdcX,"tdcX/F");
   outTree->Branch("tdcY",&tdcY,"tdcY/F");
+
+  outTree->Branch("hodoX1",&hodoX1,"hodoX1[64]/O");
+  outTree->Branch("hodoY1",&hodoY1,"hodoY1[64]/O");
+  outTree->Branch("hodoX2",&hodoX2,"hodoX2[64]/O");
+  outTree->Branch("hodoY2",&hodoY2,"hodoY2[64]/O");
   //    outTree->Branch("MCPName"+nameMCP->at(Ch_1),&baseline_Ch1,"baseline_"+nameMCP->at(Ch_1)+"/F");          
 }
 
@@ -111,4 +124,8 @@ void InitRecoTree(TTree* nt)
   nt->SetBranchAddress("X0", &X0, &b_X0);
   nt->SetBranchAddress("tdcX", &tdcX, &b_tdcX);
   nt->SetBranchAddress("tdcY", &tdcY, &b_tdcY);
+  nt->SetBranchAddress("hodoX1", &hodoX1, &b_hodoX1);
+  nt->SetBranchAddress("hodoY1", &hodoY1, &b_hodoY1);
+  nt->SetBranchAddress("hodoX2", &hodoX2, &b_hodoX2);
+  nt->SetBranchAddress("hodoY2", &hodoY2, &b_hodoY2);
 }
