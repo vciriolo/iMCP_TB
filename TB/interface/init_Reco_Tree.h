@@ -27,6 +27,10 @@ extern int                   isTrigger[10];
 extern float                 X0;
 extern float tdcX;
 extern float tdcY;
+extern bool hodoX1[64];
+extern bool hodoY1[64];
+extern bool hodoX2[64];
+extern bool hodoY2[64];
 
 // List of branches                                                                                                                                               
 extern TBranch        *b_time_CF;   //!                                            
@@ -51,6 +55,10 @@ extern TBranch        *b_isTrigger;
 extern TBranch        *b_X0;
 extern TBranch *b_tdcX;
 extern TBranch *b_tdcY;
+extern TBranch *b_hodoX1;
+extern TBranch *b_hodoY1;
+extern TBranch *b_hodoX2;
+extern TBranch *b_hodoY2;
 
 void InitRecoTree(TTree* nt);
 
