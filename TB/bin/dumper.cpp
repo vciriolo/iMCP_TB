@@ -193,7 +193,7 @@ int main (int argc, char** argv)
 	    unsigned int spill=spillNumber;
 	    unsigned int event=evtNumber;
 
-	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
+	    /*	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
 		{
                     if(adcBoard[iCh] == 1 && adcChannel[iCh] == 0) 
                         sci_front_adc = adcData[iCh];
@@ -204,7 +204,7 @@ int main (int argc, char** argv)
 		       adcChannel[iCh] <= HODOY_ADC_END_CHANNEL)
 			fibreY[(adcChannel[iCh]-HODOY_ADC_START_CHANNEL)] = adcData[iCh];
 		}
-	    
+	    */	    
 
 	    //---Read digitizer samples
 	    //	    std::cout << " nDigiSamples = " << nDigiSamples << std::endl;
@@ -329,7 +329,6 @@ int main (int argc, char** argv)
 		    if (strcmp((MCPName.at(iCh)).c_str(),trig1.c_str())==0)          isTrigger[MCPList.at(MCPName.at(iCh))] = 1;
 		    //		    else if (strcmp((MCPName.at(iCh)).c_str(),trig2.c_str())==0)     isTrigger[MCPList.at(MCPName.at(iCh))] = 2;
 		    else                                           isTrigger[MCPList.at(MCPName.at(iCh))] = 0;
-		      
 		  }
 
       	     run_id = run;
@@ -338,6 +337,15 @@ int main (int argc, char** argv)
 	     t1->GetEntry(iEntry);
 	     tdcX = (*TDCreco)[0];
 	     tdcY = (*TDCreco)[1];
+
+	     for (int i=0; i<64; i++)
+	       {
+		 hodoX1[i] = (*HODOX1)[i];
+		 hodoX2[i] = (*HODOX2)[i];
+		 hodoY1[i] = (*HODOY1)[i];
+		 hodoY2[i] = (*HODOY2)[i];		      
+		 //std::cout<<(*HODOX1)[i]<<" "<<hodoX1[i]<<std::endl;	  //DEBUG    
+	       }
 
 	     if (spill!=spillNumber || event!=evtNumber) {
 	       std::cout<<"PROBLEM: non-coherent read"<<std::endl;
