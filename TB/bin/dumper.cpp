@@ -109,6 +109,8 @@ int main (int argc, char** argv)
       vector<float> digiCh[10];
       float timeCF[10], timeCFcorr[10];
       float timeOT[10], timeStart[10], timeStop[10], ampMaxT[10];
+      float timeStart_100[10], timeStop_100[10], timeStart_150[10], timeStop_150[10];
+      float timeStart_200[10], timeStop_200[10], timeStart_250[10], timeStop_250[10], timeStart_300[10], timeStop_300[10];
       float intBase[10], intSignal[10], intSignalcorr[10], ampMax[10], ampMaxcorr[10];
       ///int fibreX[8], hodoYchannels[8];
       float tStart, tStop;
@@ -317,6 +319,16 @@ int main (int argc, char** argv)
 		    time_OT[MCPList.at(MCPName.at(iCh))]   = timeOT[iCh]*0.2;
 		    time_start[MCPList.at(MCPName.at(iCh))]   = timeStart[iCh]*0.2;
 		    time_stop[MCPList.at(MCPName.at(iCh))]   = timeStop[iCh]*0.2;
+		    time_start_100[MCPList.at(MCPName.at(iCh))]   = timeStart_100[iCh]*0.2;
+		    time_stop_100[MCPList.at(MCPName.at(iCh))]   = timeStop_100[iCh]*0.2;
+		    time_start_150[MCPList.at(MCPName.at(iCh))]   = timeStart_150[iCh]*0.2;
+		    time_stop_150[MCPList.at(MCPName.at(iCh))]   = timeStop_150[iCh]*0.2;
+		    time_start_200[MCPList.at(MCPName.at(iCh))]   = timeStart_200[iCh]*0.2;
+		    time_stop_200[MCPList.at(MCPName.at(iCh))]   = timeStop_200[iCh]*0.2;
+		    time_start_250[MCPList.at(MCPName.at(iCh))]   = timeStart_250[iCh]*0.2;
+		    time_stop_250[MCPList.at(MCPName.at(iCh))]   = timeStop_250[iCh]*0.2;
+		    time_start_300[MCPList.at(MCPName.at(iCh))]   = timeStart_300[iCh]*0.2;
+		    time_stop_300[MCPList.at(MCPName.at(iCh))]   = timeStop_300[iCh]*0.2;
 		    amp_max[MCPList.at(MCPName.at(iCh))]   = -ampMax[iCh];
 		    amp_max_corr[MCPList.at(MCPName.at(iCh))]   = ampMaxcorr[iCh];
 		    amp_max_time[MCPList.at(MCPName.at(iCh))]   = ampMaxT[iCh]*0.2;

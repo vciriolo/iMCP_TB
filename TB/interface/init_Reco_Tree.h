@@ -4,12 +4,22 @@
 #include "TTree.h"
 #include "TChain.h"
 
-// Declaration of leaf types                                                                                                                                      
+// Declaration of leaf types 
 extern float                 time_CF[10];
 extern float                 time_CF_corr[10];
 extern float                 time_OT[10];
 extern float                 time_start[10];
 extern float                 time_stop[10];
+extern float                 time_start_100[10];
+extern float                 time_stop_100[10];
+extern float                 time_start_150[10];
+extern float                 time_stop_150[10];
+extern float                 time_start_200[10];
+extern float                 time_stop_200[10];
+extern float                 time_start_250[10];
+extern float                 time_stop_250[10];
+extern float                 time_start_300[10];
+extern float                 time_stop_300[10];
 extern float                 time_Max[10];
 extern float                 amp_max[10];
 extern float                 amp_max_corr[10];
@@ -32,12 +42,22 @@ extern bool hodoY1[64];
 extern bool hodoX2[64];
 extern bool hodoY2[64];
 
-// List of branches                                                                                                                                               
+// List of branches                 
 extern TBranch        *b_time_CF;   //!                                            
 extern TBranch        *b_time_CF_corr;   //!                                   
 extern TBranch        *b_time_OT;   //!     
 extern TBranch        *b_time_start;                       
-extern TBranch        *b_time_stop;                       
+extern TBranch        *b_time_stop;       
+extern TBranch        *b_time_start_100;                       
+extern TBranch        *b_time_stop_100;       
+extern TBranch        *b_time_start_150;                       
+extern TBranch        *b_time_stop_150;       
+extern TBranch        *b_time_start_200;                       
+extern TBranch        *b_time_stop_200;       
+extern TBranch        *b_time_start_250;                       
+extern TBranch        *b_time_stop_250;       
+extern TBranch        *b_time_start_300;                       
+extern TBranch        *b_time_stop_300;       
 extern TBranch        *b_time_Max;   //!                                   
 extern TBranch        *b_amp_max;   //!                                        
 extern TBranch        *b_amp_max_corr;   //!                                                          

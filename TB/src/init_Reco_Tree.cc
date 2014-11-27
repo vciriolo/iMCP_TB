@@ -5,6 +5,16 @@ float                 time_CF_corr[10];
 float                 time_OT[10];
 float                 time_start[10];
 float                 time_stop[10];
+float                 time_start_100[10];
+float                 time_stop_100[10];
+float                 time_start_150[10];
+float                 time_stop_150[10];
+float                 time_start_200[10];
+float                 time_stop_200[10];
+float                 time_start_250[10];
+float                 time_stop_250[10];
+float                 time_start_300[10];
+float                 time_stop_300[10];
 float                 time_Max[10];
 float                 amp_max[10];
 float                 amp_max_corr[10];
@@ -27,25 +37,35 @@ bool hodoY1[64];
 bool hodoX2[64];
 bool hodoY2[64];
 
-// List of branches                                                                                                                                           
-TBranch        *b_time_CF;   //!                                                                                                                              
-TBranch        *b_time_CF_corr;   //!                                                                                                                         
+// List of branches                     
+TBranch        *b_time_CF;   //! 
+TBranch        *b_time_CF_corr;   //!   
 TBranch        *b_time_OT;   //!     
 TBranch        *b_time_start;                                                                                                                         
 TBranch        *b_time_stop;                                
-TBranch        *b_time_Max;   //!                                                                                                                             
-TBranch        *b_amp_max;   //!                                                                                                                              
-TBranch        *b_amp_max_corr;   //!                                                                                                                         
-TBranch        *b_amp_max_time;   //!                                                                                                                         
-TBranch        *b_baseline;   //!                                                                                                                             
-TBranch        *b_charge;   //!                                                                                                                               
-TBranch        *b_charge_corr;   //!                                                                                                                          
-TBranch        *b_fibreX;   //!                                                                                                                               
-TBranch        *b_fibreY;   //!                                                                                                                               
-TBranch        *b_sci_front_adc;   //!                                                                                                                        
-TBranch        *b_run_id;   //!                                                                                                                               
-TBranch        *b_isPCOn;   //!                                                                                                                               
-TBranch        *b_HV;   //!                                                                                                                                   
+TBranch        *b_time_start_100; 
+TBranch        *b_time_stop_100;                                
+TBranch        *b_time_start_150;                                                                                                                         
+TBranch        *b_time_stop_150;                                
+TBranch        *b_time_start_200;                                                                                                                         
+TBranch        *b_time_stop_200;                                
+TBranch        *b_time_start_250;                                                                                                                         
+TBranch        *b_time_stop_250;
+TBranch        *b_time_start_300;                                                                                                                         
+TBranch        *b_time_stop_300;
+TBranch        *b_time_Max;   //! 
+TBranch        *b_amp_max;   //!    
+TBranch        *b_amp_max_corr;   //!   
+TBranch        *b_amp_max_time;   //!  
+TBranch        *b_baseline;   //!   
+TBranch        *b_charge;   //!    
+TBranch        *b_charge_corr;   //!  
+TBranch        *b_fibreX;   //!  
+TBranch        *b_fibreY;   //!  
+TBranch        *b_sci_front_adc;   //! 
+TBranch        *b_run_id;   //!   
+TBranch        *b_isPCOn;   //! 
+TBranch        *b_HV;   //!     
 TBranch        *b_isTrigger;
 TBranch        *b_X0;
 TBranch *b_tdcX;
@@ -67,6 +87,16 @@ void SetOutTree(TTree* outTree)
   outTree->Branch("time_OT",&time_OT,"time_OT[10]/F");
   outTree->Branch("time_start",&time_start,"time_start[10]/F");
   outTree->Branch("time_stop",&time_stop,"time_stop[10]/F");
+  outTree->Branch("time_start_100",&time_start_100,"time_start_100[10]/F");
+  outTree->Branch("time_stop_100",&time_stop_100,"time_stop_100[10]/F");
+  outTree->Branch("time_start_150",&time_start_150,"time_start_150[10]/F");
+  outTree->Branch("time_stop_150",&time_stop_150,"time_stop_150[10]/F");
+  outTree->Branch("time_start_200",&time_start_200,"time_start_200[10]/F");
+  outTree->Branch("time_stop_200",&time_stop_200,"time_stop_200[10]/F");
+  outTree->Branch("time_start_250",&time_start_250,"time_start_250[10]/F");
+  outTree->Branch("time_stop_250",&time_stop_250,"time_stop_250[10]/F");
+  outTree->Branch("time_start_300",&time_start_300,"time_start_300[10]/F");
+  outTree->Branch("time_stop_300",&time_stop_300,"time_stop_300[10]/F");
   outTree->Branch("time_Max",&time_Max,"time_Max[10]/F");
   outTree->Branch("amp_max",&amp_max,"amp_max[10]/F");
   outTree->Branch("amp_max_corr",&amp_max_corr,"amp_max_corr[10]/F");
@@ -107,6 +137,16 @@ void InitRecoTree(TTree* nt)
   nt->SetBranchAddress("time_OT", &time_OT, &b_time_OT);
   nt->SetBranchAddress("time_start", &time_start, &b_time_start);
   nt->SetBranchAddress("time_stop", &time_stop, &b_time_stop);
+  nt->SetBranchAddress("time_start_100", &time_start_100, &b_time_start_100);
+  nt->SetBranchAddress("time_stop_100", &time_stop_100, &b_time_stop_100);
+  nt->SetBranchAddress("time_start_150", &time_start_150, &b_time_start_150);
+  nt->SetBranchAddress("time_stop_150", &time_stop_150, &b_time_stop_150);
+  nt->SetBranchAddress("time_start_200", &time_start_200, &b_time_start_200);
+  nt->SetBranchAddress("time_stop_200", &time_stop_200, &b_time_stop_200);
+  nt->SetBranchAddress("time_start_250", &time_start_250, &b_time_start_250);
+  nt->SetBranchAddress("time_stop_250", &time_stop_250, &b_time_stop_250);
+  nt->SetBranchAddress("time_start_300", &time_start_300, &b_time_start_300);
+  nt->SetBranchAddress("time_stop_300", &time_stop_300, &b_time_stop_300);
   nt->SetBranchAddress("time_Max", &time_Max, &b_time_Max);
   nt->SetBranchAddress("amp_max", &amp_max, &b_amp_max);
   nt->SetBranchAddress("amp_max_corr", &amp_max_corr, &b_amp_max_corr);
