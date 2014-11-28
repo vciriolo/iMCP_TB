@@ -270,9 +270,24 @@ int main (int argc, char** argv)
 
 		  //time OT
 		  timeOT[iCh] = TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -1000., tStart, tStop);
-
 		  timeStart[iCh]=tStart;
 		  timeStop[iCh]=tStop;
+
+		  TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -100., tStart, tStop);
+		  timeStart_100[iCh]=tStart;
+		  timeStop_100[iCh]=tStop;
+		  TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -150., tStart, tStop);
+		  timeStart_150[iCh]=tStart;
+		  timeStop_150[iCh]=tStop;
+		  TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -200., tStart, tStop);
+		  timeStart_200[iCh]=tStart;
+		  timeStop_200[iCh]=tStop;
+		  TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -250., tStart, tStop);
+		  timeStart_250[iCh]=tStart;
+		  timeStop_250[iCh]=tStop;
+		  TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -300., tStart, tStop);
+		  timeStart_300[iCh]=tStart;
+		  timeStop_300[iCh]=tStop;
 
 		  timeCF[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMax[iCh]);
 
