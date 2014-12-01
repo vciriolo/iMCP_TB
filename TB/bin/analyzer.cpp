@@ -104,6 +104,20 @@ int main(int argc, char** argv)
   std::vector<float> ScanList;
   ScanList.clear();
 
+  //Output Histos
+  TH1F *h_hodoX1   = new TH1F( "h_hodoX1", "", 64, -32., 32.); h_hodoX1->GetXaxis()->SetTitle("HODO X1");
+  TH1F *h_hodoY1   = new TH1F( "h_hodoY1", "", 64, -32., 32.); h_hodoY1->GetXaxis()->SetTitle("HODO Y1");
+  TH1F *h_hodoX2   = new TH1F( "h_hodoX2", "", 64, -32., 32.); h_hodoX2->GetXaxis()->SetTitle("HODO X2");
+  TH1F *h_hodoY2   = new TH1F( "h_hodoY2", "", 64, -32., 32.); h_hodoY2->GetXaxis()->SetTitle("HODO Y2");
+  TH1F *h_tdcX     = new TH1F( "h_tdcX", "", 64, -32., 32.); h_tdcX->GetXaxis()->SetTitle("Wire Chamber X");
+  TH1F *h_tdcY     = new TH1F( "h_tdcY", "", 64, -32., 32.); h_tdcY->GetXaxis()->SetTitle("Wire Chamber Y");
+  TH1F *h_hodoX1_c = new TH1F( "h_hodoX1_c", "", 64, -32., 32.); h_hodoX1_c->GetXaxis()->SetTitle("HODO X1");
+  TH1F *h_hodoY1_c = new TH1F( "h_hodoY1_c", "", 64, -32., 32.); h_hodoY1_c->GetXaxis()->SetTitle("HODO Y1");
+  TH1F *h_hodoX2_c = new TH1F( "h_hodoX2_c", "", 64, -32., 32.); h_hodoX2_c->GetXaxis()->SetTitle("HODO X2");
+  TH1F *h_hodoY2_c = new TH1F( "h_hodoY2_c", "", 64, -32., 32.); h_hodoY2_c->GetXaxis()->SetTitle("HODO Y2");
+  TH1F *h_tdcX_c   = new TH1F( "h_tdcX_c", "", 64, -32., 32.); h_tdcX_c->GetXaxis()->SetTitle("Wire Chamber X");
+  TH1F *h_tdcY_c   = new TH1F( "h_tdcY_c", "", 64, -32., 32.); h_tdcY_c->GetXaxis()->SetTitle("Wire Chamber Y");
+
 
   //---save list of HV (or X0) step---
   if (strcmp(scanType,"HV")==0) {
@@ -125,7 +139,43 @@ int main(int argc, char** argv)
 	}
       }
   }
-
+  else if (strcmp(scanType,"HODO")==0) {
+    int prev=0;
+    float x0_HODO1 = -7.69582, y0_HODO1 = 0.322465; //From macro/fitHodo.C
+    float x0_HODO2 = -2.44197, y0_HODO2 = 0.534708; //From macro/fitHodo.C
+    float x0_WC = -4.21425, y0_WC = 2.59668;        //From macro/fitHodo.C
+    for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++){
+	nt->GetEntry(iEntry);
+	bool sele ( true );//run_id==610 );
+	if( sele ){
+	  for(int i=0; i<64; i++){
+	    if( (i+1-int(x0_HODO1)) > 1 && (i+1-int(x0_HODO1)) < 64 ) h_hodoX1_c->SetBinContent(i+1-int(x0_HODO1), h_hodoX1_c->GetBinContent(i+1-int(x0_HODO1)) + hodoX1[i] );
+	    if( (i+1-int(y0_HODO1)) > 1 && (i+1-int(y0_HODO1)) < 64 ) h_hodoY1_c->SetBinContent(i+1-int(y0_HODO1), h_hodoY1_c->GetBinContent(i+1-int(y0_HODO1)) + hodoY1[i] );
+	    if( (i+1-int(x0_HODO2)) > 1 && (i+1-int(x0_HODO2)) < 64 ) h_hodoX2_c->SetBinContent(i+1-int(x0_HODO2), h_hodoX2_c->GetBinContent(i+1-int(x0_HODO2)) + hodoX2[i] );
+	    if( (i+1-int(y0_HODO2)) > 1 && (i+1-int(y0_HODO2)) < 64 ) h_hodoY2_c->SetBinContent(i+1-int(y0_HODO2), h_hodoY2_c->GetBinContent(i+1-int(y0_HODO2)) + hodoY2[i] );
+	     h_hodoX1->SetBinContent(i+1, h_hodoX1->GetBinContent(i+1) + hodoX1[i] );
+	     h_hodoY1->SetBinContent(i+1, h_hodoY1->GetBinContent(i+1) + hodoY1[i] );
+	     h_hodoX2->SetBinContent(i+1, h_hodoX2->GetBinContent(i+1) + hodoX2[i] );
+	     h_hodoY2->SetBinContent(i+1, h_hodoY2->GetBinContent(i+1) + hodoY2[i] );
+	  }
+	  h_tdcX->Fill( tdcX );
+	  h_tdcY->Fill( tdcY );
+	  h_tdcX_c->Fill( tdcX-x0_WC );
+	  h_tdcY_c->Fill( tdcY-y0_WC );
+	}
+	if (HV[MCPNumber]!=prev) {
+	  ScanList.push_back((float)HV[MCPNumber]);
+	  HVVal.push_back(HV[MCPNumber]);
+	  X0Step.push_back(X0);
+	  prev=HV[MCPNumber];
+	  if (iEntry==0) {
+	    for (int i=0; i<nChannels; i++){  //save trigger position!
+		if (isTrigger[i]==1)       trigPos1 = i;
+	    }
+	}
+	}
+    }
+  }
   else {
     float prev=-1.;
     for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++)
@@ -425,13 +475,31 @@ int main(int argc, char** argv)
 
   char effRootName[200]="";
   sprintf(effRootName, "plots/efficiency/efficiency_%s_%s_%s_%s.root", MCP.c_str(), doWhat, scanType, label);
+  if (strcmp(scanType,"HODO")==0) sprintf(effRootName, "plots/HODO/efficiency_%s_%s_%s_%s.root", MCP.c_str(), doWhat, scanType, label);
   if(strcmp(doWhat,"time") == 0) sprintf(effRootName, "plots/time_resolution/time_%s_%s_%s_%s.root", MCP.c_str(), doWhat, scanType, label);
   TFile* out = new TFile(TString(effRootName), "recreate");
   out->cd();
   g_eff->Write();
+
   g_frac_saturated->Write();
   if(strcmp(doWhat,"time") == 0) g_resoLED->Write();
   std::cout << " stampati .root" << std::endl;
+
+  if (strcmp(scanType,"HODO")==0){
+     h_hodoX1->Write();
+     h_hodoY1->Write();
+     h_hodoX2->Write();
+     h_hodoY2->Write();
+     h_tdcX->Write();
+     h_tdcY->Write();
+     h_hodoX1_c->Write();
+     h_hodoY1_c->Write();
+     h_hodoX2_c->Write();
+     h_hodoY2_c->Write();
+     h_tdcX_c->Write();
+     h_tdcY_c->Write();
+  }
+
   out->Close();
 
 
