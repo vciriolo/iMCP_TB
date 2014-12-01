@@ -53,8 +53,8 @@ int main (int argc, char** argv)
     std::cout<<"--------DUMPER: READ RAW DATA AND PRODUCE RECO TREE--------"<<std::endl;
 
     //-----this map tells how the MCPs will be order in the output tree. The names should match the cfg file----
-    Fill_MCPList();  //look into the MCPMap.h class
-    
+    Fill_MCPList();   //look into the MCPMap.h class
+  
     //--------Read Options--------------------------------
     ifstream inputCfg (argv[1], ios::in);
 
@@ -387,8 +387,7 @@ int main (int argc, char** argv)
         chain->Delete();
 	t1->Delete();
     }
-    
-    //-----close everything-----------------------------------------------------
+        //-----close everything-----------------------------------------------------
     for(int iCh=0; iCh<nChannels; iCh++) wf_promed[iCh]->Write();
 
     outTree->Write();
