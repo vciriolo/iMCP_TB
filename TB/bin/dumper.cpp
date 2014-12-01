@@ -179,7 +179,7 @@ int main (int argc, char** argv)
       */
       //-----Data loop--------------------------------------------------------
       for(int iEntry=0; iEntry<chain->GetEntries(); iEntry++){
-	//	for(int iEntry=0; iEntry<10; iEntry++){    //RA
+      //      for(int iEntry=7932; iEntry<7933; iEntry++){    //RA
 
 	    if(iEntry % 1000 == 0)
 		cout << "read entry: " << iEntry << endl;
@@ -228,6 +228,7 @@ int main (int argc, char** argv)
 	    for(int iCh=0; iCh<nChannels; iCh++)
 	      {
 		//Save infos for CeF3
+		//		std::cout << " INIZIO CeF3 " << std::endl;
 		if (iCh<4) {
 		  SubtractBaseline(5, 25, &digiCh[iCh]);  //baseline subtraction
 		  ampMax[iCh] = AmpMax(51, 1000, &digiCh[iCh]);
@@ -235,6 +236,7 @@ int main (int argc, char** argv)
 		  intSignal[iCh] = ComputeIntegral(51, 1000, &digiCh[iCh]);
 		  timeCF[iCh] = TimeConstFracAbs(51, 1000, &digiCh[iCh], 0.5, ampMax[iCh]);
 		  timeOT[iCh] = TimeOverThreshold(51, 1000, &digiCh[iCh], -1000., tStart, tStop);
+		  //		  if( iCh == 3) std::cout << " FINE CeF3 " << std::endl;
 		}
 
 		//save infos for MCPs
@@ -269,25 +271,47 @@ int main (int argc, char** argv)
 		    }*/
 
 		  //time OT
-		  timeOT[iCh] = TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -1000., tStart, tStop);
-		  timeStart[iCh]=tStart;
-		  timeStop[iCh]=tStop;
-
 		  TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -100., tStart, tStop);
 		  timeStart_100[iCh]=tStart;
 		  timeStop_100[iCh]=tStop;
+
 		  TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -150., tStart, tStop);
 		  timeStart_150[iCh]=tStart;
 		  timeStop_150[iCh]=tStop;
+
 		  TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -200., tStart, tStop);
 		  timeStart_200[iCh]=tStart;
 		  timeStop_200[iCh]=tStop;
+		  
 		  TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -250., tStart, tStop);
 		  timeStart_250[iCh]=tStart;
 		  timeStop_250[iCh]=tStop;
+
 		  TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -300., tStart, tStop);
 		  timeStart_300[iCh]=tStart;
 		  timeStop_300[iCh]=tStop;
+
+		  /*
+		  if( (tStart < 0. || tStop < 0.) && tStart != -100){
+		    std::cout << "iEntry =  " << iEntry << std::endl;
+		    std::cout << " channel iCh = " << iCh << " tStart = " << tStart 
+			      << " tStop = " << tStop 
+			      << " ampMax[iCh] = " << ampMax[iCh] << std::endl;
+
+		    TH1F* histo = new TH1F("histo", "", 1024, 0., 1024.);
+		    for(int iBinni=0; iBinni<1024; ++iBinni)
+		      histo->SetBinContent(iBinni+1, digiCh[iCh].at(iBinni));
+		    TFile outF("outF.root", "recreate");
+		    outF.cd();
+		    histo->Write();
+		    outF.Close();
+		    return 1000;
+		  }
+		  */
+
+		  timeOT[iCh] = TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -1000., tStart, tStop);
+		  timeStart[iCh]=tStart;
+		  timeStop[iCh]=tStop;
 
 		  timeCF[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMax[iCh]);
 
