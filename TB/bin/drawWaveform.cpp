@@ -59,6 +59,7 @@ int main (int argc, char** argv)
     int channel = atoi (argv[3]);
     int firstEntry = atoi (argv[4]);
     int nEvents = atoi (argv[5]);
+    nEvents += firstEntry;
 
     std::cout << " >>> run = " << run << std::endl;
     std::cout << " >>> channel = " << channel << std::endl;
@@ -119,12 +120,14 @@ int main (int argc, char** argv)
     system("rm listTemp2.txt");
 
     int ampMaxTimeTemp;
+    int timeCF;
     TLine *line;    
     TLine *line2;
     TLine *line3;    
     TLine *line4;
     TLine *line5;    
     TLine *line6;
+    TLine *line7;
       //-----Read raw data tree-----------------------------------------------
       std::string iRun_str = inputFolder+Form("/%d/[0-9]*.root", run);
       chain->Add(iRun_str.c_str());
@@ -170,11 +173,14 @@ int main (int argc, char** argv)
 
 		ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[channel], 1)/0.2;
 		if (channel!=4)  SubtractBaseline(ampMaxTimeTemp-40, ampMaxTimeTemp-20, &digiCh[channel]);
-		    
+
+		int ampMax = AmpMax(ampMaxTimeTemp-13, ampMaxTimeTemp+12, &digiCh[channel]);
+		timeCF = TimeConstFracAbs(ampMaxTimeTemp-23, ampMaxTimeTemp+22, &digiCh[channel], 0.5, ampMax);		    
 		    //		    if (-AmpMax(5, 25, &digiCh[channel])<-200)  std::cout<<iEntry<<" "<<-AmpMax(5, 25, &digiCh[channel])<<std::endl;
 		    
 
-	  for(unsigned int iSample=0; iSample<digiCh[channel].size(); iSample++){
+		//	  for(unsigned int iSample=0; iSample<digiCh[channel].size(); iSample++){
+	  for(unsigned int iSample=0; iSample<300; iSample++){
 	    gWF->SetPoint(i, i, digiCh[channel].at(iSample));
 	    i++;
 	  }
@@ -188,15 +194,16 @@ int main (int argc, char** argv)
       }
 
       if (channel!=4) {
-      line = new TLine(ampMaxTimeTemp-18, -2000, ampMaxTimeTemp-18, 200);
+      line = new TLine(ampMaxTimeTemp-13, -2000, ampMaxTimeTemp-13, 200);
       line2 = new TLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
       line3 = new TLine(ampMaxTimeTemp-20, -2000, ampMaxTimeTemp-20, 200);
       line4 = new TLine(ampMaxTimeTemp-40, -2000, ampMaxTimeTemp-40, 200);
       line5 = new TLine(triggerTime-50, -2000, triggerTime-50, 200);
       line6 = new TLine(triggerTime+50, -2000, triggerTime+50, 200);
+      line7 = new TLine(timeCF, -2000, timeCF, 200);
       
       mgWF->Draw("apl");
-      line->DrawLine(ampMaxTimeTemp-18, -2000, ampMaxTimeTemp-18, 200);
+      line->DrawLine(ampMaxTimeTemp-13, -2000, ampMaxTimeTemp-13, 200);
       line->SetLineColor(2);
       line->Draw("same");
       line2->DrawLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
@@ -208,6 +215,9 @@ int main (int argc, char** argv)
       line4->DrawLine(ampMaxTimeTemp-40, -2000, ampMaxTimeTemp-40, 200);
       line4->SetLineColor(4);
       line4->Draw("same");
+      line7->DrawLine(timeCF, -2000, timeCF, 200);
+      line7->SetLineColor(8);
+      line7->Draw("same");
       /*      line5->DrawLine(triggerTime-50, -2000, triggerTime-50, 200);
       line5->SetLineColor(1);
       line5->Draw("same");
@@ -218,7 +228,7 @@ int main (int argc, char** argv)
       }
 
       else {
-      line = new TLine(ampMaxTimeTemp-18, -2000, ampMaxTimeTemp-18, 200);
+      line = new TLine(ampMaxTimeTemp-13, -2000, ampMaxTimeTemp-13, 200);
       line2 = new TLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
       line3 = new TLine(5, -2000, 5, 200);
       line4 = new TLine(25, -2000, 25, 200);
@@ -226,7 +236,7 @@ int main (int argc, char** argv)
       line6 = new TLine(triggerTime+50, -2000, triggerTime+50, 200);
       
       mgWF->Draw("apl");
-      /*      line->DrawLine(ampMaxTimeTemp-18, -2000, ampMaxTimeTemp-18, 200);
+      /*      line->DrawLine(ampMaxTimeTemp-13, -2000, ampMaxTimeTemp-13, 200);
       line->SetLineColor(2);
       line->Draw("same");
       line2->DrawLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
