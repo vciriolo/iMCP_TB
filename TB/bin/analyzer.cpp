@@ -83,6 +83,7 @@ int main(int argc, char** argv)
   char str_cut_trig0[200]="";
   char str_cut_tdc[200]="";
   char str_cut_saturated[200]="";
+  char str_cut_nFibers[200]="";
 
   char var_sig[100]="";
   char var_dt_vs_ampM[100]="";
@@ -209,12 +210,14 @@ int main(int argc, char** argv)
   sprintf(str_cut_trig0, "charge_corr[%d] > %d", trigPos1, treshold.at(trigPos1));
   sprintf(str_cut_tdc, "tdcX > -8 && tdcX < 0 && tdcY >-2 && tdcY < 6");
   sprintf(str_cut_saturated, "amp_max[%d] > 3450", MCPNumber);
+  sprintf(str_cut_nFibers, "nhodoX1<=3 && nhodoX2<=3 && nhodoY1<=3 && nhodoY2<=3");
 
   //-----construct TCut-----
   TCut cut_sig = str_cut_sig;
   TCut cut_trig0 = str_cut_trig0;
   TCut cut_tdc = str_cut_tdc;
   TCut cut_saturated = str_cut_saturated;
+  TCut cut_nFibers = str_cut_nFibers;
 
   TGraphErrors *g_eff = new TGraphErrors(ScanList.size());
   g_eff->SetName("eff");
@@ -289,8 +292,8 @@ int main(int argc, char** argv)
       if(MCPNumber == 2) sprintf(str_cut_saturated, "run_id > 796 && amp_max[%d] > 4000", MCPNumber);
 
       //-----Draw and print infos-----
-      nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc, "goff");
-      nt->Draw(var_trig0,cut_trig0 && cut_scan && cut_tdc, "goff");
+      nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers, "goff");
+      nt->Draw(var_trig0,cut_trig0 && cut_scan && cut_tdc && cut_nFibers, "goff");
 
       //      int acc = 1*(float(h_base->GetEntries())/2000.); //estimated from pedestal run
       //            std::cout<<h_sig->GetEntries()<<" "<<h_trig0->GetEntries()<<" "<<h_base->GetEntries()<<std::endl;
@@ -355,15 +358,15 @@ int main(int argc, char** argv)
       //---Time study 
       else if(strcmp(doWhat,"time") == 0)
 	{
-	  nt->Draw(var_dt_vs_ampM, cut_trig0 && cut_sig && cut_scan);
-	  nt->Draw(var_dtStart_vs_ampM, cut_trig0 && cut_sig && cut_scan);
-	  nt->Draw(var_dtStart_vs_Tot, cut_trig0 && cut_sig && cut_scan);
+	  nt->Draw(var_dt_vs_ampM, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
+	  nt->Draw(var_dtStart_vs_ampM, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
+	  nt->Draw(var_dtStart_vs_Tot, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
 
-	  nt->Draw(var_fracSaturated, cut_trig0 && cut_sig && cut_scan && cut_saturated);
-	  nt->Draw(var_evtAll, cut_trig0 && cut_sig && cut_scan);
+	  nt->Draw(var_fracSaturated, cut_trig0 && cut_sig && cut_scan && cut_saturated && cut_tdc && cut_nFibers);
+	  nt->Draw(var_evtAll, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
 
 	  //time resolution with LED
-	  nt->Draw(var_timeLED, cut_trig0 && cut_sig && cut_scan);
+	  nt->Draw(var_timeLED, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
 	  resLED_func->SetParameters(h_timeLED->GetEntries(), h_timeLED->GetMean(), h_timeLED->GetRMS()/2.);
           resLED_func->SetParLimits(0, 0, h_timeLED->GetEntries()*2);
 	  resLED_func->SetParLimits(2, 0, h_timeLED->GetRMS());
@@ -382,7 +385,7 @@ int main(int argc, char** argv)
 	  g_resoLED->SetPointError(i, 0, e_t_res);
 
 	  //time resolution with CFD
-	  nt->Draw(var_time, cut_trig0 && cut_sig && cut_scan);
+	  nt->Draw(var_time, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
 	  res_func->SetParameters(h_time->GetEntries()/2, h_time->GetMean(), h_time->GetRMS()/2);
 	  res_func->SetParLimits(0, 0, h_time->GetEntries()*2);
 	  res_func->SetParLimits(2, 0, h_time->GetRMS());
