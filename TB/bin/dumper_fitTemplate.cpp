@@ -220,7 +220,7 @@ int main (int argc, char** argv)
 	    unsigned int spill=spillNumber;
 	    unsigned int event=evtNumber;
 
-	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
+	    /*	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
 		{
                     if(adcBoard[iCh] == 1 && adcChannel[iCh] == 0) 
                         sci_front_adc = adcData[iCh];
@@ -231,7 +231,7 @@ int main (int argc, char** argv)
 		       adcChannel[iCh] <= HODOY_ADC_END_CHANNEL)
 			fibreY[(adcChannel[iCh]-HODOY_ADC_START_CHANNEL)] = adcData[iCh];
 		}
-
+	    */
 	    int tStart[10] = {0,0,0,0,0,0,0,0,0,0};
 	    int tStop[10] = {0,0,0,0,0,0,0,0,0,0};
 	    int tMax[10] = {0,0,0,0,0,0,0,0,0,0};
