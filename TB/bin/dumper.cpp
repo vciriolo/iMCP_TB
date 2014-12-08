@@ -193,7 +193,12 @@ int main (int argc, char** argv)
             chain->GetEntry(iEntry);
  
 	    unsigned int spill=spillNumber;
-	    unsigned int event=evtNumber;
+	    event=evtNumber;
+
+	    if (spill!=spillNumber || event!=evtNumber) {
+	       std::cout<<"PROBLEM: non-coherent read"<<std::endl;
+	       continue;
+	    }
 
 	    /*	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
 		{
@@ -388,20 +393,25 @@ int main (int argc, char** argv)
 	     t1->GetEntry(iEntry);
 	     tdcX = (*TDCreco)[0];
 	     tdcY = (*TDCreco)[1];
+	     // event = evtNumber;
+
+	     nhodoX1=0;
+	     nhodoX2=0;
+	     nhodoY1=0;
+	     nhodoY2=0;
 
 	     for (int i=0; i<64; i++)
 	       {
-		 hodoX1[i] = (*HODOX1)[i];
+		 hodoX1[i] = (*HODOX1)[i];		 
 		 hodoX2[i] = (*HODOX2)[i];
 		 hodoY1[i] = (*HODOY1)[i];
 		 hodoY2[i] = (*HODOY2)[i];		      
 		 //std::cout<<(*HODOX1)[i]<<" "<<hodoX1[i]<<std::endl;	  //DEBUG    
+		 if (hodoX1[i]==true)   nhodoX1++;
+		 if (hodoX2[i]==true)   nhodoX2++;
+		 if (hodoY1[i]==true)   nhodoY1++;
+		 if (hodoY2[i]==true)   nhodoY2++;
 	       }
-
-	     if (spill!=spillNumber || event!=evtNumber) {
-	       std::cout<<"PROBLEM: non-coherent read"<<std::endl;
-	       continue;
-	     }
 
 	     outTree->Fill();    
 
