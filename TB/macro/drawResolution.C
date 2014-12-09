@@ -204,15 +204,15 @@
 
   if(HVE == "HVH_50" || HVE == "HVH_20"){
   legC->AddEntry(eff_MiB3, "MiB3 chevron-OFF HV 3200", "p");
-  legC->AddEntry(eff_ZStack1, "ZStack2 OFF HV 3200", "p");
-  legC->AddEntry(eff_ZStack2, "ZStack1 OFF HV 3200", "p");
+  legC->AddEntry(eff_ZStack1, "ZStack1 OFF HV 3200", "p");
+  legC->AddEntry(eff_ZStack2, "ZStack2 OFF HV 3200", "p");
   legC->AddEntry(eff_enSEE, "SEE OFF  HV 2200", "p");
   }
 
   if(HVE == "HVL_50" || HVE == "HVL_20"){
   legC->AddEntry(eff_MiB3, "MiB3 chevron-OFF HV 3000", "p");
-  legC->AddEntry(eff_ZStack1, "ZStack2 OFF HV 3000", "p");
-  legC->AddEntry(eff_ZStack2, "ZStack1 OFF HV 3000", "p");
+  legC->AddEntry(eff_ZStack1, "ZStack1 OFF HV 3000", "p");
+  legC->AddEntry(eff_ZStack2, "ZStack2 OFF HV 3000", "p");
   legC->AddEntry(eff_enSEE, "SEE OFF  HV 1900", "p");
   }
 
