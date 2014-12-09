@@ -335,8 +335,8 @@ int main(int argc, char** argv)
         if(MCPNumber == 2) sprintf(str_cut_saturated, "run_id > 796 && amp_max[%d] > 4000", MCPNumber);
 
         //-----Draw and print infos-----
-        nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers, "goff");
-        nt->Draw(var_trig0,cut_trig0 && cut_scan && cut_tdc && cut_nFibers, "goff");
+        nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat, "goff");
+        nt->Draw(var_trig0,cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat, "goff");
 
         //      int acc = 1*(float(h_base->GetEntries())/2000.); //estimated from pedestal run
         //            std::cout<<h_sig->GetEntries()<<" "<<h_trig0->GetEntries()<<" "<<h_base->GetEntries()<<std::endl;
@@ -401,15 +401,15 @@ int main(int argc, char** argv)
         //---Time study 
         else if(strcmp(doWhat,"time") == 0)
 	{
-            nt->Draw(var_dt_vs_ampM, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
-            nt->Draw(var_dtStart_vs_ampM, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
-            nt->Draw(var_dtStart_vs_Tot, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
+            nt->Draw(var_dt_vs_ampM, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
+            nt->Draw(var_dtStart_vs_ampM, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
+            nt->Draw(var_dtStart_vs_Tot, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
 
-            nt->Draw(var_fracSaturated, cut_trig0 && cut_sig && cut_scan && cut_saturated && cut_tdc && cut_nFibers);
-            nt->Draw(var_evtAll, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
+            nt->Draw(var_fracSaturated, cut_trig0 && cut_sig && cut_scan && cut_saturated && cut_tdc && cut_nFibers && cut_trig_not_sat);
+            nt->Draw(var_evtAll, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
 
             //time resolution with CFD
-            nt->Draw(var_time, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
+            nt->Draw(var_time, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
             res_func->SetParameters(h_time->GetEntries()/2, h_time->GetMean(), h_time->GetRMS()/2);
             res_func->SetParLimits(0, 0, h_time->GetEntries()*2);
             res_func->SetParLimits(2, 0, h_time->GetRMS());
