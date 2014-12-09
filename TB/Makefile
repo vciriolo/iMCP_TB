@@ -10,30 +10,30 @@ CC = g++
 CFLAGS = -Wall
 
 lib/%.o: src/%.cc $(DEPS)
-	$(CC) $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $< $(ROOT_LIB) $(ROOT_FLAGS)
 
 all: dumper.exe analyzer.exe calcTreshold.exe preshower.exe drawWaveform.exe dumper_fitTemplate.exe calcTreshold_fitTemplate.exe
 
 dumper.exe: bin/dumper.cpp $(DEPS_OBJ)
-	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
+	g++ $(CFLAGS) -o $@ $^ $(ROOT_LIB) $(ROOT_FLAGS) 
 
 analyzer.exe: bin/analyzer.cpp $(DEPS_OBJ)
-	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
+	g++ $(CFLAGS) -o $@ $^ $(ROOT_LIB) $(ROOT_FLAGS) 
 
 calcTreshold.exe: bin/calcTreshold.cpp $(DEPS_OBJ)
-	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
+	g++ $(CFLAGS) -o $@ $^ $(ROOT_LIB) $(ROOT_FLAGS) 
 
 calcTreshold_fitTemplate.exe: bin/calcTreshold_fitTemplate.cpp $(DEPS_OBJ)
-	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
+	g++ $(CFLAGS) -o $@ $^ $(ROOT_LIB) $(ROOT_FLAGS) 
 
 drawWaveform.exe: bin/drawWaveform.cpp $(DEPS_OBJ)
-	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
+	g++ $(CFLAGS) -o $@ $^ $(ROOT_LIB) $(ROOT_FLAGS) 
 
 dumper_fitTemplate.exe: bin/dumper_fitTemplate.cpp $(DEPS_OBJ)
-	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
+	g++ $(CFLAGS) -o $@ $^ $(ROOT_LIB) $(ROOT_FLAGS) 
 
 preshower.exe: bin/preshower.cpp $(DEPS_OBJ)
-	g++ $(CFLAGS) $(ROOT_LIB) $(ROOT_FLAGS) -o $@ $^
+	g++ $(CFLAGS) -o $@ $^ $(ROOT_LIB) $(ROOT_FLAGS) 
 
 clean:
 	rm -f lib/*.o
