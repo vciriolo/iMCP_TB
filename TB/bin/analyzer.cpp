@@ -248,18 +248,19 @@ int main(int argc, char** argv)
     char var_fracSaturated[100]="";
     char var_evtAll[100]="";
     //---time resolution
-    char var_timeCFD[100]="";
-    char var_timeCFD_vs_TOT[1000] = "";
-    char var_timeLED[100] = "";
-    char var_timeLED_vs_TOT[1000] = "";
+    char var_timeCFD[200]="";
+    char var_timeCFD_vs_TOT[500] = "";
+    char var_timeLED[200] = "";
+    char var_timeLED_vs_TOT[500] = "";
     //---cut strings
-    char str_cut_sig[200]="";
-    char str_cut_trig0[200]="";
-    char str_cut_tdc[200]="";
-    char str_cut_saturated[200]="";
-    char str_cut_nFibers[200]="";
-    char str_cut_trig_not_sat[200]="";
-    char str_cut_bad_time[200]="";
+    char str_cut_sig[500]="";
+    char str_cut_trig0[500]="";
+    char str_cut_tdc[500]="";
+    char str_cut_saturated[500]="";
+    char str_cut_nFibers[500]="";
+    char str_cut_trig_not_sat[500]="";
+    char str_cut_bad_timeCFD[500]="";
+    char str_cut_bad_timeLED[500]="";
     //---Define Cuts---
     sprintf(str_cut_sig, "charge_corr[%d] > %d", MCPNumber, treshold.at(MCPNumber));
     sprintf(str_cut_trig0, "charge_corr[%d] > %d", trigPos1, treshold.at(trigPos1));
@@ -267,16 +268,17 @@ int main(int argc, char** argv)
     sprintf(str_cut_saturated, "amp_max[%d] > 3450", MCPNumber);
     sprintf(str_cut_nFibers, "nhodoX1<=3 && nhodoX2<=3 && nhodoY1<=3 && nhodoY2<=3");
     sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
+    sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
     if (MCPList.at(MCP)==4)
     {
-        sprintf(str_cut_bad_time, "time_start_150[%d] != 20 && time_start_150[%d] != 20 && "
-                "(time_start_150[%d]-time_CF[%d])<-3/5*(time_stop_150[%d]-time_start_150[%d])",
+        sprintf(str_cut_bad_timeLED, "time_start_150[%d] != 20 && time_start_150[%d] != 20 && "
+                "((time_start_150[%d]-time_CF[%d])<-3/5*(time_stop_150[%d]-time_start_150[%d]))",
                 MCPNumber, trigPos1, MCPNumber, trigPos1, MCPNumber, MCPNumber);
     }
     else
     {
-        sprintf(str_cut_bad_time, "time_start_150[%d] != 20 && time_start_150[%d] != 20 && "
-                "(time_start_150[%d]-time_CF[%d])<-1/3*(time_stop_150[%d]-time_start_150[%d])+2",
+        sprintf(str_cut_bad_timeLED, "time_start_150[%d] != 20 && time_start_150[%d] != 20 && "
+                "((time_start_150[%d]-time_CF[%d])<-1/3*(time_stop_150[%d]-time_start_150[%d])+2)",
                 MCPNumber, trigPos1, MCPNumber, trigPos1, MCPNumber, MCPNumber);
     }     
     //---construct TCut
@@ -286,7 +288,8 @@ int main(int argc, char** argv)
     TCut cut_saturated = str_cut_saturated;
     TCut cut_nFibers = str_cut_nFibers;
     TCut cut_trig_not_sat = str_cut_trig_not_sat;
-    TCut cut_bad_time = str_cut_bad_time;
+    TCut cut_bad_timeCFD = str_cut_bad_timeCFD;
+    TCut cut_bad_timeLED = str_cut_bad_timeLED;
 
 //-------Runs loop------------------------------------------------------------------------
     for(unsigned int i=0; i<ScanList.size(); i++)
@@ -343,13 +346,13 @@ int main(int argc, char** argv)
         {                              
             pr_timeCFD_vs_TOT = new TProfile(pr_timeCFD_vs_TOT_name, "timeCF vs TOT difference",
                                           25, 0, 5, -5, 2);
-            f_corrCFD = new TF1(f_corrCFD_name, "pol2", 0, 5);
+            f_corrCFD = new TF1(f_corrCFD_name, "pol2", 1, 5);
         }
         else
         {
             pr_timeCFD_vs_TOT = new TProfile(pr_timeCFD_vs_TOT_name, "timeCF vs TOT difference",
                                           30, 0, 10, -5, 2);
-            f_corrCFD = new TF1(f_corrCFD_name, "pol2", 0, 10);
+            f_corrCFD = new TF1(f_corrCFD_name, "pol2", 1, 10);
         }
         pr_timeCFD_vs_TOT->SetMarkerStyle(20);
         pr_timeCFD_vs_TOT->SetMarkerSize(0.7);
@@ -431,7 +434,7 @@ int main(int argc, char** argv)
 		printf("-----------------------------\n");
 	}
         //-----Charge study-----
-        if(strcmp(doWhat, "Q") == 0 || strcmp(doWhat, "all") == 0)
+        if(strcmp(doWhat, "Q") == 0)// || strcmp(doWhat, "all") == 0)
 	{
 	    if(i == 0)
 	    {
@@ -475,7 +478,7 @@ int main(int argc, char** argv)
             sprintf(var_timeCFD_vs_TOT, "%s:%s>>%s", t_CF_diff, t_OT_diff, pr_timeCFD_vs_TOT_name);
             //---correction
             nt->Draw(var_timeCFD_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
-                     && cut_tdc && cut_trig_not_sat, "goff");
+                     && cut_tdc && cut_trig_not_sat && cut_bad_timeCFD, "goff");
             //---skip run with low stat
             if(pr_timeCFD_vs_TOT->GetEntries() < 100) 
                 continue;         
@@ -485,7 +488,7 @@ int main(int argc, char** argv)
                     t_CF_diff, f_corrCFD->GetParameter(0), f_corrCFD->GetParameter(1), t_OT_diff,
                     f_corrCFD->GetParameter(2), t_OT_diff, t_OT_diff, h_resCFD_name);
             nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers
-                     && cut_trig_not_sat, "goff");  
+                     && cut_trig_not_sat && cut_bad_timeCFD, "goff");  
             //---fit coincidence peak
             f_resCFD->SetParameters(h_resCFD->GetEntries(), 0, 0.05);
             f_resCFD->SetParLimits(1, -0.03, 0.03);
@@ -538,7 +541,7 @@ int main(int argc, char** argv)
             sprintf(var_timeLED_vs_TOT, "%s:%s>>%s", t_start_diff, t_OT_diff, pr_timeLED_vs_TOT_name);
             //---correction
             nt->Draw(var_timeLED_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
-                     && cut_tdc && cut_trig_not_sat && cut_bad_time, "goff");
+                     && cut_tdc && cut_trig_not_sat && cut_bad_timeLED, "goff");
             //---skip run with low stat
             if(pr_timeLED_vs_TOT->GetEntries() < 100) 
                 continue;         
@@ -548,7 +551,7 @@ int main(int argc, char** argv)
                     t_start_diff, f_corrLED->GetParameter(0), f_corrLED->GetParameter(1), t_OT_diff,
                     f_corrLED->GetParameter(2), t_OT_diff, t_OT_diff, h_resLED_name);
             nt->Draw(var_timeLED, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers
-                     && cut_trig_not_sat && cut_bad_time, "goff");  
+                     && cut_trig_not_sat && cut_bad_timeLED, "goff");  
             //---fit coincidence peak
             f_resLED->SetParameters(h_resLED->GetEntries(), 0, 0.05);
             f_resLED->SetParLimits(1, -0.03, 0.03);
