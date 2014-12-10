@@ -383,8 +383,8 @@ int main(int argc, char** argv)
         //-----Saturated event computation----
         sprintf(var_fracSaturated, "time_CF[%d] >> %s", MCPNumber, h_fracSat_name); 
         sprintf(var_evtAll, "time_CF[%d] >> %s", MCPNumber, h_evtAll_name); 
-        nt->Draw(var_fracSaturated, cut_trig0 && cut_sig && cut_scan && cut_saturated && cut_tdc && cut_nFibers && cut_trig_not_sat);
-        nt->Draw(var_evtAll, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
+        nt->Draw(var_fracSaturated, cut_trig0 && cut_sig && cut_scan && cut_saturated && cut_tdc && cut_nFibers);
+        nt->Draw(var_evtAll, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
         if(TString(scanType).Contains("HV") == 1) 
         {
             if(h_evtAll->GetEntries() != 0)
@@ -404,8 +404,8 @@ int main(int argc, char** argv)
 	{
             sprintf(var_sig, "charge_corr[%d]>>%s", MCPNumber, h_sig_name);
             sprintf(var_trig0, "charge_corr[%d]>>%s", trigPos1, h_trig0_name);
-            nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat, "goff");
-            nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat, "goff");
+            nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers, "goff");
+            nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_tdc && cut_nFibers, "goff");
             float eff = h_sig->GetEntries()/h_trig0->GetEntries();
             float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
             if(eff < 0)   
