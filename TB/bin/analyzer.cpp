@@ -96,14 +96,14 @@ int main(int argc, char** argv)
         outROOT_Q = TFile::Open(Form("plots/charge_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
     }    
     //---time resolution CDF
-    if(strcmp(doWhat, "CDF") == 0 || strcmp(doWhat, "all") == 0)
+    if(strcmp(doWhat, "time") == 0 || strcmp(doWhat, "all") == 0)
     {
         sprintf(mkdir_command, "mkdir plots/resCDF_studies");
         system(mkdir_command);         
         outROOT_CFD = TFile::Open(Form("plots/resCDF_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
     }
     //---time resolution LED
-    if(strcmp(doWhat, "resLED") == 0 || strcmp(doWhat, "all") == 0)
+    if(strcmp(doWhat, "timeLED") == 0 || strcmp(doWhat, "all") == 0)
     {
         sprintf(mkdir_command, "mkdir plots/resLED_studies");
         system(mkdir_command);         
