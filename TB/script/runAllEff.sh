@@ -25,3 +25,7 @@ python python/analyzer.py -cfg cfg/treshold_5s.txt -m enSEE -a eff -n AngScan_HV
 python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack1 -a eff -n AngScan_HVLow -s X0
 python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack2 -a eff -n AngScan_HVLow -s X0
 python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB3 -a eff -n AngScan_HVLow -s X0
+python python/analyzer.py -cfg cfg/treshold_5s.txt -m enSEE -a eff -n AngScan_HVHigh -s X0
+python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack1 -a eff -n AngScan_HVHigh -s X0
+python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack2 -a eff -n AngScan_HVHigh -s X0
+python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB3 -a eff -n AngScan_HVHigh -s X0

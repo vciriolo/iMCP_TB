@@ -43,7 +43,7 @@ int main(int argc, char** argv)
     Fill_MCPList();
     Fill_inverted_MCPList();
 
-    //read input options
+    //---Read input options---
     std::ifstream inputCfg (argv[1],ios::in);
     std::string MCP = argv[2];
     doWhat = argv[3];
@@ -58,28 +58,57 @@ int main(int argc, char** argv)
     int nChannels=0;
     int trigPos1 = -1;  //positions of the two trigger chambers in the reco tree
  
-    //---open cfg file and fill map with treshold for each channel----
+    //---Open cfg file and fill map with treshold for each channel---
     while(!inputCfg.eof())
     {
 	inputCfg >> ch >> tresh;
 	treshold.insert(std::make_pair(ch,tresh));
 	nChannels++;
     }
-    //---open reco tree---
+    //---Open reco tree---
     std::string inFileName = "ntuples/reco_"+string(label)+".root";
     TFile *inFile = new TFile (inFileName.c_str());
     TTree* nt = (TTree*)inFile->Get("reco_tree");
     InitRecoTree(nt);
-    //---out files---
-    //---txt
+    //-----Create output files---
+    //---txt---
     char outputFileName[200]="";
     sprintf(outputFileName, "results/%s_%s_%s_%s.txt", MCP.c_str(), doWhat, scanType, label);
     std::ofstream outputFile (outputFileName, std::ofstream::out);
-    //---root
+    //---ROOT---
     char mkdir_command[50];
-    sprintf(mkdir_command, "mkdir plots/time_resolution/%s", label);
-    system(mkdir_command);         
-    TFile* outROOT = TFile::Open(Form("plots/time_resolution/%s/%s.root", label, MCP.c_str()), "recreate");
+    TFile* outROOT_eff = NULL;
+    TFile* outROOT_Q = NULL;
+    TFile* outROOT_CFD = NULL;
+    TFile* outROOT_LED = NULL;
+    //---efficiency
+    if(strcmp(doWhat, "eff") == 0 || strcmp(doWhat, "all") == 0)
+    {
+        sprintf(mkdir_command, "mkdir plots/efficiency_studies");
+        system(mkdir_command);         
+        outROOT_eff = TFile::Open(Form("plots/efficiency_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
+    }
+    //---charge
+    if(strcmp(doWhat, "Q") == 0 || strcmp(doWhat, "all") == 0)
+    {
+        sprintf(mkdir_command, "mkdir plots/charge_studies");
+        system(mkdir_command);         
+        outROOT_Q = TFile::Open(Form("plots/charge_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
+    }    
+    //---time resolution CDF
+    if(strcmp(doWhat, "CDF") == 0 || strcmp(doWhat, "all") == 0)
+    {
+        sprintf(mkdir_command, "mkdir plots/resCDF_studies");
+        system(mkdir_command);         
+        outROOT_CFD = TFile::Open(Form("plots/resCDF_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
+    }
+    //---time resolution LED
+    if(strcmp(doWhat, "resLED") == 0 || strcmp(doWhat, "all") == 0)
+    {
+        sprintf(mkdir_command, "mkdir plots/resLED_studies");
+        system(mkdir_command);         
+        outROOT_LED = TFile::Open(Form("plots/resLED_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
+    }
 
     //------Build TCut and draw variables--------------------------------------------------
     char str_cut_sig[200]="";
@@ -242,8 +271,14 @@ int main(int argc, char** argv)
     TGraphErrors *g_eff = new TGraphErrors(ScanList.size());
     g_eff->SetName("eff");
 
-    TGraphErrors *g_resoLED = new TGraphErrors(ScanList.size());
-    g_resoLED->SetName("resoLED");
+    TGraphErrors *g_Q = new TGraphErrors(ScanList.size());
+    g_Q->SetName("Q");
+
+    TGraphErrors *g_resCDF = new TGraphErrors(ScanList.size());
+    g_resCDF->SetName("resCDF");
+
+    TGraphErrors *g_resLED = new TGraphErrors(ScanList.size());
+    g_resLED->SetName("resLED");
 
     TGraphErrors* g_frac_saturated = new TGraphErrors(ScanList.size());
     g_frac_saturated->SetName("frac_saturated");
@@ -337,21 +372,26 @@ int main(int argc, char** argv)
         //-----Draw and print infos-----
         nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat, "goff");
         nt->Draw(var_trig0,cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat, "goff");
-
-        //      int acc = 1*(float(h_base->GetEntries())/2000.); //estimated from pedestal run
-        //            std::cout<<h_sig->GetEntries()<<" "<<h_trig0->GetEntries()<<" "<<h_base->GetEntries()<<std::endl;
-
+        // int acc = 1*(float(h_base->GetEntries())/2000.); //estimated from pedestal run
+        // std::cout<<h_sig->GetEntries()<<" "<<h_trig0->GetEntries()<<" "<<h_base->GetEntries()<<std::endl;
         float eff = h_sig->GetEntries()/h_trig0->GetEntries();
         float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
-      
-        //      float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
-        //     float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig1->GetEntries());
-
+        // float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
+        // float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig1->GetEntries());
         if(eff < 0)   eff = 0;
         char var_name[3] = "X0";
-        if(TString(scanType).Contains("HV") == 1)    sprintf(var_name, "HV");
-        //---Eff study
-        if(strcmp(doWhat,"eff") == 0)
+        if(TString(scanType).Contains("HV") == 1)    
+            sprintf(var_name, "HV");
+
+        //-----Saturated event computation----
+        nt->Draw(var_fracSaturated, cut_trig0 && cut_sig && cut_scan && cut_saturated && cut_tdc && cut_nFibers && cut_trig_not_sat);
+        nt->Draw(var_evtAll, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
+        if(TString(scanType).Contains("HV") == 1) 
+            g_frac_saturated->SetPoint(i, HVVal.at(i), 100.*h_fracSat->GetEntries()/h_evtAll->GetEntries());	
+        else
+            g_frac_saturated->SetPoint(i, X0Step.at(i), 100.*h_fracSat->GetEntries()/h_evtAll->GetEntries());	
+        //-----Efficiency study-----
+        if(strcmp(doWhat, "eff") == 0 || strcmp(doWhat, "all") == 0)
 	{
 	    if(i == 0)
 	    {
@@ -359,13 +399,15 @@ int main(int argc, char** argv)
 		printf(" %s\teff\te_%s\te_eff\n", var_name, var_name);
 		printf("-----------------------------\n");
 	    }
-	    if(TString(scanType).Contains("HV") == 1) {
+	    if(TString(scanType).Contains("HV") == 1) 
+            {
                 printf("%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i), eff, 0., e_eff);
                 outputFile << HVVal.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
                 g_eff->SetPoint(i, HVVal.at(i), eff);
                 g_eff->SetPointError(i, 0, e_eff);
 	    }
-	    else {
+	    else 
+            {
                 printf("%.3f\t%.3f\t%.3f\t%.3f\n", X0Step.at(i), eff, 0., e_eff);
                 outputFile << X0Step.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
                 g_eff->SetPoint(i, X0Step.at(i), eff);
@@ -374,8 +416,8 @@ int main(int argc, char** argv)
 	    if(i == (ScanList.size()-1))    
 		printf("-----------------------------\n");
 	}
-        //---Charge study
-        else if(strcmp(doWhat,"Q") == 0)
+        //-----Charge study-----
+        if(strcmp(doWhat, "Q") == 0 || strcmp(doWhat, "all") == 0)
 	{
 	    if(i == 0)
 	    {
@@ -384,86 +426,95 @@ int main(int argc, char** argv)
 		printf("-----------------------------\n");
 	    }
 	    nt->Draw(var_sig, cut_scan);
-	    if(TString(scanType).Contains("HV") == 1) {
+	    if(TString(scanType).Contains("HV") == 1) 
+            {
                 printf("%d\t%.0f\t%.0f\t%.0f\n", HVVal.at(i), h_sig->GetMean(), 0., h_sig->GetMeanError());
                 outputFile << HVVal.at(i)<<"\t"<<h_sig->GetMean()<<"\t 0.\t"<<h_sig->GetMeanError()<<std::endl;
-                g_eff->SetPoint(i, HVVal.at(i), h_sig->GetMean());
-                g_eff->SetPoint(i, 0, h_sig->GetMeanError());
+                g_Q->SetPoint(i, HVVal.at(i), h_sig->GetMean());
+                g_Q->SetPoint(i, 0, h_sig->GetMeanError());
 	    }
-	    else {
+	    else 
+            {
                 printf("%.3f\t%.0f\t%.0f\t%.0f\n", X0Step.at(i), h_sig->GetMean(), 0., h_sig->GetMeanError());
                 outputFile << X0Step.at(i)<<"\t"<<h_sig->GetMean()<<"\t 0.\t"<<h_sig->GetMeanError()<<std::endl;
-                g_eff->SetPoint(i, 0, h_sig->GetMeanError());
+                g_Q->SetPoint(i, X0Step.at(i), h_sig->GetMean());
+                g_Q->SetPoint(i, 0, h_sig->GetMeanError());
 	    }
 	    if(i == (ScanList.size()-1))    
 		printf("-----------------------------\n");
 	}
-        //---Time study 
-        else if(strcmp(doWhat,"time") == 0)
+        //-----TIME RESOLUTION STUDY----- 
+        //---time resolution with CFD---
+        if(strcmp(doWhat, "time") == 0 || strcmp(doWhat, "all") == 0)
 	{
-            nt->Draw(var_dt_vs_ampM, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
-            nt->Draw(var_dtStart_vs_ampM, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
-            nt->Draw(var_dtStart_vs_Tot, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
-
-            nt->Draw(var_fracSaturated, cut_trig0 && cut_sig && cut_scan && cut_saturated && cut_tdc && cut_nFibers && cut_trig_not_sat);
-            nt->Draw(var_evtAll, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
-
-            //time resolution with CFD
-            nt->Draw(var_time, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
-            res_func->SetParameters(h_time->GetEntries()/2, h_time->GetMean(), h_time->GetRMS()/2);
-            res_func->SetParLimits(0, 0, h_time->GetEntries()*2);
-            res_func->SetParLimits(2, 0, h_time->GetRMS());
-            res_func->SetRange(h_time->GetMean()-2*h_time->GetRMS(), h_time->GetMean()+2*h_time->GetRMS());
-            h_time->Fit(res_func, "QRN+");
-	  
-            res_func_2sig->SetParameter(0,res_func->GetParameter(0));
-            res_func_2sig->SetParameter(1,res_func->GetParameter(1));
-            res_func_2sig->SetParameter(2,res_func->GetParameter(2));
-            res_func_2sig->SetRange(res_func->GetParameter(1)-2*res_func->GetParameter(2), res_func->GetParameter(1)+2*res_func->GetParameter(2));
-            h_time->Fit(res_func_2sig, "QR+");
-	  
-            float err_time = res_func_2sig->GetParError(2)*1000.;
-            float t_res = res_func_2sig->GetParameter(2)*1000;
-            float e_t_res = err_time*res_func_2sig->GetParameter(2)*1000/(t_res);
-            float prob = res_func_2sig->GetProb();
+            //---print banner
             if(i == 0)
 	    {
                 printf("----------Time Resolution(ps)----------\n");
                 printf(" %s\tt_res\te_%s\te_t_res\tX_prob\n", var_name, var_name);
                 printf("---------------------------------------\n");
 	    }
-            if(TString(scanType).Contains("HV") == 1) {
+            //---correlation plot
+            nt->Draw(var_dt_vs_ampM, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
+            nt->Draw(var_dtStart_vs_ampM, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
+            nt->Draw(var_dtStart_vs_Tot, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
+            //---timing first try
+            nt->Draw(var_time, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
+            //---skip run with low stat
+            if(h_time->GetEntries() < 100)
+                continue;
+            res_func->SetParameters(h_time->GetEntries()/2, h_time->GetMean(), h_time->GetRMS()/2);
+            res_func->SetParLimits(0, 0, h_time->GetEntries()*2);
+            res_func->SetParLimits(2, 0, h_time->GetRMS());
+            res_func->SetRange(h_time->GetMean()-2*h_time->GetRMS(), h_time->GetMean()+2*h_time->GetRMS());
+            h_time->Fit(res_func, "QRN+");
+            //---timing second try
+            res_func_2sig->SetParameter(0,res_func->GetParameter(0));
+            res_func_2sig->SetParameter(1,res_func->GetParameter(1));
+            res_func_2sig->SetParameter(2,res_func->GetParameter(2));
+            res_func_2sig->SetRange(res_func->GetParameter(1)-2*res_func->GetParameter(2), res_func->GetParameter(1)+2*res_func->GetParameter(2));
+            h_time->Fit(res_func_2sig, "QR+");
+            //---get time resolution
+            float err_time = res_func_2sig->GetParError(2)*1000.;
+            float t_res = res_func_2sig->GetParameter(2)*1000;
+            float e_t_res = err_time*res_func_2sig->GetParameter(2)*1000/(t_res);
+            float prob = res_func_2sig->GetProb();
+            //---print results on screen
+            if(TString(scanType).Contains("HV") == 1) 
+            {
                 printf("%d\t%.1f\t%.0f\t%.1f\t%.3f\n", HVVal.at(i), t_res, 0., e_t_res, prob);
                 outputFile << HVVal.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
-                g_eff->SetPoint(i, HVVal.at(i), t_res);
-                g_eff->SetPointError(i, 0, e_t_res);
-                g_frac_saturated->SetPoint(i, HVVal.at(i), 100.*h_fracSat->GetEntries()/h_evtAll->GetEntries());	
-                //	    g_frac_saturated->SetPoint(i, HVVal.at(i), sqrt(h_fracSat->GetEntries()/h_evtAll->GetEntries());	
+                g_resCDF->SetPoint(i, HVVal.at(i), t_res);
+                g_resCDF->SetPointError(i, 0, e_t_res);
             }
-            else {
+            else 
+            {
                 printf("%.3f\t%.1f\t%.1f\t%.1f\t%.3f\n", X0Step.at(i), t_res, 0., e_t_res, prob);
                 outputFile << X0Step.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
-                g_eff->SetPoint(i, X0Step.at(i), t_res);
-                g_eff->SetPointError(i, 0, e_t_res);
-                g_frac_saturated->SetPoint(i, X0Step.at(i), 100.*h_fracSat->GetEntries()/h_evtAll->GetEntries());	
+                g_resCDF->SetPoint(i, X0Step.at(i), t_res);
+                g_resCDF->SetPointError(i, 0, e_t_res);            
             }
             if(i == (ScanList.size()-1))    
                 printf("---------------------------------------\n");
+            //---print single fit+plot (png/pdf)---
             TCanvas* c = new TCanvas();
             char plot_name[100];
-            std::string command = "if [ ! -e plots/time_resolution/"+string(label)+" ] ; then mkdir plots/time_resolution/"+label+" ; fi";
+            std::string command = "if [ ! -e plots/resCFD_studies"+string(label)+" ] ; then mkdir plots/resCFD_studies"+label+" ; fi";
             system(command.c_str());
-	  
-            sprintf(plot_name, "plots/time_resolution/%s/%s_%d.pdf", label, MCP.c_str(), i);
+            sprintf(plot_name, "plots/resCFD_studies%s/%s_%d.pdf", label, MCP.c_str(), i);
             h_time->Draw();
             res_func_2sig->Draw("same");
-            //	    gStyle->SetOptFit(1111);
+            gStyle->SetOptFit(1111);
             gStyle->SetOptStat(0000);
             c->Print(plot_name, "pdf");
-            sprintf(plot_name, "plots/time_resolution/%s/%s_%d.png", label, MCP.c_str(), i);
+            sprintf(plot_name, "plots/resCFD_studies%s/%s_%d.png", label, MCP.c_str(), i);
             c->Print(plot_name, "png");
+            //---write histo+fit to common ROOT file---
+            outROOT_CFD->cd();
+            h_time->Write();
         }
-        else if(strcmp(doWhat, "timeLED") == 0)
+        //---Time resolution with LED and TOT correction---
+        if(strcmp(doWhat, "timeLED") == 0 || strcmp(doWhat, "all") == 0)
         {
             //---print banner
             if(i == 0)
@@ -473,7 +524,7 @@ int main(int argc, char** argv)
                 printf("---------------------------------------\n");
             }
             //---correction
-            nt->Draw(var_timeLED_vs_TOT, cut_trig0 && cut_sig && cut_scan 
+            nt->Draw(var_timeLED_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
                      && cut_tdc && cut_trig_not_sat && cut_bad_time, "goff");
             //---skip run with low stat
             if(pr_time_vs_TOT->GetEntries() < 100) 
@@ -483,6 +534,8 @@ int main(int argc, char** argv)
             sprintf(var_timeLED, "%s-(%f + %f*%s + %f*%s*%s)>>%s",
                     t_start_diff, f_corrLED->GetParameter(0), f_corrLED->GetParameter(1), t_OT_diff,
                     f_corrLED->GetParameter(2), t_OT_diff, t_OT_diff, h_resLED_name);
+            nt->Draw(var_timeLED, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers
+                     && cut_trig_not_sat && cut_bad_time, "goff");  
             //---fit coincidence peak
             f_resLED->SetParameters(h_resLED->GetEntries(), 0, 0.05);
             f_resLED->SetParLimits(1, -0.03, 0.03);
@@ -494,88 +547,73 @@ int main(int argc, char** argv)
             float e_t_res = f_resLED->GetParError(2)*1000.;
             float t_res = f_resLED->GetParameter(2)*1000.;
             float prob = f_resLED->GetProb();
-            //---print results
+            //---print results + graph
             if(TString(scanType).Contains("HV") == 1) 
             {
                 printf("%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i), t_res, 0., e_t_res, prob);
                 outputFile << HVVal.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
-                g_eff->SetPoint(i, HVVal.at(i), t_res);
-                g_eff->SetPointError(i, 0, e_t_res); 
+                g_resLED->SetPoint(i,  HVVal.at(i), t_res);
+                g_resLED->SetPointError(i, 0, e_t_res);
             } 
             else
             {  
                 printf("%d\t%.3f\t%.1f\t%.1f\t%.1f\t%.3f\n", i, X0Step.at(i), t_res, 0., e_t_res, prob);
                 outputFile << X0Step.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
-                g_eff->SetPoint(i, X0Step.at(i), t_res);
-                g_eff->SetPointError(i, 0, e_t_res);
+                g_resLED->SetPoint(i, X0Step.at(i), t_res);
+                g_resLED->SetPointError(i, 0, e_t_res);
             }
             if(i == (ScanList.size()-1))
                 printf("---------------------------------------\n");
-            //---store plots
-            // if(TString(scanType).Contains("HV") == 1) g_resoLED->SetPoint(i,  HVVal.at(i), t_res);
-            // else g_resoLED->SetPoint(i, X0Step.at(i), t_res);
-            // g_resoLED->SetPointError(i, 0, e_t_res);
-
-            outROOT->cd();
+            //---write plots in the out file
+            outROOT_LED->cd();
             pr_time_vs_TOT->Write();
             h_resLED->Write();
             pr_time_vs_TOT->Delete();
             h_resLED->Delete();
         }
     }
-    //do efficiency plot!
-    if(strcmp(doWhat,"time") != 0)
+    //---Save global scan graph---
+    //---efficiency
+    if(outROOT_eff)
     {
-        TCanvas* c2 = new TCanvas();
-        c2->cd();
-        g_eff->GetXaxis()->SetTitle(scanType);
-        g_eff->GetYaxis()->SetTitle("Efficiency");
-        g_eff->SetTitle(MCP.c_str());
-        g_eff->SetMarkerStyle(20);
-        g_eff->SetMarkerSize(0.9);
-        g_eff->SetMarkerColor(4);
-        gPad->SetGrid();
-        g_eff->Draw("AP");
-        g_eff->GetXaxis()->SetRangeUser(1100,3500);
-        g_eff->Draw("AP");
-        char effPlotName[200]="";
-        sprintf(effPlotName, "plots/efficiency/efficiency_%s_%s_%s_%s.pdf", MCP.c_str(), doWhat, scanType, label);
-        c2->Print(effPlotName,"pdf");
+        outROOT_eff->cd();
+        g_eff->Write();
+        g_frac_saturated->Write();
+        outROOT_eff->Close();
     }
-
-    char effRootName[200]="";
-    sprintf(effRootName, "plots/efficiency/efficiency_%s_%s_%s_%s.root", MCP.c_str(), doWhat, scanType, label);
-    if (strcmp(scanType,"HODO")==0) sprintf(effRootName, "plots/HODO/efficiency_%s_%s_%s_%s.root", MCP.c_str(), doWhat, scanType, label);
-    if(strcmp(doWhat,"time") == 0) sprintf(effRootName, "plots/time_resolution/time_%s_%s_%s_%s.root", MCP.c_str(), doWhat, scanType, label);
-    TFile* out = new TFile(TString(effRootName), "recreate");
-    out->cd();
-    g_eff->Write();
-
-    g_frac_saturated->Write();
-    if(strcmp(doWhat,"time") == 0) g_resoLED->Write();
-    std::cout << " stampati .root" << std::endl;
-
-    if (strcmp(scanType,"HODO")==0){
-        h_hodoX1->Write();
-        h_hodoY1->Write();
-        h_hodoX2->Write();
-        h_hodoY2->Write();
-        h_tdcX->Write();
-        h_tdcY->Write();
-        h_hodoX1_c->Write();
-        h_hodoY1_c->Write();
-        h_hodoX2_c->Write();
-        h_hodoY2_c->Write();
-        h_tdcX_c->Write();
-        h_tdcY_c->Write();
+    //---time resolution CFD
+    if(outROOT_CFD)
+    {
+        outROOT_CFD->cd();
+        g_resCDF->Write();
+        g_frac_saturated->Write();
+        outROOT_CFD->Close();
     }
-
-    out->Close();
-
-    std::cout<<"results printed in results/"<<std::endl;
-    //  outputFile.close();
-    inFile->Close();
-  
+    //---time resolution LED
+    if(outROOT_LED)
+    {
+        outROOT_LED->cd();
+        g_resLED->Write();
+        g_frac_saturated->Write();
+        outROOT_LED->Close();
+    }
+    // //---hodo
+    // if(strcmp(scanType,"HODO")==0)
+    // {
+    //     h_hodoX1->Write();
+    //     h_hodoY1->Write();
+    //     h_hodoX2->Write();
+    //     h_hodoY2->Write();
+    //     h_tdcX->Write();
+    //     h_tdcY->Write();
+    //     h_hodoX1_c->Write();
+    //     h_hodoY1_c->Write();
+    //     h_hodoX2_c->Write();
+    //     h_hodoY2_c->Write();
+    //     h_tdcX_c->Write();
+    //     h_tdcY_c->Write();
+    // }
+    inFile->Close();  
     return 0;     
 
 }
