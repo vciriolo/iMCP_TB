@@ -56,8 +56,7 @@ int main(int argc, char** argv)
     std::map <int,int> treshold;
     int ch, tresh;
     int nChannels=0;
-    int trigPos1 = -1;  //positions of the two trigger chambers in the reco tree
- 
+    int trigPos1 = -1;  //positions of the two trigger chambers in the reco tree 
     //---Open cfg file and fill map with treshold for each channel---
     while(!inputCfg.eof())
     {
@@ -70,7 +69,8 @@ int main(int argc, char** argv)
     TFile *inFile = new TFile (inFileName.c_str());
     TTree* nt = (TTree*)inFile->Get("reco_tree");
     InitRecoTree(nt);
-    //-----Create output files---
+
+    //-----Create output files-----
     //---txt---
     char outputFileName[200]="";
     sprintf(outputFileName, "results/%s_%s_%s_%s.txt", MCP.c_str(), doWhat, scanType, label);
@@ -95,12 +95,12 @@ int main(int argc, char** argv)
         system(mkdir_command);         
         outROOT_Q = TFile::Open(Form("plots/charge_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
     }    
-    //---time resolution CDF
-    if(strcmp(doWhat, "time") == 0 || strcmp(doWhat, "all") == 0)
+    //---time resolution CFD
+    if(strcmp(doWhat, "timeCFD") == 0 || strcmp(doWhat, "all") == 0)
     {
-        sprintf(mkdir_command, "mkdir plots/resCDF_studies");
+        sprintf(mkdir_command, "mkdir plots/resCFD_studies");
         system(mkdir_command);         
-        outROOT_CFD = TFile::Open(Form("plots/resCDF_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
+        outROOT_CFD = TFile::Open(Form("plots/resCFD_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
     }
     //---time resolution LED
     if(strcmp(doWhat, "timeLED") == 0 || strcmp(doWhat, "all") == 0)
@@ -110,28 +110,7 @@ int main(int argc, char** argv)
         outROOT_LED = TFile::Open(Form("plots/resLED_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
     }
 
-    //------Build TCut and draw variables--------------------------------------------------
-    char str_cut_sig[200]="";
-    char str_cut_trig0[200]="";
-    char str_cut_tdc[200]="";
-    char str_cut_saturated[200]="";
-    char str_cut_nFibers[200]="";
-    char str_cut_trig_not_sat[200]="";
-    char str_cut_bad_time[200]="";
-
-    char var_sig[100]="";
-    char var_dt_vs_ampM[100]="";
-    char var_dtStart_vs_ampM[100] = "";
-    char var_dtStart_vs_Tot[100] = "";
-    char var_fracSaturated[100]="";
-    char var_evtAll[100]="";
-
-    char var_time[100]="";
-    char var_timeLED[100] = "";
-    char var_timeLED_vs_TOT[1000] = "";
-    char var_trig0[100]="";
-
-    //---open tree and get: run list and corresponding HV/X0-----
+    //---open tree and get: run list and corresponding HV/X0---
     std::vector<int> HVVal;
     HVVal.clear();
     std::vector<float> X0Step;
@@ -139,7 +118,7 @@ int main(int argc, char** argv)
     std::vector<float> ScanList;
     ScanList.clear();
 
-    //Output Histos
+    //---Output Histos HODO---
     TH1F *h_hodoX1   = new TH1F( "h_hodoX1", "", 64, -32., 32.); h_hodoX1->GetXaxis()->SetTitle("HODO X1");
     TH1F *h_hodoY1   = new TH1F( "h_hodoY1", "", 64, -32., 32.); h_hodoY1->GetXaxis()->SetTitle("HODO Y1");
     TH1F *h_hodoX2   = new TH1F( "h_hodoX2", "", 64, -32., 32.); h_hodoX2->GetXaxis()->SetTitle("HODO X2");
@@ -153,9 +132,11 @@ int main(int argc, char** argv)
     TH1F *h_tdcX_c   = new TH1F( "h_tdcX_c", "", 64, -32., 32.); h_tdcX_c->GetXaxis()->SetTitle("Wire Chamber X");
     TH1F *h_tdcY_c   = new TH1F( "h_tdcY_c", "", 64, -32., 32.); h_tdcY_c->GetXaxis()->SetTitle("Wire Chamber Y");
 
+//----------------------------------------------------------------------------------------
+//------Get HV / X0 / HODO and MCP channels-----------------------------------------------
 
-    //---save list of HV (or X0) step---
-    if (strcmp(scanType,"HV")==0) {
+    if (strcmp(scanType,"HV")==0) 
+    {
         int prev=0;  
         for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++)
         {
@@ -174,7 +155,8 @@ int main(int argc, char** argv)
             }
         }
     }
-    else if (strcmp(scanType,"HODO")==0) {
+    else if (strcmp(scanType,"HODO")==0) 
+    {
         int prev=0;
         float x0_HODO1 = -7.69582, y0_HODO1 = 0.322465; //From macro/fitHodo.C
         float x0_HODO2 = -2.44197, y0_HODO2 = 0.534708; //From macro/fitHodo.C
@@ -211,7 +193,8 @@ int main(int argc, char** argv)
             }
         }
     }
-    else {
+    else 
+    {
         float prev=-1.;
         for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++)
         {
@@ -239,7 +222,45 @@ int main(int argc, char** argv)
     else
         std::cout<<"TRIGGER INFO: --> \ntrigger 1 = "<<inverted_MCPList.at(trigPos1)<<"\n----------"<<std::endl;
 
-    //---cut strings---
+    //---Results graphs---
+    TGraphErrors *g_eff = new TGraphErrors(ScanList.size());
+    g_eff->SetName("eff");
+
+    TGraphErrors *g_Q = new TGraphErrors(ScanList.size());
+    g_Q->SetName("Q");
+
+    TGraphErrors *g_resCFD = new TGraphErrors(ScanList.size());
+    g_resCFD->SetName("resCFD");
+
+    TGraphErrors *g_resLED = new TGraphErrors(ScanList.size());
+    g_resLED->SetName("resLED");
+
+    TGraphErrors* g_frac_saturated = new TGraphErrors(ScanList.size());
+    g_frac_saturated->SetName("frac_saturated");
+
+//------Build TCut and draw variables-----------------------------------------------------
+    //---efficiency
+    char var_sig[100]="";
+    char var_trig0[100]="";
+    // char var_dt_vs_ampM[100]="";
+    // char var_dtStart_vs_ampM[100] = "";
+    // char var_dtStart_vs_Tot[100] = "";
+    char var_fracSaturated[100]="";
+    char var_evtAll[100]="";
+    //---time resolution
+    char var_timeCFD[100]="";
+    char var_timeCFD_vs_TOT[1000] = "";
+    char var_timeLED[100] = "";
+    char var_timeLED_vs_TOT[1000] = "";
+    //---cut strings
+    char str_cut_sig[200]="";
+    char str_cut_trig0[200]="";
+    char str_cut_tdc[200]="";
+    char str_cut_saturated[200]="";
+    char str_cut_nFibers[200]="";
+    char str_cut_trig_not_sat[200]="";
+    char str_cut_bad_time[200]="";
+    //---Define Cuts---
     sprintf(str_cut_sig, "charge_corr[%d] > %d", MCPNumber, treshold.at(MCPNumber));
     sprintf(str_cut_trig0, "charge_corr[%d] > %d", trigPos1, treshold.at(trigPos1));
     sprintf(str_cut_tdc, "tdcX > -8 && tdcX < 0 && tdcY >-2 && tdcY < 6");
@@ -258,7 +279,7 @@ int main(int argc, char** argv)
                 "(time_start_150[%d]-time_CF[%d])<-1/3*(time_stop_150[%d]-time_start_150[%d])+2",
                 MCPNumber, trigPos1, MCPNumber, trigPos1, MCPNumber, MCPNumber);
     }     
-    //---construct TCut---
+    //---construct TCut
     TCut cut_sig = str_cut_sig;
     TCut cut_trig0 = str_cut_trig0;
     TCut cut_tdc = str_cut_tdc;
@@ -267,132 +288,125 @@ int main(int argc, char** argv)
     TCut cut_trig_not_sat = str_cut_trig_not_sat;
     TCut cut_bad_time = str_cut_bad_time;
 
-    //---Results graphs---
-    TGraphErrors *g_eff = new TGraphErrors(ScanList.size());
-    g_eff->SetName("eff");
-
-    TGraphErrors *g_Q = new TGraphErrors(ScanList.size());
-    g_Q->SetName("Q");
-
-    TGraphErrors *g_resCDF = new TGraphErrors(ScanList.size());
-    g_resCDF->SetName("resCDF");
-
-    TGraphErrors *g_resLED = new TGraphErrors(ScanList.size());
-    g_resLED->SetName("resLED");
-
-    TGraphErrors* g_frac_saturated = new TGraphErrors(ScanList.size());
-    g_frac_saturated->SetName("frac_saturated");
-
-    //-------Runs loop---------------------------------------------------------------------
+//-------Runs loop------------------------------------------------------------------------
     for(unsigned int i=0; i<ScanList.size(); i++)
     {
-        //---create names---
-        char h_sig_name[20], h_trig0_name[20], h_time_name[20];
-        char h_dt_vs_ampM_name[20], h_dtStart_vs_ampM_name[20], h_dtStart_vs_Tot_name[20];
-        char h_fracSat_name[20], h_evtAll_name[20];
-        char res_func_name[20], res_func_name_2sig[20];
-        char pr_time_vs_TOT_name[20], h_resLED_name[20], f_resLED_name[20], f_corrLED_name[20];
+        //---Define run dependend cut---
+        char cut_scan[100];
+        if (strcmp(scanType,"HV")==0)  
+            sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
+        else  
+//            sprintf(cut_scan, "X0 > %f && X0 < %f", X0Step.at(i)-0.0001, X0Step.at(i)+0.0001); //"X0==%f" does not work, don't know why 
+            sprintf(cut_scan, "X0 == %f", X0Step.at(i));
+        if(MCPNumber == 2) 
+            sprintf(str_cut_saturated, "run_id > 796 && amp_max[%d] > 4000", MCPNumber);
+        //---and print infos
+        char var_name[3] = "X0";
+        if(TString(scanType).Contains("HV") == 1)    
+            sprintf(var_name, "HV");
 
+        //-------define histos------------------------------------------------------------
+        //-----create objects names-----
+        char h_sig_name[20], h_trig0_name[20];
+        // char h_dt_vs_ampM_name[20], h_dtStart_vs_ampM_name[20], h_dtStart_vs_Tot_name[20];
+        char h_fracSat_name[20], h_evtAll_name[20];
+        char pr_timeCFD_vs_TOT_name[20], h_resCFD_name[20], f_resCFD_name[20], f_corrCFD_name[20];
+        char pr_timeLED_vs_TOT_name[20], h_resLED_name[20], f_resLED_name[20], f_corrLED_name[20];
+        //-----create objects------
+        //---saturated events fraction
+        sprintf(h_fracSat_name, "h_fracSat_name_%d", i);
+        sprintf(h_evtAll_name, "h_evtAll_name_%d", i);      
+        TH1F* h_fracSat = new TH1F(h_fracSat_name, h_fracSat_name, 100, 0., 100.);
+        TH1F* h_evtAll = new TH1F(h_evtAll_name, h_evtAll_name, 100, 0., 100.);
         //---efficiency
         sprintf(h_sig_name, "h_sig_%d", i);
         sprintf(h_trig0_name, "h_trig0_%d", i);
-        sprintf(h_time_name, "h_time_%d", i);
-        sprintf(h_dt_vs_ampM_name, "h_dt_vs_ampM_%d", i);
-        sprintf(h_dtStart_vs_ampM_name, "h_dtStart_vs_ampM_%d", i);
-        sprintf(h_dtStart_vs_Tot_name, "h_dtStart_vs_Tot_%d", i);      
-        sprintf(h_fracSat_name, "h_fracSat_name_%d", i);
-        sprintf(h_evtAll_name, "h_evtAll_name_%d", i);      
-        //---time CFD
-        sprintf(res_func_name, "res_func_%d", i);
-        sprintf(res_func_name_2sig, "res_func_2sig_%d", i);
+        TH1F* h_sig= new TH1F(h_sig_name, h_sig_name, 500, -5000, 25000);
+        TH1F* h_trig0 = new TH1F(h_trig0_name, h_trig0_name, 500, -5000, 25000);
+        // sprintf(h_dt_vs_ampM_name, "h_dt_vs_ampM_%d", i);
+        // sprintf(h_dtStart_vs_ampM_name, "h_dtStart_vs_ampM_%d", i);
+        // sprintf(h_dtStart_vs_Tot_name, "h_dtStart_vs_Tot_%d", i);      
+        // TH2F* h_dt_vs_ampM = new TH2F(h_dt_vs_ampM_name, h_dt_vs_ampM_name, 10000, 0., 10000., 1000, -5., 5.);
+        // TH2F* h_dtStart_vs_ampM = new TH2F(h_dtStart_vs_ampM_name, h_dtStart_vs_ampM_name, 10000, 0., 10000., 100, -10., 10.);
+        // TH2F* h_dtStart_vs_Tot = new TH2F(h_dtStart_vs_Tot_name, h_dtStart_vs_Tot_name, 1000, 0., 50., 100, -10., 10.);
+        //---timing---
+        //---time CFD/TOT corrected                          
+        sprintf(pr_timeCFD_vs_TOT_name, "pr_timeCFD_vs_TOT_%d", i);
+        sprintf(h_resCFD_name, "h_resCFD_%d", i);  
+        sprintf(f_resCFD_name, "f_resCFD_%d", i);    
+        sprintf(f_corrCFD_name, "f_corrCFD_%d", i);
+        TH1F* h_resCFD = new TH1F(h_resCFD_name, "time res with CFD method", 250, -1, 1);
+        TF1* f_resCFD = new TF1(f_resCFD_name, "gausn", -1, 1);
+        TProfile* pr_timeCFD_vs_TOT;
+        TF1* f_corrCFD;
+        if(strcmp(scanType, "HV") == 0)
+        {                              
+            pr_timeCFD_vs_TOT = new TProfile(pr_timeCFD_vs_TOT_name, "timeCF vs TOT difference",
+                                          25, 0, 5, -5, 2);
+            f_corrCFD = new TF1(f_corrCFD_name, "pol2", 0, 5);
+        }
+        else
+        {
+            pr_timeCFD_vs_TOT = new TProfile(pr_timeCFD_vs_TOT_name, "timeCF vs TOT difference",
+                                          30, 0, 10, -5, 2);
+            f_corrCFD = new TF1(f_corrCFD_name, "pol2", 0, 10);
+        }
+        pr_timeCFD_vs_TOT->SetMarkerStyle(20);
+        pr_timeCFD_vs_TOT->SetMarkerSize(0.7);
         //---time LED/TOT corrected                          
-        sprintf(pr_time_vs_TOT_name, "pr_time_vs_TOT_%d", i);
+        sprintf(pr_timeLED_vs_TOT_name, "pr_timeLED_vs_TOT_%d", i);
         sprintf(h_resLED_name, "h_resLED_%d", i);  
         sprintf(f_resLED_name, "f_resLED_%d", i);    
         sprintf(f_corrLED_name, "f_corrLED_%d", i);
-        //---define histos---
-        TH1F* h_sig= new TH1F(h_sig_name, h_sig_name, 500, -5000, 25000);
-        TH1F* h_trig0 = new TH1F(h_trig0_name, h_trig0_name, 500, -5000, 25000);
-        TH2F* h_dt_vs_ampM = new TH2F(h_dt_vs_ampM_name, h_dt_vs_ampM_name, 10000, 0., 10000., 1000, -5., 5.);
-        TH2F* h_dtStart_vs_ampM = new TH2F(h_dtStart_vs_ampM_name, h_dtStart_vs_ampM_name, 10000, 0., 10000., 100, -10., 10.);
-        TH2F* h_dtStart_vs_Tot = new TH2F(h_dtStart_vs_Tot_name, h_dtStart_vs_Tot_name, 1000, 0., 50., 100, -10., 10.);
-        TH1F* h_fracSat = new TH1F(h_fracSat_name, h_fracSat_name, 100, 0., 100.);
-        TH1F* h_evtAll = new TH1F(h_evtAll_name, h_evtAll_name, 100, 0., 100.);
-        //---CFD stuff
-        TH1F* h_time; 
-        if (MCPList.at(MCP)==4) 
-            h_time = new TH1F(h_time_name, h_time_name, 1000, -5, -2);
-        else
-            h_time = new TH1F(h_time_name, h_time_name, 1000, -2, 1);
-        TF1* res_func = new TF1(res_func_name, "gausn", -10, 10);
-        TF1* res_func_2sig = new TF1(res_func_name_2sig, "gausn", -10, 10);
-        //---LED stuff
         TH1F* h_resLED = new TH1F(h_resLED_name, "time res with LED method", 250, -1, 1);
         TF1* f_resLED = new TF1(f_resLED_name, "gausn", -1, 1);
-        TProfile* pr_time_vs_TOT;
+        TProfile* pr_timeLED_vs_TOT;
         TF1* f_corrLED;
         if(strcmp(scanType, "HV") == 0)
         {                              
-            pr_time_vs_TOT = new TProfile(pr_time_vs_TOT_name, "time vs TOT difference",
+            pr_timeLED_vs_TOT = new TProfile(pr_timeLED_vs_TOT_name, "time vs TOT difference",
                                           25, 0, 5, -5, 2);
             f_corrLED = new TF1(f_corrLED_name, "pol2", 0, 5);
         }
         else
         {
-            pr_time_vs_TOT = new TProfile(pr_time_vs_TOT_name, "time vs TOT difference",
+            pr_timeLED_vs_TOT = new TProfile(pr_timeLED_vs_TOT_name, "time vs TOT difference",
                                           30, 0, 10, -5, 2);
             f_corrLED = new TF1(f_corrLED_name, "pol2", 0, 10);
         }
-        pr_time_vs_TOT->SetMarkerStyle(20);
-        pr_time_vs_TOT->SetMarkerSize(0.7);
-
-        //-----Draw variables-----
-        sprintf(var_sig, "charge_corr[%d]>>%s", MCPNumber, h_sig_name);
-        sprintf(var_trig0, "charge_corr[%d]>>%s", trigPos1, h_trig0_name);
-        sprintf(var_dt_vs_ampM, "(time_CF_corr[%d]-time_CF_corr[%d]):amp_max_corr[%d]>>%s", MCPNumber, trigPos1, MCPNumber, h_dt_vs_ampM_name);
-        sprintf(var_dtStart_vs_ampM, "(time_start[%d]-time_start[%d]):amp_max_corr[%d]>>%s", MCPNumber, trigPos1, MCPNumber, h_dtStart_vs_ampM_name);
-        sprintf(var_dtStart_vs_Tot, "(time_start[%d]-time_start[%d]):time_OT[%d]>>%s", MCPNumber, trigPos1, MCPNumber, h_dtStart_vs_Tot_name);
-        sprintf(var_fracSaturated, "time_CF[%d] >> %s", MCPNumber, h_fracSat_name); 
-        sprintf(var_evtAll, "time_CF[%d] >> %s", MCPNumber, h_evtAll_name); 
-        //---timing---
-        char t_start_diff[100], t_OT_diff[100];
-        sprintf(t_start_diff, "(time_start_150[%d]-time_CF[%d])", MCPNumber, trigPos1);
-        sprintf(t_OT_diff, "(time_stop_150[%d]-time_start_150[%d])", MCPNumber, MCPNumber);
-        //---CFD
-        sprintf(var_time, "(time_CF_corr[%d]-time_CF_corr[%d])>>%s", MCPNumber, trigPos1, h_time_name);
-        //---LED
-        sprintf(var_timeLED_vs_TOT, "%s:%s>>%s", t_start_diff, t_OT_diff, pr_time_vs_TOT_name);
-
-        char cut_scan[100];
-        if (strcmp(scanType,"HV")==0)  sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
-        else  sprintf(cut_scan, "X0 > %f && X0 < %f", X0Step.at(i)-0.0001, X0Step.at(i)+0.0001); //"X0==%f" does not work, don't know why 
-
-        if(MCPNumber == 2) sprintf(str_cut_saturated, "run_id > 796 && amp_max[%d] > 4000", MCPNumber);
-
-        //-----Draw and print infos-----
-        nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat, "goff");
-        nt->Draw(var_trig0,cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat, "goff");
-        // int acc = 1*(float(h_base->GetEntries())/2000.); //estimated from pedestal run
-        // std::cout<<h_sig->GetEntries()<<" "<<h_trig0->GetEntries()<<" "<<h_base->GetEntries()<<std::endl;
-        float eff = h_sig->GetEntries()/h_trig0->GetEntries();
-        float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
-        // float eff = (h_sig->GetEntries()-h_base->GetEntries()*h_trig1->GetEntries()/h_trig0->GetEntries())/h_trig1->GetEntries();
-        // float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig1->GetEntries());
-        if(eff < 0)   eff = 0;
-        char var_name[3] = "X0";
-        if(TString(scanType).Contains("HV") == 1)    
-            sprintf(var_name, "HV");
+        pr_timeLED_vs_TOT->SetMarkerStyle(20);
+        pr_timeLED_vs_TOT->SetMarkerSize(0.7);
 
         //-----Saturated event computation----
+        sprintf(var_fracSaturated, "time_CF[%d] >> %s", MCPNumber, h_fracSat_name); 
+        sprintf(var_evtAll, "time_CF[%d] >> %s", MCPNumber, h_evtAll_name); 
         nt->Draw(var_fracSaturated, cut_trig0 && cut_sig && cut_scan && cut_saturated && cut_tdc && cut_nFibers && cut_trig_not_sat);
         nt->Draw(var_evtAll, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
         if(TString(scanType).Contains("HV") == 1) 
-            g_frac_saturated->SetPoint(i, HVVal.at(i), 100.*h_fracSat->GetEntries()/h_evtAll->GetEntries());	
+        {
+            if(h_evtAll->GetEntries() != 0)
+                g_frac_saturated->SetPoint(i, HVVal.at(i), 100.*h_fracSat->GetEntries()/h_evtAll->GetEntries());	
+            else
+                g_frac_saturated->SetPoint(i, HVVal.at(i), 0);	
+        }
         else
-            g_frac_saturated->SetPoint(i, X0Step.at(i), 100.*h_fracSat->GetEntries()/h_evtAll->GetEntries());	
+        {
+            if(h_evtAll->GetEntries() != 0)
+                g_frac_saturated->SetPoint(i, X0Step.at(i), 100.*h_fracSat->GetEntries()/h_evtAll->GetEntries());
+            else
+                g_frac_saturated->SetPoint(i, X0Step.at(i), 0);	
+        }
         //-----Efficiency study-----
         if(strcmp(doWhat, "eff") == 0 || strcmp(doWhat, "all") == 0)
 	{
+            sprintf(var_sig, "charge_corr[%d]>>%s", MCPNumber, h_sig_name);
+            sprintf(var_trig0, "charge_corr[%d]>>%s", trigPos1, h_trig0_name);
+            nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat, "goff");
+            nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat, "goff");
+            float eff = h_sig->GetEntries()/h_trig0->GetEntries();
+            float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
+            if(eff < 0)   
+                eff = 0;
 	    if(i == 0)
 	    {
 		printf("---------Efficiency----------\n");
@@ -445,7 +459,7 @@ int main(int argc, char** argv)
 	}
         //-----TIME RESOLUTION STUDY----- 
         //---time resolution with CFD---
-        if(strcmp(doWhat, "time") == 0 || strcmp(doWhat, "all") == 0)
+        if(strcmp(doWhat, "timeCFD") == 0 || strcmp(doWhat, "all") == 0)
 	{
             //---print banner
             if(i == 0)
@@ -454,64 +468,58 @@ int main(int argc, char** argv)
                 printf(" %s\tt_res\te_%s\te_t_res\tX_prob\n", var_name, var_name);
                 printf("---------------------------------------\n");
 	    }
-            //---correlation plot
-            nt->Draw(var_dt_vs_ampM, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
-            nt->Draw(var_dtStart_vs_ampM, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
-            nt->Draw(var_dtStart_vs_Tot, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
-            //---timing first try
-            nt->Draw(var_time, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_trig_not_sat);
+            //---create variables
+            char t_CF_diff[100], t_OT_diff[100];
+            sprintf(t_CF_diff, "(time_CF[%d]-time_CF[%d])", MCPNumber, trigPos1);
+            sprintf(t_OT_diff, "(time_stop_150[%d]-time_start_150[%d])", MCPNumber, MCPNumber);        
+            sprintf(var_timeCFD_vs_TOT, "%s:%s>>%s", t_CF_diff, t_OT_diff, pr_timeCFD_vs_TOT_name);
+            //---correction
+            nt->Draw(var_timeCFD_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
+                     && cut_tdc && cut_trig_not_sat, "goff");
             //---skip run with low stat
-            if(h_time->GetEntries() < 100)
-                continue;
-            res_func->SetParameters(h_time->GetEntries()/2, h_time->GetMean(), h_time->GetRMS()/2);
-            res_func->SetParLimits(0, 0, h_time->GetEntries()*2);
-            res_func->SetParLimits(2, 0, h_time->GetRMS());
-            res_func->SetRange(h_time->GetMean()-2*h_time->GetRMS(), h_time->GetMean()+2*h_time->GetRMS());
-            h_time->Fit(res_func, "QRN+");
-            //---timing second try
-            res_func_2sig->SetParameter(0,res_func->GetParameter(0));
-            res_func_2sig->SetParameter(1,res_func->GetParameter(1));
-            res_func_2sig->SetParameter(2,res_func->GetParameter(2));
-            res_func_2sig->SetRange(res_func->GetParameter(1)-2*res_func->GetParameter(2), res_func->GetParameter(1)+2*res_func->GetParameter(2));
-            h_time->Fit(res_func_2sig, "QR+");
-            //---get time resolution
-            float err_time = res_func_2sig->GetParError(2)*1000.;
-            float t_res = res_func_2sig->GetParameter(2)*1000;
-            float e_t_res = err_time*res_func_2sig->GetParameter(2)*1000/(t_res);
-            float prob = res_func_2sig->GetProb();
-            //---print results on screen
+            if(pr_timeCFD_vs_TOT->GetEntries() < 100) 
+                continue;         
+            pr_timeCFD_vs_TOT->Fit(f_corrCFD, "QR");    
+            //---draw res histo with corrections
+            sprintf(var_timeCFD, "%s-(%f + %f*%s + %f*%s*%s)>>%s",
+                    t_CF_diff, f_corrCFD->GetParameter(0), f_corrCFD->GetParameter(1), t_OT_diff,
+                    f_corrCFD->GetParameter(2), t_OT_diff, t_OT_diff, h_resCFD_name);
+            nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers
+                     && cut_trig_not_sat, "goff");  
+            //---fit coincidence peak
+            f_resCFD->SetParameters(h_resCFD->GetEntries(), 0, 0.05);
+            f_resCFD->SetParLimits(1, -0.03, 0.03);
+            f_resCFD->SetParLimits(2, 0.01, 0.5);
+            h_resCFD->Fit(f_resCFD, "QR");
+            h_resCFD->Fit(f_resCFD, "QRBIM", "", f_resCFD->GetParameter(1)-2*f_resCFD->GetParameter(2),
+                          f_resCFD->GetParameter(1)+2*f_resCFD->GetParameter(2));
+            //---get resolution
+            float e_t_res = f_resCFD->GetParError(2)*1000.;
+            float t_res = f_resCFD->GetParameter(2)*1000.;
+            float prob = f_resCFD->GetProb();
+            //---print results + graph
             if(TString(scanType).Contains("HV") == 1) 
             {
-                printf("%d\t%.1f\t%.0f\t%.1f\t%.3f\n", HVVal.at(i), t_res, 0., e_t_res, prob);
+                printf("%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i), t_res, 0., e_t_res, prob);
                 outputFile << HVVal.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
-                g_resCDF->SetPoint(i, HVVal.at(i), t_res);
-                g_resCDF->SetPointError(i, 0, e_t_res);
-            }
-            else 
-            {
-                printf("%.3f\t%.1f\t%.1f\t%.1f\t%.3f\n", X0Step.at(i), t_res, 0., e_t_res, prob);
+                g_resCFD->SetPoint(i,  HVVal.at(i), t_res);
+                g_resCFD->SetPointError(i, 0, e_t_res);
+            } 
+            else
+            {  
+                printf("%d\t%.3f\t%.1f\t%.1f\t%.1f\t%.3f\n", i, X0Step.at(i), t_res, 0., e_t_res, prob);
                 outputFile << X0Step.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
-                g_resCDF->SetPoint(i, X0Step.at(i), t_res);
-                g_resCDF->SetPointError(i, 0, e_t_res);            
+                g_resCFD->SetPoint(i, X0Step.at(i), t_res);
+                g_resCFD->SetPointError(i, 0, e_t_res);
             }
-            if(i == (ScanList.size()-1))    
+            if(i == (ScanList.size()-1))
                 printf("---------------------------------------\n");
-            //---print single fit+plot (png/pdf)---
-            TCanvas* c = new TCanvas();
-            char plot_name[100];
-            std::string command = "if [ ! -e plots/resCFD_studies"+string(label)+" ] ; then mkdir plots/resCFD_studies"+label+" ; fi";
-            system(command.c_str());
-            sprintf(plot_name, "plots/resCFD_studies%s/%s_%d.pdf", label, MCP.c_str(), i);
-            h_time->Draw();
-            res_func_2sig->Draw("same");
-            gStyle->SetOptFit(1111);
-            gStyle->SetOptStat(0000);
-            c->Print(plot_name, "pdf");
-            sprintf(plot_name, "plots/resCFD_studies%s/%s_%d.png", label, MCP.c_str(), i);
-            c->Print(plot_name, "png");
-            //---write histo+fit to common ROOT file---
+            //---write plots in the out file
             outROOT_CFD->cd();
-            h_time->Write();
+            pr_timeCFD_vs_TOT->Write();
+            h_resCFD->Write();
+            pr_timeCFD_vs_TOT->Delete();
+            h_resCFD->Delete();
         }
         //---Time resolution with LED and TOT correction---
         if(strcmp(doWhat, "timeLED") == 0 || strcmp(doWhat, "all") == 0)
@@ -523,13 +531,18 @@ int main(int argc, char** argv)
                 printf(" #\t%s\tt_res\te_%s\te_t_res\tX_prob\n", var_name, var_name);
                 printf("---------------------------------------\n");
             }
+            //---create variables
+            char t_start_diff[100], t_OT_diff[100];
+            sprintf(t_start_diff, "(time_start_150[%d]-time_CF[%d])", MCPNumber, trigPos1);
+            sprintf(t_OT_diff, "(time_stop_150[%d]-time_start_150[%d])", MCPNumber, MCPNumber);        
+            sprintf(var_timeLED_vs_TOT, "%s:%s>>%s", t_start_diff, t_OT_diff, pr_timeLED_vs_TOT_name);
             //---correction
             nt->Draw(var_timeLED_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
                      && cut_tdc && cut_trig_not_sat && cut_bad_time, "goff");
             //---skip run with low stat
-            if(pr_time_vs_TOT->GetEntries() < 100) 
+            if(pr_timeLED_vs_TOT->GetEntries() < 100) 
                 continue;         
-            pr_time_vs_TOT->Fit(f_corrLED, "QR");    
+            pr_timeLED_vs_TOT->Fit(f_corrLED, "QR");    
             //---draw res histo with corrections
             sprintf(var_timeLED, "%s-(%f + %f*%s + %f*%s*%s)>>%s",
                     t_start_diff, f_corrLED->GetParameter(0), f_corrLED->GetParameter(1), t_OT_diff,
@@ -566,9 +579,9 @@ int main(int argc, char** argv)
                 printf("---------------------------------------\n");
             //---write plots in the out file
             outROOT_LED->cd();
-            pr_time_vs_TOT->Write();
+            pr_timeLED_vs_TOT->Write();
             h_resLED->Write();
-            pr_time_vs_TOT->Delete();
+            pr_timeLED_vs_TOT->Delete();
             h_resLED->Delete();
         }
     }
@@ -585,7 +598,7 @@ int main(int argc, char** argv)
     if(outROOT_CFD)
     {
         outROOT_CFD->cd();
-        g_resCDF->Write();
+        g_resCFD->Write();
         g_frac_saturated->Write();
         outROOT_CFD->Close();
     }
