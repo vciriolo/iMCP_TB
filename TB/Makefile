@@ -12,7 +12,7 @@ CFLAGS = -Wall
 lib/%.o: src/%.cc $(DEPS)
 	$(CC) $(CFLAGS) -c -o $@ $< $(ROOT_LIB) $(ROOT_FLAGS)
 
-all: dumper.exe analyzer.exe calcTreshold.exe preshower.exe drawWaveform.exe dumper_fitTemplate.exe calcTreshold_fitTemplate.exe drawEfficiency.exe drawResolutionCFD.exe drawResolutionLED.exe
+all: dumper.exe analyzer.exe calcTreshold.exe preshower.exe drawWaveform.exe dumper_fitTemplate.exe calcTreshold_fitTemplate.exe drawEfficiency.exe drawResolutionCFD.exe drawResolutionLED.exe drawSaturatedFrac.exe
 
 dumper.exe: bin/dumper.cpp $(DEPS_OBJ)
 	g++ $(CFLAGS) -o $@ $^ $(ROOT_LIB) $(ROOT_FLAGS) 
@@ -42,6 +42,9 @@ drawResolutionCFD.exe: bin/drawResolutionCFD.cpp $(DEPS_OBJ)
 	g++ $(CFLAGS) -o $@ $^ $(ROOT_LIB) $(ROOT_FLAGS) 
 
 drawResolutionLED.exe: bin/drawResolutionLED.cpp $(DEPS_OBJ)
+	g++ $(CFLAGS) -o $@ $^ $(ROOT_LIB) $(ROOT_FLAGS) 
+
+drawSaturatedFrac.exe: bin/drawSaturatedFrac.cpp $(DEPS_OBJ)
 	g++ $(CFLAGS) -o $@ $^ $(ROOT_LIB) $(ROOT_FLAGS) 
 
 clean:
