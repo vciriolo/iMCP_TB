@@ -299,7 +299,6 @@ int main(int argc, char** argv)
         if (strcmp(scanType,"HV")==0)  
             sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
         else  
-//            sprintf(cut_scan, "X0 > %f && X0 < %f", X0Step.at(i)-0.0001, X0Step.at(i)+0.0001); //"X0==%f" does not work, don't know why 
             sprintf(cut_scan, "X0 == %f", X0Step.at(i));
         if(MCPNumber == 2) 
             sprintf(str_cut_saturated, "run_id > 796 && amp_max[%d] > 4000", MCPNumber);
