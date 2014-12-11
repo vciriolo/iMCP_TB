@@ -313,7 +313,6 @@ int main(int argc, char** argv)
         //-----create objects names-----
         char h_fracSat_name[20], h_evtAll_name[20];
         char h_sig_name[20], h_trig0_name[20];
-        // char h_dt_vs_ampM_name[20], h_dtStart_vs_ampM_name[20], h_dtStart_vs_Tot_name[20];        
         char h_charge_name[20];
         char pr_timeCFD_vs_TOT_name[20], h_resCFD_name[20], f_resCFD_name[20], f_corrCFD_name[20];
         char pr_timeLED_vs_TOT_name[20], h_resLED_name[20], f_resLED_name[20], f_corrLED_name[20];
@@ -328,17 +327,12 @@ int main(int argc, char** argv)
         sprintf(h_trig0_name, "h_trig0_%d", i);
         TH1F* h_sig= new TH1F(h_sig_name, h_sig_name, 500, -5000, 25000);
         TH1F* h_trig0 = new TH1F(h_trig0_name, h_trig0_name, 500, -5000, 25000);
-        // sprintf(h_dt_vs_ampM_name, "h_dt_vs_ampM_%d", i);
-        // sprintf(h_dtStart_vs_ampM_name, "h_dtStart_vs_ampM_%d", i);
-        // sprintf(h_dtStart_vs_Tot_name, "h_dtStart_vs_Tot_%d", i);      
-        // TH2F* h_dt_vs_ampM = new TH2F(h_dt_vs_ampM_name, h_dt_vs_ampM_name, 10000, 0., 10000., 1000, -5., 5.);
-        // TH2F* h_dtStart_vs_ampM = new TH2F(h_dtStart_vs_ampM_name, h_dtStart_vs_ampM_name, 10000, 0., 10000., 100, -10., 10.);
-        // TH2F* h_dtStart_vs_Tot = new TH2F(h_dtStart_vs_Tot_name, h_dtStart_vs_Tot_name, 1000, 0., 50., 100, -10., 10.);
         //---TOT        
         char TOT_diff[100];
         sprintf(TOT_diff, "(time_stop_150[%d]-time_start_150[%d])", MCPNumber, MCPNumber);        
         //---charge
         sprintf(h_charge_name, "h_charge_%d", i);
+        // TH1F* h_charge = new TH1F(h_charge_name, "TOT distribution", 500, -500, 50000);
         TH1F* h_charge = new TH1F(h_charge_name, "TOT distribution", 200, 0, 10);
         //---time CFD/TOT corrected                          
         sprintf(pr_timeCFD_vs_TOT_name, "pr_timeCFD_vs_TOT_%d", i);
@@ -390,7 +384,7 @@ int main(int argc, char** argv)
         //-----Saturated event computation----
         sprintf(var_fracSaturated, "time_CF[%d] >> %s", MCPNumber, h_fracSat_name); 
         sprintf(var_evtAll, "time_CF[%d] >> %s", MCPNumber, h_evtAll_name); 
-        nt->Draw(var_fracSaturated, cut_trig0 && cut_sig && cut_scan && cut_saturated && cut_tdc && cut_nFibers);
+        nt->Draw(var_fracSaturated, cut_trig0 && cut_sig && cut_scan && cut_saturated && cut_tdc && cut_nFibers); 
         nt->Draw(var_evtAll, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers);
         if(TString(scanType).Contains("HV") == 1) 
         {
@@ -449,8 +443,9 @@ int main(int argc, char** argv)
 		printf(" %s\tQ\te_%s\te_Q\n", var_name, var_name);
 		printf("-----------------------------\n");
 	    }
-            printf(var_charge, "%s>>%s", TOT_diff, h_charge_name);
-            nt->Draw(var_charge, cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_bad_timeLED, "goff");
+            sprintf(var_charge, "%s>>%s", TOT_diff, h_charge_name);
+            // sprintf(var_charge, "charge_corr[%d]>>%s", MCPNumber, h_charge_name);
+            nt->Draw(var_charge, cut_trig0 && cut_scan && cut_tdc && cut_nFibers, "goff");
 	    if(TString(scanType).Contains("HV") == 1) 
             {
                 printf("%d\t%.0f\t%.0f\t%.0f\n", HVVal.at(i), h_charge->GetMean(), 0., h_charge->GetMeanError());
@@ -460,7 +455,7 @@ int main(int argc, char** argv)
 	    }
 	    else 
             {
-                printf("%f\t%.0f\t%.0f\t%.0f\n", X0Step.at(i), h_charge->GetMean(), 0., h_charge->GetMeanError());
+                printf("%.0f\t%.3f\t%.0f\t%.3f\n", X0Step.at(i), h_charge->GetMean(), 0., h_charge->GetMeanError());
                 outputFile << X0Step.at(i)<<"\t"<<h_charge->GetMean()<<"\t 0.\t"<<h_charge->GetMeanError()<<std::endl;
                 g_Q->SetPoint(i, X0Step.at(i), h_charge->GetMean());
                 g_Q->SetPoint(i, 0, h_charge->GetMeanError());
@@ -498,8 +493,8 @@ int main(int argc, char** argv)
             nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers
                      && cut_trig_not_sat && cut_bad_timeCFD, "goff");  
             //---fit coincidence peak
-            f_resCFD->SetParameters(h_resCFD->GetEntries(), 0, 0.05);
-            f_resCFD->SetParLimits(1, -0.03, 0.03);
+            f_resCFD->SetParameters(h_resCFD->GetEntries(), h_resCFD->GetMean(), h_resCFD->GetRMS());
+            f_resCFD->SetParLimits(1, -0.05, 0.05);
             f_resCFD->SetParLimits(2, 0.01, 0.5);
             h_resCFD->Fit(f_resCFD, "QR");
             h_resCFD->Fit(f_resCFD, "QRBIM", "", f_resCFD->GetParameter(1)-2*f_resCFD->GetParameter(2),
@@ -560,8 +555,8 @@ int main(int argc, char** argv)
             nt->Draw(var_timeLED, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers
                      && cut_trig_not_sat && cut_bad_timeLED, "goff");  
             //---fit coincidence peak
-            f_resLED->SetParameters(h_resLED->GetEntries(), 0, 0.05);
-            f_resLED->SetParLimits(1, -0.03, 0.03);
+            f_resLED->SetParameters(h_resLED->GetEntries(), h_resLED->GetMean(), h_resLED->GetRMS());
+            f_resLED->SetParLimits(1, -0.05, 0.05);
             f_resLED->SetParLimits(2, 0.01, 0.5);
             h_resLED->Fit(f_resLED, "QR");
             h_resLED->Fit(f_resLED, "QRBIM", "", f_resLED->GetParameter(1)-2*f_resLED->GetParameter(2),
