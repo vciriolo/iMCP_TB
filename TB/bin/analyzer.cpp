@@ -678,7 +678,7 @@ int main(int argc, char** argv)
 	    }
             sprintf(var_charge, "%s>>%s", TOT_diff, h_charge_name);
             // sprintf(var_charge, "charge_corr[%d]>>%s", MCPNumber, h_charge_name);
-            nt->Draw(var_charge, cut_trig0 && cut_scan && cut_tdc && cut_nFibers, "goff");
+            nt->Draw(var_charge, cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_bad_timeCFD, "goff");
 	    if(TString(scanType).Contains("HV") == 1) 
             {
                 printf("%d\t%.0f\t%.0f\t%.0f\n", HVVal.at(i), h_charge->GetMean(), 0., h_charge->GetMeanError());
