@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 
   TLegend *legC;
 
-  if(plot_type == "EffAll"){
+  if(plot_type == "HVScan"){
     legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
 
     inF_MiB3_ON = TFile::Open("plots/resCFD_studies/MiB3_HV_HVScan2.root");
@@ -147,6 +147,8 @@ int main(int argc, char** argv)
     sprintf(plot_name, "final_plots/timeResCFD_%s.png", plot_type.c_str());
     c->Print(plot_name, "png");
 
+    sprintf(plot_name, "final_plots/timeResCFD_%s.root", plot_type.c_str());
+    c->SaveAs(plot_name, "root");
   }
 
   else {
@@ -270,7 +272,10 @@ int main(int argc, char** argv)
     mg->Draw("APL");
     if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20" || plot_type=="scanX0_HVHigh_50" || plot_type=="scanX0_HVLow_50") 
       {
-	mg->GetXaxis()->SetRangeUser(-0.1,5.1);
+	if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20")
+	  mg->GetXaxis()->SetRangeUser(-0.1,7.1);
+	else
+	  mg->GetXaxis()->SetRangeUser(-0.1,5.1);
 	mg->GetXaxis()->SetTitle("X0");
 	mg->GetYaxis()->SetTitle("Time Resolution, ps (trigger included)");
 	mg->SetTitle(plot_type.c_str());
@@ -291,6 +296,9 @@ int main(int argc, char** argv)
     c->Print(plot_name, "pdf");
     sprintf(plot_name, "final_plots/timeResCFD_%s.png", plot_type.c_str());
     c->Print(plot_name, "png");
+
+    sprintf(plot_name, "final_plots/timeResCFD_%s.root", plot_type.c_str());
+    c->SaveAs(plot_name, "root");
   }
 
 
