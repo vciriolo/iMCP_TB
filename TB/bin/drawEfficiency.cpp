@@ -277,7 +277,7 @@ int main(int argc, char** argv)
     if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20" || plot_type=="scanX0_HVHigh_50" || plot_type=="scanX0_HVLow_50") 
       {
 	if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20") 
-	  mg->GetXaxis()->SetRangeUser(-0.1,7.1);
+	  mg->GetXaxis()->SetRangeUser(-0.1,5.1);
 	else 
 	  mg->GetXaxis()->SetRangeUser(-0.1,5.1);
 	mg->GetXaxis()->SetTitle("X0");
