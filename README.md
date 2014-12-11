@@ -41,9 +41,14 @@ Main codes:
 --> usage:      python python/analyzer.py
 --> example:    python python/analyzer.py -m MiB3 -n HVScan4 -a eff -s HV
 
+TO RUN THE ENTIRE ANALYSIS (all the MCPs, efficiency and timing), just do:
+
+--> sh script/runAllEff.sh
 
 4- drawWaveform:
 		read raw data and draw 10 waveforms.
 
 --> usage:
 		python python/drawWaveform.py
+
+
