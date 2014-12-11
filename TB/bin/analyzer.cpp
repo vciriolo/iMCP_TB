@@ -76,7 +76,7 @@ int main(int argc, char** argv)
     sprintf(outputFileName, "results/%s_%s_%s_%s.txt", MCP.c_str(), doWhat, scanType, label);
     std::ofstream outputFile (outputFileName, std::ofstream::out);
     //---ROOT---
-    char mkdir_command[50];
+    char mkdir_command[100];
     TFile* outROOT_eff = NULL;
     TFile* outROOT_Q = NULL;
     TFile* outROOT_CFD = NULL;
@@ -84,28 +84,28 @@ int main(int argc, char** argv)
     //---efficiency
     if(strcmp(doWhat, "eff") == 0 || strcmp(doWhat, "all") == 0)
     {
-        sprintf(mkdir_command, "mkdir plots/efficiency_studies");
+        sprintf(mkdir_command, "if [ ! -e plots/efficiency_studies ] ; then mkdir plots/efficiency_studies ; fi");
         system(mkdir_command);         
         outROOT_eff = TFile::Open(Form("plots/efficiency_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
     }
     //---charge
     if(strcmp(doWhat, "Q") == 0 || strcmp(doWhat, "all") == 0)
     {
-        sprintf(mkdir_command, "mkdir plots/charge_studies");
+        sprintf(mkdir_command, "if [ ! -e plots/charge_studies ] ; then mkdir plots/charge_studies ; fi");
         system(mkdir_command);         
         outROOT_Q = TFile::Open(Form("plots/charge_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
     }    
     //---time resolution CFD
     if(strcmp(doWhat, "timeCFD") == 0 || strcmp(doWhat, "all") == 0)
     {
-        sprintf(mkdir_command, "mkdir plots/resCFD_studies");
+        sprintf(mkdir_command, "if [ ! -e plots/resCFD_studies ] ; then mkdir plots/resCFD_studies ; fi");
         system(mkdir_command);         
         outROOT_CFD = TFile::Open(Form("plots/resCFD_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
     }
     //---time resolution LED
     if(strcmp(doWhat, "timeLED") == 0 || strcmp(doWhat, "all") == 0)
     {
-        sprintf(mkdir_command, "mkdir plots/resLED_studies");
+        sprintf(mkdir_command, "if [ ! -e plots/resLED_studies ] ; then mkdir plots/resLED_studies ; fi");
         system(mkdir_command);         
         outROOT_LED = TFile::Open(Form("plots/resLED_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
     }
@@ -223,19 +223,19 @@ int main(int argc, char** argv)
         std::cout<<"TRIGGER INFO: --> \ntrigger 1 = "<<inverted_MCPList.at(trigPos1)<<"\n----------"<<std::endl;
 
     //---Results graphs---
-    TGraphErrors *g_eff = new TGraphErrors(ScanList.size());
+    TGraphErrors *g_eff = new TGraphErrors();
     g_eff->SetName("eff");
 
-    TGraphErrors *g_Q = new TGraphErrors(ScanList.size());
+    TGraphErrors *g_Q = new TGraphErrors();
     g_Q->SetName("Q");
 
-    TGraphErrors *g_resCFD = new TGraphErrors(ScanList.size());
+    TGraphErrors *g_resCFD = new TGraphErrors();
     g_resCFD->SetName("resCFD");
 
-    TGraphErrors *g_resLED = new TGraphErrors(ScanList.size());
+    TGraphErrors *g_resLED = new TGraphErrors();
     g_resLED->SetName("resLED");
 
-    TGraphErrors* g_frac_saturated = new TGraphErrors(ScanList.size());
+    TGraphErrors* g_frac_saturated = new TGraphErrors();
     g_frac_saturated->SetName("frac_saturated");
 
 //------Build TCut and draw variables-----------------------------------------------------
@@ -247,6 +247,8 @@ int main(int argc, char** argv)
     // char var_dtStart_vs_Tot[100] = "";
     char var_fracSaturated[100]="";
     char var_evtAll[100]="";
+    //---charge
+    char var_charge[200]="";
     //---time resolution
     char var_timeCFD[200]="";
     char var_timeCFD_vs_TOT[500] = "";
@@ -272,13 +274,13 @@ int main(int argc, char** argv)
     if (MCPList.at(MCP)==4)
     {
         sprintf(str_cut_bad_timeLED, "time_start_150[%d] != 20 && time_start_150[%d] != 20 && "
-                "((time_start_150[%d]-time_CF[%d])<-3/5*(time_stop_150[%d]-time_start_150[%d]))",
+                "((time_start_150[%d]-time_CF_corr[%d])<-3/5*(time_stop_150[%d]-time_start_150[%d]))",
                 MCPNumber, trigPos1, MCPNumber, trigPos1, MCPNumber, MCPNumber);
     }
     else
     {
         sprintf(str_cut_bad_timeLED, "time_start_150[%d] != 20 && time_start_150[%d] != 20 && "
-                "((time_start_150[%d]-time_CF[%d])<-1/3*(time_stop_150[%d]-time_start_150[%d])+2)",
+                "((time_start_150[%d]-time_CF_corr[%d])<-1/3*(time_stop_150[%d]-time_start_150[%d])+2)",
                 MCPNumber, trigPos1, MCPNumber, trigPos1, MCPNumber, MCPNumber);
     }     
     //---construct TCut
@@ -299,7 +301,6 @@ int main(int argc, char** argv)
         if (strcmp(scanType,"HV")==0)  
             sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
         else  
-//            sprintf(cut_scan, "X0 > %f && X0 < %f", X0Step.at(i)-0.0001, X0Step.at(i)+0.0001); //"X0==%f" does not work, don't know why 
             sprintf(cut_scan, "X0 == %f", X0Step.at(i));
         if(MCPNumber == 2) 
             sprintf(str_cut_saturated, "run_id > 796 && amp_max[%d] > 4000", MCPNumber);
@@ -310,9 +311,10 @@ int main(int argc, char** argv)
 
         //-------define histos------------------------------------------------------------
         //-----create objects names-----
-        char h_sig_name[20], h_trig0_name[20];
-        // char h_dt_vs_ampM_name[20], h_dtStart_vs_ampM_name[20], h_dtStart_vs_Tot_name[20];
         char h_fracSat_name[20], h_evtAll_name[20];
+        char h_sig_name[20], h_trig0_name[20];
+        // char h_dt_vs_ampM_name[20], h_dtStart_vs_ampM_name[20], h_dtStart_vs_Tot_name[20];        
+        char h_charge_name[20];
         char pr_timeCFD_vs_TOT_name[20], h_resCFD_name[20], f_resCFD_name[20], f_corrCFD_name[20];
         char pr_timeLED_vs_TOT_name[20], h_resLED_name[20], f_resLED_name[20], f_corrLED_name[20];
         //-----create objects------
@@ -332,7 +334,12 @@ int main(int argc, char** argv)
         // TH2F* h_dt_vs_ampM = new TH2F(h_dt_vs_ampM_name, h_dt_vs_ampM_name, 10000, 0., 10000., 1000, -5., 5.);
         // TH2F* h_dtStart_vs_ampM = new TH2F(h_dtStart_vs_ampM_name, h_dtStart_vs_ampM_name, 10000, 0., 10000., 100, -10., 10.);
         // TH2F* h_dtStart_vs_Tot = new TH2F(h_dtStart_vs_Tot_name, h_dtStart_vs_Tot_name, 1000, 0., 50., 100, -10., 10.);
-        //---timing---
+        //---TOT        
+        char TOT_diff[100];
+        sprintf(TOT_diff, "(time_stop_150[%d]-time_start_150[%d])", MCPNumber, MCPNumber);        
+        //---charge
+        sprintf(h_charge_name, "h_charge_%d", i);
+        TH1F* h_charge = new TH1F(h_charge_name, "TOT distribution", 200, 0, 10);
         //---time CFD/TOT corrected                          
         sprintf(pr_timeCFD_vs_TOT_name, "pr_timeCFD_vs_TOT_%d", i);
         sprintf(h_resCFD_name, "h_resCFD_%d", i);  
@@ -346,13 +353,13 @@ int main(int argc, char** argv)
         {                              
             pr_timeCFD_vs_TOT = new TProfile(pr_timeCFD_vs_TOT_name, "timeCF vs TOT difference",
                                           25, 0, 5, -5, 2);
-            f_corrCFD = new TF1(f_corrCFD_name, "pol2", 1, 5);
+            f_corrCFD = new TF1(f_corrCFD_name, "pol3", 1, 5);
         }
         else
         {
             pr_timeCFD_vs_TOT = new TProfile(pr_timeCFD_vs_TOT_name, "timeCF vs TOT difference",
                                           30, 0, 10, -5, 2);
-            f_corrCFD = new TF1(f_corrCFD_name, "pol2", 1, 10);
+            f_corrCFD = new TF1(f_corrCFD_name, "pol3", 1, 7);
         }
         pr_timeCFD_vs_TOT->SetMarkerStyle(20);
         pr_timeCFD_vs_TOT->SetMarkerSize(0.7);
@@ -369,13 +376,13 @@ int main(int argc, char** argv)
         {                              
             pr_timeLED_vs_TOT = new TProfile(pr_timeLED_vs_TOT_name, "time vs TOT difference",
                                           25, 0, 5, -5, 2);
-            f_corrLED = new TF1(f_corrLED_name, "pol2", 0, 5);
+            f_corrLED = new TF1(f_corrLED_name, "pol2", 1, 5);
         }
         else
         {
             pr_timeLED_vs_TOT = new TProfile(pr_timeLED_vs_TOT_name, "time vs TOT difference",
                                           30, 0, 10, -5, 2);
-            f_corrLED = new TF1(f_corrLED_name, "pol2", 0, 10);
+            f_corrLED = new TF1(f_corrLED_name, "pol2", 1, 8);
         }
         pr_timeLED_vs_TOT->SetMarkerStyle(20);
         pr_timeLED_vs_TOT->SetMarkerSize(0.7);
@@ -442,20 +449,21 @@ int main(int argc, char** argv)
 		printf(" %s\tQ\te_%s\te_Q\n", var_name, var_name);
 		printf("-----------------------------\n");
 	    }
-	    nt->Draw(var_sig, cut_scan);
+            printf(var_charge, "%s>>%s", TOT_diff, h_charge_name);
+            nt->Draw(var_charge, cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_bad_timeLED, "goff");
 	    if(TString(scanType).Contains("HV") == 1) 
             {
-                printf("%d\t%.0f\t%.0f\t%.0f\n", HVVal.at(i), h_sig->GetMean(), 0., h_sig->GetMeanError());
-                outputFile << HVVal.at(i)<<"\t"<<h_sig->GetMean()<<"\t 0.\t"<<h_sig->GetMeanError()<<std::endl;
-                g_Q->SetPoint(i, HVVal.at(i), h_sig->GetMean());
-                g_Q->SetPoint(i, 0, h_sig->GetMeanError());
+                printf("%d\t%.0f\t%.0f\t%.0f\n", HVVal.at(i), h_charge->GetMean(), 0., h_charge->GetMeanError());
+                outputFile << HVVal.at(i)<<"\t"<<h_charge->GetMean()<<"\t 0.\t"<<h_charge->GetMeanError()<<std::endl;
+                g_Q->SetPoint(i, HVVal.at(i), h_charge->GetMean());
+                g_Q->SetPoint(i, 0, h_charge->GetMeanError());
 	    }
 	    else 
             {
-                printf("%.3f\t%.0f\t%.0f\t%.0f\n", X0Step.at(i), h_sig->GetMean(), 0., h_sig->GetMeanError());
-                outputFile << X0Step.at(i)<<"\t"<<h_sig->GetMean()<<"\t 0.\t"<<h_sig->GetMeanError()<<std::endl;
-                g_Q->SetPoint(i, X0Step.at(i), h_sig->GetMean());
-                g_Q->SetPoint(i, 0, h_sig->GetMeanError());
+                printf("%f\t%.0f\t%.0f\t%.0f\n", X0Step.at(i), h_charge->GetMean(), 0., h_charge->GetMeanError());
+                outputFile << X0Step.at(i)<<"\t"<<h_charge->GetMean()<<"\t 0.\t"<<h_charge->GetMeanError()<<std::endl;
+                g_Q->SetPoint(i, X0Step.at(i), h_charge->GetMean());
+                g_Q->SetPoint(i, 0, h_charge->GetMeanError());
 	    }
 	    if(i == (ScanList.size()-1))    
 		printf("-----------------------------\n");
@@ -468,14 +476,13 @@ int main(int argc, char** argv)
             if(i == 0)
 	    {
                 printf("----------Time Resolution(ps)----------\n");
-                printf(" %s\tt_res\te_%s\te_t_res\tX_prob\n", var_name, var_name);
+                printf(" #\t%s\tt_res\te_%s\te_t_res\tX_prob\n", var_name, var_name);
                 printf("---------------------------------------\n");
 	    }
             //---create variables
-            char t_CF_diff[100], t_OT_diff[100];
-            sprintf(t_CF_diff, "(time_CF[%d]-time_CF[%d])", MCPNumber, trigPos1);
-            sprintf(t_OT_diff, "(time_stop_150[%d]-time_start_150[%d])", MCPNumber, MCPNumber);        
-            sprintf(var_timeCFD_vs_TOT, "%s:%s>>%s", t_CF_diff, t_OT_diff, pr_timeCFD_vs_TOT_name);
+            char t_CF_diff[100];
+            sprintf(t_CF_diff, "(time_CF_corr[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
+            sprintf(var_timeCFD_vs_TOT, "%s:%s>>%s", t_CF_diff, TOT_diff, pr_timeCFD_vs_TOT_name);
             //---correction
             nt->Draw(var_timeCFD_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
                      && cut_tdc && cut_trig_not_sat && cut_bad_timeCFD, "goff");
@@ -484,9 +491,10 @@ int main(int argc, char** argv)
                 continue;         
             pr_timeCFD_vs_TOT->Fit(f_corrCFD, "QR");    
             //---draw res histo with corrections
-            sprintf(var_timeCFD, "%s-(%f + %f*%s + %f*%s*%s)>>%s",
-                    t_CF_diff, f_corrCFD->GetParameter(0), f_corrCFD->GetParameter(1), t_OT_diff,
-                    f_corrCFD->GetParameter(2), t_OT_diff, t_OT_diff, h_resCFD_name);
+            sprintf(var_timeCFD, "%s-(%f + %f*%s + %f*%s*%s + %f*%s*%s*%s)>>%s",
+                    t_CF_diff, f_corrCFD->GetParameter(0), f_corrCFD->GetParameter(1), TOT_diff,
+                    f_corrCFD->GetParameter(2), TOT_diff, TOT_diff,
+                    f_corrCFD->GetParameter(3), TOT_diff, TOT_diff, TOT_diff, h_resCFD_name);
             nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers
                      && cut_trig_not_sat && cut_bad_timeCFD, "goff");  
             //---fit coincidence peak
@@ -505,15 +513,15 @@ int main(int argc, char** argv)
             {
                 printf("%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i), t_res, 0., e_t_res, prob);
                 outputFile << HVVal.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
-                g_resCFD->SetPoint(i,  HVVal.at(i), t_res);
-                g_resCFD->SetPointError(i, 0, e_t_res);
+                g_resCFD->SetPoint(g_resCFD->GetN(),  HVVal.at(i), t_res);
+                g_resCFD->SetPointError(g_resCFD->GetN()-1, 0, e_t_res);
             } 
             else
             {  
                 printf("%d\t%.3f\t%.1f\t%.1f\t%.1f\t%.3f\n", i, X0Step.at(i), t_res, 0., e_t_res, prob);
                 outputFile << X0Step.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
-                g_resCFD->SetPoint(i, X0Step.at(i), t_res);
-                g_resCFD->SetPointError(i, 0, e_t_res);
+                g_resCFD->SetPoint(g_resCFD->GetN(), X0Step.at(i), t_res);
+                g_resCFD->SetPointError(g_resCFD->GetN()-1, 0, e_t_res);
             }
             if(i == (ScanList.size()-1))
                 printf("---------------------------------------\n");
@@ -535,10 +543,9 @@ int main(int argc, char** argv)
                 printf("---------------------------------------\n");
             }
             //---create variables
-            char t_start_diff[100], t_OT_diff[100];
-            sprintf(t_start_diff, "(time_start_150[%d]-time_CF[%d])", MCPNumber, trigPos1);
-            sprintf(t_OT_diff, "(time_stop_150[%d]-time_start_150[%d])", MCPNumber, MCPNumber);        
-            sprintf(var_timeLED_vs_TOT, "%s:%s>>%s", t_start_diff, t_OT_diff, pr_timeLED_vs_TOT_name);
+            char t_start_diff[100];
+            sprintf(t_start_diff, "(time_start_150[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
+            sprintf(var_timeLED_vs_TOT, "%s:%s>>%s", t_start_diff, TOT_diff, pr_timeLED_vs_TOT_name);
             //---correction
             nt->Draw(var_timeLED_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
                      && cut_tdc && cut_trig_not_sat && cut_bad_timeLED, "goff");
@@ -548,8 +555,8 @@ int main(int argc, char** argv)
             pr_timeLED_vs_TOT->Fit(f_corrLED, "QR");    
             //---draw res histo with corrections
             sprintf(var_timeLED, "%s-(%f + %f*%s + %f*%s*%s)>>%s",
-                    t_start_diff, f_corrLED->GetParameter(0), f_corrLED->GetParameter(1), t_OT_diff,
-                    f_corrLED->GetParameter(2), t_OT_diff, t_OT_diff, h_resLED_name);
+                    t_start_diff, f_corrLED->GetParameter(0), f_corrLED->GetParameter(1), TOT_diff,
+                    f_corrLED->GetParameter(2), TOT_diff, TOT_diff, h_resLED_name);
             nt->Draw(var_timeLED, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers
                      && cut_trig_not_sat && cut_bad_timeLED, "goff");  
             //---fit coincidence peak
@@ -568,15 +575,15 @@ int main(int argc, char** argv)
             {
                 printf("%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i), t_res, 0., e_t_res, prob);
                 outputFile << HVVal.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
-                g_resLED->SetPoint(i,  HVVal.at(i), t_res);
-                g_resLED->SetPointError(i, 0, e_t_res);
+                g_resLED->SetPoint(g_resLED->GetN(),  HVVal.at(i), t_res);
+                g_resLED->SetPointError(g_resLED->GetN()-1, 0, e_t_res);
             } 
             else
             {  
                 printf("%d\t%.3f\t%.1f\t%.1f\t%.1f\t%.3f\n", i, X0Step.at(i), t_res, 0., e_t_res, prob);
                 outputFile << X0Step.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
-                g_resLED->SetPoint(i, X0Step.at(i), t_res);
-                g_resLED->SetPointError(i, 0, e_t_res);
+                g_resLED->SetPoint(g_resLED->GetN(), X0Step.at(i), t_res);
+                g_resLED->SetPointError(g_resLED->GetN()-1, 0, e_t_res);
             }
             if(i == (ScanList.size()-1))
                 printf("---------------------------------------\n");
@@ -596,6 +603,14 @@ int main(int argc, char** argv)
         g_eff->Write();
         g_frac_saturated->Write();
         outROOT_eff->Close();
+    }
+    //---charge
+    if(outROOT_Q)
+    {
+        outROOT_Q->cd();
+        g_Q->Write();
+        g_frac_saturated->Write();
+        outROOT_Q->Close();
     }
     //---time resolution CFD
     if(outROOT_CFD)
