@@ -52,18 +52,18 @@ void fitHodo( TString NameFile = "../plots/HODO/efficiency_MiB3_eff_HODO_HVScan1
   system( Comm.Data() );
   TString ori = Original ? "_c" : "";
   //Getting histos
-  TH1F * h_hodoX1 = (TH1F*) File->Get(("h_hodoX1"+ori).Data());
-  if( !h_hodoX1 )  cout<<"WARNING: h_hodoX1 does not exist"<<endl;
-  TH1F * h_hodoY1 = (TH1F*) File->Get(("h_hodoY1"+ori).Data());
-  if( !h_hodoY1 )  cout<<"WARNING: h_hodoY1 does not exist"<<endl;
-  TH1F * h_hodoX2 = (TH1F*) File->Get(("h_hodoX2"+ori).Data());
-  if( !h_hodoX2 )  cout<<"WARNING: h_hodoX2 does not exist"<<endl;
-  TH1F * h_hodoY2 = (TH1F*) File->Get(("h_hodoY2"+ori).Data());
-  if( !h_hodoY2 )  cout<<"WARNING: h_hodoY2 does not exist"<<endl;
-  TH1F * h_tdcX = (TH1F*) File->Get(("h_tdcX"+ori).Data());
-  if( !h_tdcX )    cout<<"WARNING: h_tdcX does not exist"<<endl;
-  TH1F * h_tdcY = (TH1F*) File->Get(("h_tdcX"+ori).Data());
-  if( !h_tdcY )    cout<<"WARNING: h_tdcY does not exist"<<endl;
+  TH1F * h_XDiff_Hodo1TDC = (TH1F*) File->Get(("h_XDiff_Hodo1TDC"+ori).Data());
+  if( !h_XDiff_Hodo1TDC )  cout<<"WARNING: h_XDiff_Hodo1TDC does not exist"<<endl;
+  TH1F * h_YDiff_Hodo1TDC = (TH1F*) File->Get(("h_YDiff_Hodo1TDC"+ori).Data());
+  if( !h_YDiff_Hodo1TDC )  cout<<"WARNING: h_YDiff_Hodo1TDC does not exist"<<endl;
+  TH1F * h_XDiff_Hodo2TDC = (TH1F*) File->Get(("h_XDiff_Hodo2TDC"+ori).Data());
+  if( !h_XDiff_Hodo2TDC )  cout<<"WARNING: h_XDiff_Hodo2TDC does not exist"<<endl;
+  TH1F * h_YDiff_Hodo2TDC = (TH1F*) File->Get(("h_YDiff_Hodo2TDC"+ori).Data());
+  if( !h_YDiff_Hodo2TDC )  cout<<"WARNING: h_YDiff_Hodo2TDC does not exist"<<endl;
+  TH1F * h_XDiff_Hodo12 = (TH1F*) File->Get(("h_XDiff_Hodo12"+ori).Data());
+  if( !h_XDiff_Hodo12 )    cout<<"WARNING: h_XDiff_Hodo12 does not exist"<<endl;
+  TH1F * h_YDiff_Hodo12 = (TH1F*) File->Get(("h_XDiff_Hodo12"+ori).Data());
+  if( !h_YDiff_Hodo12 )    cout<<"WARNING: h_YDiff_Hodo12 does not exist"<<endl;
 
   //Now lt's go...
   cout<<"Files and hisots loaded... let's start to fit."<<endl;  
@@ -71,14 +71,14 @@ void fitHodo( TString NameFile = "../plots/HODO/efficiency_MiB3_eff_HODO_HVScan1
   float Coordinates[6] = {0.};
   for(int nToFit=0; nToFit<6; nToFit++){
     cout<<"------------------------- FIT: "<<nToFit<<" ------------------------------"<<endl;
-    TH1F *histoToFit = h_hodoX1;
+    TH1F *histoToFit = h_XDiff_Hodo1TDC;
     float integ = -1., nBins = -1.; 
-    if(nToFit==0){ histoToFit = h_hodoX1; integ = h_hodoX1->Integral(); nBins = h_hodoX1->GetNbinsX(); }
-    if(nToFit==1){ histoToFit = h_hodoY1; integ = h_hodoY1->Integral(); nBins = h_hodoX1->GetNbinsX(); }
-    if(nToFit==2){ histoToFit = h_hodoX2; integ = h_hodoX2->Integral(); nBins = h_hodoX1->GetNbinsX(); } 
-    if(nToFit==3){ histoToFit = h_hodoY2; integ = h_hodoY2->Integral(); nBins = h_hodoX1->GetNbinsX(); }
-    if(nToFit==4){ histoToFit = h_tdcX; integ = h_tdcX->Integral(); nBins = h_tdcX->GetNbinsX(); }
-    if(nToFit==5){ histoToFit = h_tdcY; integ = h_tdcY->Integral(); nBins = h_tdcY->GetNbinsX(); }
+    if(nToFit==0){ histoToFit = h_XDiff_Hodo1TDC; integ = h_XDiff_Hodo1TDC->Integral(); nBins = h_XDiff_Hodo1TDC->GetNbinsX(); }
+    if(nToFit==1){ histoToFit = h_YDiff_Hodo1TDC; integ = h_YDiff_Hodo1TDC->Integral(); nBins = h_XDiff_Hodo1TDC->GetNbinsX(); }
+    if(nToFit==2){ histoToFit = h_XDiff_Hodo2TDC; integ = h_XDiff_Hodo2TDC->Integral(); nBins = h_XDiff_Hodo1TDC->GetNbinsX(); } 
+    if(nToFit==3){ histoToFit = h_YDiff_Hodo2TDC; integ = h_YDiff_Hodo2TDC->Integral(); nBins = h_XDiff_Hodo1TDC->GetNbinsX(); }
+    if(nToFit==4){ histoToFit = h_XDiff_Hodo12; integ = h_XDiff_Hodo12->Integral(); nBins = h_XDiff_Hodo12->GetNbinsX(); }
+    if(nToFit==5){ histoToFit = h_YDiff_Hodo12; integ = h_YDiff_Hodo12->Integral(); nBins = h_YDiff_Hodo12->GetNbinsX(); }
     if( integ == -1. || nBins == -1) cout<<"WARNING: integ and nBins not defined!"<<endl;
     RooRealVar  x("x","HODO fibers", -31., 31., "");
     RooDataHist dh("dh","HODO fibers",RooArgList(x), histoToFit);
@@ -104,12 +104,12 @@ void fitHodo( TString NameFile = "../plots/HODO/efficiency_MiB3_eff_HODO_HVScan1
     m.setVerbose(kFALSE);
     m.migrad();
     RooPlot*  xframe = x.frame( nBins );
-    if(nToFit==0) xframe->SetTitle( "HODO X1" );
-    if(nToFit==1) xframe->SetTitle( "HODO Y1" );
-    if(nToFit==2) xframe->SetTitle( "HODO X2" );
-    if(nToFit==3) xframe->SetTitle( "HODO Y2" );
-    if(nToFit==4) xframe->SetTitle( "Wire Chamb. X" );
-    if(nToFit==5) xframe->SetTitle( "Wire Chamb. Y" );
+    if(nToFit==0) xframe->SetTitle( "X: HODO1 - TDC [mm]" );
+    if(nToFit==1) xframe->SetTitle( "Y: HODO1 - TDC [mm]" );
+    if(nToFit==2) xframe->SetTitle( "X: HODO2 - TDC [mm]" );
+    if(nToFit==3) xframe->SetTitle( "Y: HODO2 - TDC [mm]" );
+    if(nToFit==4) xframe->SetTitle( "X: HODO1 - HODO2 [mm]" );
+    if(nToFit==5) xframe->SetTitle( "Y: HODO1 - HODO2 [mm]" );
     dh.plotOn(xframe);
     model->plotOn(xframe,Components(gaus),LineStyle(kDashed), LineColor(kRed));
     model->plotOn(xframe);
@@ -123,19 +123,19 @@ void fitHodo( TString NameFile = "../plots/HODO/efficiency_MiB3_eff_HODO_HVScan1
     lat.DrawLatex(xmin,yhi-ypass, line);
     Coordinates[ nToFit ] = mean.getVal();
     TString name = "";
-    if(nToFit==0) name = "../plots/HODO/FIT" + Dir + "/FIT_HODOX1" + ori + ".png";
-    if(nToFit==1) name = "../plots/HODO/FIT" + Dir + "/FIT_HODOY1" + ori + ".png";
-    if(nToFit==2) name = "../plots/HODO/FIT" + Dir + "/FIT_HODOX2" + ori + ".png";
-    if(nToFit==3) name = "../plots/HODO/FIT" + Dir + "/FIT_HODOY2" + ori + ".png";
-    if(nToFit==4) name = "../plots/HODO/FIT" + Dir + "/FIT_WCX" + ori + ".png";
-    if(nToFit==5) name = "../plots/HODO/FIT" + Dir + "/FIT_WCY" + ori + ".png";
+    if(nToFit==0) name = "../plots/HODO/FIT" + Dir + "/FIT_HODOX1TDC" + ori + ".png";
+    if(nToFit==1) name = "../plots/HODO/FIT" + Dir + "/FIT_HODOY1TDC" + ori + ".png";
+    if(nToFit==2) name = "../plots/HODO/FIT" + Dir + "/FIT_HODOX2TDC" + ori + ".png";
+    if(nToFit==3) name = "../plots/HODO/FIT" + Dir + "/FIT_HODOY2TDC" + ori + ".png";
+    if(nToFit==4) name = "../plots/HODO/FIT" + Dir + "/FIT_HODOX1HODOX2" + ori + ".png";
+    if(nToFit==5) name = "../plots/HODO/FIT" + Dir + "/FIT_HODOY1HODOY2" + ori + ".png";
     myc1->SaveAs( name.Data() );
   }
   cout<<"----------"<<endl;
   cout<<"Considerign the fits we have the following X0 Y0:"<<endl;
-  cout<<"float x0_HODO1 = "<<Coordinates[0]<<", y0_HODO1 = "<<Coordinates[1]<<";"<<endl;
-  cout<<"float x0_HODO2 = "<<Coordinates[2]<<", y0_HODO2 = "<<Coordinates[3]<<";"<<endl;
-  cout<<"float x0_WC = "<<Coordinates[4]<<", y0_WC = "<<Coordinates[5]<<";"<<endl;
+  cout<<"float HODOX1TDC = "<<Coordinates[0]<<", HODOY1TDC = "<<Coordinates[1]<<";"<<endl;
+  cout<<"float HODOX2TDC = "<<Coordinates[2]<<", HODOY2TDC = "<<Coordinates[3]<<";"<<endl;
+  cout<<"float HODOX1HODOX2 = "<<Coordinates[4]<<", HODOY1HODOY2 = "<<Coordinates[5]<<";"<<endl;
   cout<<"----------"<<endl;
   cout<<"THE END... thanks for choosing fitHodo.C"<<endl;
 }
