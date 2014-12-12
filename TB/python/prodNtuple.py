@@ -10,7 +10,7 @@ import subprocess
 currentDir = os.getcwd();
 CMSSWDir = currentDir+"../../";
 
-name = ["HVScan1","HVScan2","HVScan3","HVScan4","HVScan5","HVScan6","HVScan7","HVScan8","AngScan_HVHigh","AngScan_HVLow","pedestal","preshower_600GeV_HighV","scanX0_HVHigh20GeV","scanX0_HVHigh50GeV","scanX0_HVLow20GeV","scanX0_HVLow50GeV"];
+name = ["HVScan1","HVScan2","HVScan3","HVScan4","HVScan5","HVScan6","HVScan7","HVScan8","AngScan_HVHigh","AngScan_HVLow","pedestal","preshower_600GeV_HighV","scanX0_HVHigh20GeV","scanX0_HVHigh50GeV","scanX0_HVLow20GeV","scanX0_HVLow50GeV","H4test_X0scan_HVH_20GeV", "H4test_X0scan_HVH_50GeV", "H4test_X0scan_HVL_20GeV", "H4test_X0scan_HVL_50GeV"];
 
 for i in range(len(name)):
     fn = "Job/Job_"+name[i];
