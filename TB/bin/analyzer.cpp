@@ -562,11 +562,11 @@ int main(int argc, char** argv)
         TH1F* h_trig0 = new TH1F(h_trig0_name, h_trig0_name, 500, -5000, 25000);
         //---TOT        
         char TOT_diff[100];
-        sprintf(TOT_diff, "(time_stop_150[%d]-time_start_150[%d])", MCPNumber, MCPNumber);        
+        sprintf(TOT_diff, "(time_stop_150[%d]-time_start_150[%d])", MCPNumber, MCPNumber);
         //---charge
         sprintf(h_charge_name, "h_charge_%d", i);
-        // TH1F* h_charge = new TH1F(h_charge_name, "TOT distribution", 500, -500, 50000);
-        TH1F* h_charge = new TH1F(h_charge_name, "TOT distribution", 200, 0, 10);
+        TH1F* h_charge = new TH1F(h_charge_name, "charge distribution", 500, -500, 110000);
+        // TH1F* h_charge = new TH1F(h_charge_name, "TOT distribution", 200, 0, 10);
         //---time CFD/TOT corrected                          
         sprintf(pr_timeCFD_vs_TOT_name, "pr_timeCFD_vs_TOT_%d", i);
         sprintf(h_resCFD_name, "h_resCFD_%d", i);  
@@ -580,13 +580,13 @@ int main(int argc, char** argv)
         {                              
             pr_timeCFD_vs_TOT = new TProfile(pr_timeCFD_vs_TOT_name, "timeCF vs TOT difference",
                                           25, 0, 5, -5, 2);
-            f_corrCFD = new TF1(f_corrCFD_name, "pol3", 1, 5);
+            f_corrCFD = new TF1(f_corrCFD_name, "pol2", 0, 5);
         }
         else
         {
             pr_timeCFD_vs_TOT = new TProfile(pr_timeCFD_vs_TOT_name, "timeCF vs TOT difference",
                                           30, 0, 10, -5, 2);
-            f_corrCFD = new TF1(f_corrCFD_name, "pol3", 1, 7);
+            f_corrCFD = new TF1(f_corrCFD_name, "pol2", 0, 6);
         }
         pr_timeCFD_vs_TOT->SetMarkerStyle(20);
         pr_timeCFD_vs_TOT->SetMarkerSize(0.7);
@@ -603,13 +603,13 @@ int main(int argc, char** argv)
         {                              
             pr_timeLED_vs_TOT = new TProfile(pr_timeLED_vs_TOT_name, "time vs TOT difference",
                                           25, 0, 5, -5, 2);
-            f_corrLED = new TF1(f_corrLED_name, "pol2", 1, 5);
+            f_corrLED = new TF1(f_corrLED_name, "pol2", 0, 5);
         }
         else
         {
             pr_timeLED_vs_TOT = new TProfile(pr_timeLED_vs_TOT_name, "time vs TOT difference",
                                           30, 0, 10, -5, 2);
-            f_corrLED = new TF1(f_corrLED_name, "pol2", 1, 8);
+            f_corrLED = new TF1(f_corrLED_name, "pol2", 0, 6);
         }
         pr_timeLED_vs_TOT->SetMarkerStyle(20);
         pr_timeLED_vs_TOT->SetMarkerSize(0.7);
@@ -676,9 +676,9 @@ int main(int argc, char** argv)
 		printf(" %s\tQ\te_%s\te_Q\n", var_name, var_name);
 		printf("-----------------------------\n");
 	    }
-            sprintf(var_charge, "%s>>%s", TOT_diff, h_charge_name);
-            // sprintf(var_charge, "charge_corr[%d]>>%s", MCPNumber, h_charge_name);
-            nt->Draw(var_charge, cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_bad_timeCFD, "goff");
+            // sprintf(var_charge, "%s>>%s", TOT_diff, h_charge_name);
+            sprintf(var_charge, "charge_corr[%d]>>%s", MCPNumber, h_charge_name);
+            nt->Draw(var_charge, cut_scan && cut_tdc && cut_nFibers, "goff");
 	    if(TString(scanType).Contains("HV") == 1) 
             {
                 printf("%d\t%.0f\t%.0f\t%.0f\n", HVVal.at(i), h_charge->GetMean(), 0., h_charge->GetMeanError());
@@ -707,6 +707,9 @@ int main(int argc, char** argv)
                 printf(" #\t%s\tt_res\te_%s\te_t_res\tX_prob\n", var_name, var_name);
                 printf("---------------------------------------\n");
 	    }
+            //---change TOT for X0 runs
+            if(strcmp(scanType, "X0") == 0 && X0Step.at(i) != 0 && MCPNumber < 3) 
+                sprintf(TOT_diff, "(time_stop_500[%d]-time_start_500[%d])", MCPNumber, MCPNumber);
             //---create variables
             char t_CF_diff[100];
             sprintf(t_CF_diff, "(time_CF_corr[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
@@ -715,21 +718,23 @@ int main(int argc, char** argv)
             nt->Draw(var_timeCFD_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
                      && cut_tdc && cut_trig_not_sat && cut_bad_timeCFD, "goff");
             //---skip run with low stat
-            if(pr_timeCFD_vs_TOT->GetEntries() < 100) 
+            if(pr_timeCFD_vs_TOT->GetEntries() < 200)
+                h_resCFD->Rebin(2);
+            if(pr_timeCFD_vs_TOT->GetEntries() < 50) 
                 continue;         
             pr_timeCFD_vs_TOT->Fit(f_corrCFD, "QR");    
             //---draw res histo with corrections
-            sprintf(var_timeCFD, "%s-(%f + %f*%s + %f*%s*%s + %f*%s*%s*%s)>>%s",
+            sprintf(var_timeCFD, "%s-(%f + %f*%s + %f*%s*%s)>>%s",
                     t_CF_diff, f_corrCFD->GetParameter(0), f_corrCFD->GetParameter(1), TOT_diff,
-                    f_corrCFD->GetParameter(2), TOT_diff, TOT_diff,
-                    f_corrCFD->GetParameter(3), TOT_diff, TOT_diff, TOT_diff, h_resCFD_name);
+                    f_corrCFD->GetParameter(2), TOT_diff, TOT_diff, h_resCFD_name);
+                    //f_corrCFD->GetParameter(3), TOT_diff, TOT_diff, TOT_diff, h_resCFD_name);
             nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers
                      && cut_trig_not_sat && cut_bad_timeCFD, "goff");  
             //---fit coincidence peak
             f_resCFD->SetParameters(h_resCFD->GetEntries(), h_resCFD->GetMean(), h_resCFD->GetRMS());
             f_resCFD->SetParLimits(1, -0.05, 0.05);
             f_resCFD->SetParLimits(2, 0.01, 0.5);
-            h_resCFD->Fit(f_resCFD, "QR");
+            h_resCFD->Fit(f_resCFD, "QRB");
             h_resCFD->Fit(f_resCFD, "QRBIM", "", f_resCFD->GetParameter(1)-2*f_resCFD->GetParameter(2),
                           f_resCFD->GetParameter(1)+2*f_resCFD->GetParameter(2));
             //---get resolution
@@ -773,12 +778,20 @@ int main(int argc, char** argv)
             //---create variables
             char t_start_diff[100];
             sprintf(t_start_diff, "(time_start_150[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
+            //---change TOT for X0 runs
+            if(strcmp(scanType, "X0") == 0 && X0Step.at(i) != 0 && MCPNumber < 3) 
+            {
+                sprintf(TOT_diff, "(time_stop_500[%d]-time_start_500[%d])", MCPNumber, MCPNumber);
+                sprintf(t_start_diff, "(time_start_500[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
+            }
             sprintf(var_timeLED_vs_TOT, "%s:%s>>%s", t_start_diff, TOT_diff, pr_timeLED_vs_TOT_name);
             //---correction
             nt->Draw(var_timeLED_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
                      && cut_tdc && cut_trig_not_sat && cut_bad_timeLED, "goff");
             //---skip run with low stat
-            if(pr_timeLED_vs_TOT->GetEntries() < 100) 
+            if(pr_timeLED_vs_TOT->GetEntries() < 200)
+                h_resLED->Rebin(2);
+            if(pr_timeLED_vs_TOT->GetEntries() < 50)
                 continue;         
             pr_timeLED_vs_TOT->Fit(f_corrLED, "QR");    
             //---draw res histo with corrections
@@ -790,8 +803,9 @@ int main(int argc, char** argv)
             //---fit coincidence peak
             f_resLED->SetParameters(h_resLED->GetEntries(), h_resLED->GetMean(), h_resLED->GetRMS());
             f_resLED->SetParLimits(1, -0.05, 0.05);
-            f_resLED->SetParLimits(2, 0.01, 0.5);
-            h_resLED->Fit(f_resLED, "QR");
+            f_resLED->SetParLimits(2, 0.02, 0.5);
+            h_resLED->Fit(f_resLED, "QRB"); 
+            f_resLED->SetParLimits(2, 0.01, 0.4);
             h_resLED->Fit(f_resLED, "QRBIM", "", f_resLED->GetParameter(1)-2*f_resLED->GetParameter(2),
                           f_resLED->GetParameter(1)+2*f_resLED->GetParameter(2));
             //---get resolution
