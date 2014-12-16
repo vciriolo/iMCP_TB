@@ -375,121 +375,80 @@ float TimeConstFracAbs(int t1, int t2, const vector<float>* samples, float AmpFr
 float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float threshold, float &start, float &stop, 
 			float step, int Nsamples){
 
-  float xx= 0.;
-  float xy= 0.;
-  float Sx = 0.;
-  float Sy = 0.;
-  float Sxx = 0.;
-  float Sxy = 0.;
-  //  float Chi2 = 0.;
-  int startSample = t1;
-  int minSample = t1;
+    float xx= 0.;
+    float xy= 0.;
+    float Sx = 0.;
+    float Sy = 0.;
+    float Sxx = 0.;
+    float Sxy = 0.;
+    //  float Chi2 = 0.;
+    int startSample = -100;
+    int stopSample = -100;
 
-  //  std::cout << " threshold  = " << threshold << std::endl;
-
-  for(int iSample=t1; iSample<t2; iSample++){
-    //    if(samples->at(iSample) < samples->at(minSample)) minSample = iSample;
-    if(samples->at(iSample) < threshold) minSample = iSample;
-    //     std::cout << "OT: iSample = " << iSample << " samples->at(iSample) " << samples->at(iSample) 
-    //  	      << " minSample " << minSample << std::endl;
-  }
-  if(minSample == t1){start = -100; stop = -100; return -100;}
-
-  for(int iSample=minSample; iSample>t1; --iSample){
-    //      std::cout << " iSample = " << iSample << " samples->at(iSample) = " << samples->at(iSample) << " threshold = " << threshold << std::endl;
-    if(samples->at(iSample) > threshold){
-      startSample = iSample;
-      //      std::cout << " OT startSample = " << startSample << " samples->at(iSample) = " << samples->at(iSample) << std::endl;
-      break;
-    }
-  }
-
-  //interpolation
-  for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
+    for(int iSample=t1; iSample<t2; iSample++)
     {
-      //      std::cout << " samples->at(startSample+n) = " << samples->at(startSample+n) << std::endl;
-      if(startSample+n<0) continue;
-      if(samples->at(startSample+n) > threshold && n > 0) continue;
-      xx = (startSample+n)*(startSample+n)*step*step;
-      xy = (startSample+n)*step*(samples->at(startSample+n));
-      Sx = Sx + (startSample+n)*step;
-      Sy = Sy + samples->at(startSample+n);
-      Sxx = Sxx + xx;
-      Sxy = Sxy + xy;
+        if(samples->at(iSample) < threshold && startSample == -100) 
+            startSample = iSample;
+        else if(samples->at(iSample) > threshold)
+        {
+            stopSample = iSample-1;
+            break;
+        }
     }
-
-  float Delta = Nsamples*Sxx - Sx*Sx;
-  float A = (Sxx*Sy - Sx*Sxy) / Delta;
-  float B = (Nsamples*Sxy - Sx*Sy) / Delta;
-  //    std::cout<<Nsamples<<" "<<Sxx<<" "<<Sx<<" "<<Sy<<" "<<Delta<<" "<<step<<std::endl;
-
-  //  float sigma2 = pow(step/sqrt(12)*B,2);
-  // for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
-  //   {
-  //     if(startSample+n<0) continue;
-  //     Chi2 = Chi2 + pow(samples->at(startSample+n) - A - B*((startSample+n)*step),2)/sigma2;
-  //   }
-
-  // A+Bx = threshold
-
-  float tStart_int = (threshold*1. - A) / B /step;
-  //   if(tStart_int < 0.)  std::cout << " t1 = " << t1 << " t2 = " << t2 << " A = " << A << " B = " << B 
-  // 				 << " tStart_int = " << tStart_int << " threshold = " << threshold << std::endl;
-
-  ///////compute tStop
-  //  std::cout << " ORA STOP " << std::endl;
-  xx = 0.;
-  xy = 0.;
-  Sx = 0.;
-  Sy = 0.;
-  Sxx = 0.;
-  Sxy = 0.;
-  //  Chi2 = 0.;
-
-  float stopSample = t2;
-  
-  for(int iSample=minSample; iSample<t2; ++iSample){
-    if(samples->at(iSample) > threshold){
-      stopSample = iSample;
-      //      std::cout << " OT stopSample = " << stopSample << " samples->at(iSample) = " << samples->at(iSample) << std::endl;
-      break;
-    }
-  }
-
-  for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
+    if(startSample == -100)
     {
-      //      std::cout << " samples->at(stopSample+n) = " << samples->at(stopSample+n) << std::endl;
-      if(stopSample+n<0) continue;
-      if(samples->at(stopSample+n) > threshold && n < 0) continue;
-      //      std::cout << " passed " << std::endl;
-      xx = (stopSample+n)*(stopSample+n)*step*step;
-      xy = (stopSample+n)*step*(samples->at(stopSample+n));
-      Sx = Sx + (stopSample+n)*step;
-      Sy = Sy + samples->at(stopSample+n);
-      Sxx = Sxx + xx;
-      Sxy = Sxy + xy;
+        start = -100; 
+        stop = -100; 
+        return -100;
     }
 
-  Delta = Nsamples*Sxx - Sx*Sx;
-  A = (Sxx*Sy - Sx*Sxy) / Delta;
-  B = (Nsamples*Sxy - Sx*Sy) / Delta;
+    //---t_start interpolation
+    for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
+    {
+        if(startSample+n<0) continue;
+        xx = (startSample+n)*(startSample+n)*step*step;
+        xy = (startSample+n)*step*(samples->at(startSample+n));
+        Sx = Sx + (startSample+n)*step;
+        Sy = Sy + samples->at(startSample+n);
+        Sxx = Sxx + xx;
+        Sxy = Sxy + xy;
+    }
 
-  // sigma2 = pow(step/sqrt(12)*B,2);
-  // for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
-  //   {
-  //     if(stopSample+n<0) continue;
-  //     Chi2 = Chi2 + pow(samples->at(stopSample+n) - A - B*((stopSample+n)*step),2)/sigma2;
-  //   }
+    float Delta = Nsamples*Sxx - Sx*Sx;
+    float A = (Sxx*Sy - Sx*Sxy) / Delta;
+    float B = (Nsamples*Sxy - Sx*Sy) / Delta;
+    
+    //---Ax+B = thresh
+    start = (threshold*1. - A) / B /step;
 
-  // A+Bx = thresh
-  float tStop_int = (threshold*1. - A) / B / step;
+    //---reset
+    xx = 0.;
+    xy = 0.;
+    Sx = 0.;
+    Sy = 0.;
+    Sxx = 0.;
+    Sxy = 0.;
 
-  start = tStart_int; //SAVE T_START
-  stop = tStop_int; //SAVE T_STOP
+    //---t_stop interpolation
+    for(int n=-(Nsamples-1)/2; n<=(Nsamples-1)/2; n++)
+    {
+        if(stopSample+n<0) continue;
+        xx = (stopSample+n)*(stopSample+n)*step*step;
+        xy = (stopSample+n)*step*(samples->at(stopSample+n));
+        Sx = Sx + (stopSample+n)*step;
+        Sy = Sy + samples->at(stopSample+n);
+        Sxx = Sxx + xx;
+        Sxy = Sxy + xy;
+    }
 
-  //  if(tStop_int < 0.)  std::cout << " t1 = " << t1 << " t2 = " << t2 << " A = " << A << " B = " << B << " tStop_int = " << tStop_int << std::endl;
+    Delta = Nsamples*Sxx - Sx*Sx;
+    A = (Sxx*Sy - Sx*Sxy) / Delta;
+    B = (Nsamples*Sxy - Sx*Sy) / Delta;
 
-  return (tStop_int - tStart_int);
+    //---A+Bx = thresh
+    stop = (threshold*1. - A) / B / step;
+
+    return (stop - start);
 }
 
 
