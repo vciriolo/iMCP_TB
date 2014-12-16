@@ -389,7 +389,7 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
     {
         if(samples->at(iSample) < threshold && startSample == -100) 
             startSample = iSample;
-        else if(samples->at(iSample) > threshold)
+        else if(samples->at(iSample) > threshold && startSample != -100)
         {
             stopSample = iSample-1;
             break;
@@ -447,6 +447,8 @@ float TimeOverThreshold(int t1, int t2, const vector<float>* samples, float thre
 
     //---A+Bx = thresh
     stop = (threshold*1. - A) / B / step;
+
+    //    std::cout << " t1 = " << t1 << " t2 = " << t2 << " A = " << A << " B = " << B  << " tStart_int = " << start << " tstop: " << stop << " threshold = " << threshold << std::endl;
 
     return (stop - start);
 }
