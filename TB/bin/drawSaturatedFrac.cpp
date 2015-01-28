@@ -141,7 +141,7 @@ int main(int argc, char** argv)
     mg->GetXaxis()->SetRangeUser(-0.1,5.1);
     mg->GetXaxis()->SetTitle("HV (V)");
     mg->GetYaxis()->SetTitle("SaturatedFrac");
-    mg->SetMaximum(1);
+    mg->SetMaximum(100);
     mg->SetMinimum(0);
     mg->Draw("APL");  
     legC->Draw("same");
@@ -154,7 +154,7 @@ int main(int argc, char** argv)
 
   else {
 
-    legC = new TLegend(0.50,0.20,0.79,0.4,NULL,"brNDC");
+    legC = new TLegend(0.15,0.70,0.3,0.85,NULL,"brNDC");
 
     TGraphErrors* eff_MiB3;
     TGraphErrors* eff_enSEE;
@@ -287,7 +287,7 @@ int main(int argc, char** argv)
 	mg->SetTitle(plot_type.c_str());
       }
 
-    mg->SetMaximum(1);
+    mg->SetMaximum(100);
     mg->SetMinimum(0);
     mg->Draw("APL");  
     legC->Draw("same");
