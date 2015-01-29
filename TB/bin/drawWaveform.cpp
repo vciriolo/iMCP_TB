@@ -74,7 +74,7 @@ int main (int argc, char** argv)
     c->cd();
 
     // Definitions
-    std::vector<float> digiCh[10];
+    std::vector<float> digiCh[18];
 
     int triggerTime;
       //--reading wire chamber from other tree --
@@ -121,6 +121,7 @@ int main (int argc, char** argv)
 
     int ampMaxTimeTemp;
     int timeCF;
+    float tStart, tStop;
     TLine *line;    
     TLine *line2;
     TLine *line3;    
@@ -142,23 +143,26 @@ int main (int argc, char** argv)
           //---Read the entry
           chain->GetEntry(iEntry);
 	
-	  for(int iCh=0; iCh<10; iCh++) digiCh[iCh].clear();
+	  for(int iCh=0; iCh<18; iCh++) digiCh[iCh].clear();
 
 	  //---Read digitizer samples
 	  for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
-	    if(iSample > 1024*10 - 1) break;
+	    if (digiGroup[iSample] == 0)
+	      digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
+	    else if (digiGroup[iSample] == 1 && digiChannel[iSample] == 0 && channel == 9) 
+	      digiCh[9].push_back(digiSampleValue[iSample]);
+	    else if (digiGroup[iSample] == 1 && digiChannel[iSample] == 8 && channel == 17) {
+	      digiCh[17].push_back(digiSampleValue[iSample]);
+	    }
+	   	    
+	    //	    if(iSample > 1024*10 - 1) break;
 	    // std::cout << " >>> iSample = " << iSample << std::endl;
 	    // std::cout << " >>> digiChannel[iSample] = " << digiChannel[iSample] << std::endl;
-	    if (digiGroup[iSample] == 1 && digiChannel[iSample] == 0 && channel == 9) 
-	      digiCh[9].push_back(digiSampleValue[iSample]);
-	    else
-	      digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
 	  }
 	  gWF = new TGraph();
 	  int i=0;
-	  
-	  //---loop over MPC's channels                                                                                                               
 
+	  //---loop over MPC's channels                                                                                                               
     triggerTime=100;
 
 	  if (iEntry>=firstEntry) {
@@ -177,10 +181,12 @@ int main (int argc, char** argv)
 		int ampMax = AmpMax(ampMaxTimeTemp-13, ampMaxTimeTemp+12, &digiCh[channel]);
 		timeCF = TimeConstFracAbs(ampMaxTimeTemp-23, ampMaxTimeTemp+22, &digiCh[channel], 0.5, ampMax);		    
 		    //		    if (-AmpMax(5, 25, &digiCh[channel])<-200)  std::cout<<iEntry<<" "<<-AmpMax(5, 25, &digiCh[channel])<<std::endl;
+		if (channel==8 || channel==17) {
+		  TimeOverThreshold(200, 1000, &digiCh[channel], -150., tStart, tStop);
+		}
 		    
-
 		//	  for(unsigned int iSample=0; iSample<digiCh[channel].size(); iSample++){
-	  for(unsigned int iSample=0; iSample<300; iSample++){
+	  for(unsigned int iSample=0; iSample<1000; iSample++){
 	    gWF->SetPoint(i, i, digiCh[channel].at(iSample));
 	    i++;
 	  }
