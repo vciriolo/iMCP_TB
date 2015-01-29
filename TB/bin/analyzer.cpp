@@ -57,7 +57,9 @@ int main(int argc, char** argv)
     std::map <int,int> treshold;
     int ch, tresh;
     int nChannels=0;
-    int trigPos1 = -1;  //positions of the two trigger chambers in the reco tree 
+    int trigPos1 = -1;  //positions of the trigger chamber in the reco tree 
+    int clockPos1 = -1, clockPos2 = -1;
+
     //---Open cfg file and fill map with treshold for each channel---
     while(!inputCfg.eof())
     {
@@ -395,9 +397,12 @@ int main(int argc, char** argv)
 	}
       }
   }
+  
+  clockPos1 = MCPList.at("trig1");
+  clockPos2 = MCPList.at("trig2");
 
-  if (trigPos1==-1) {
-    std::cout<<"ERROR!!! trigger not found!!!"<<std::endl;
+  if (trigPos1==-1 || clockPos1==-1 || clockPos2==-1) {
+    std::cout<<"ERROR!!! trigger or clock not found!!!"<<std::endl;
     return -1;
   }
   else
@@ -664,7 +669,7 @@ int main(int argc, char** argv)
                 sprintf(TOT_diff, "(time_stop_500[%d]-time_start_500[%d])", MCPNumber, MCPNumber);
             //---create variables
             char t_CF_diff[100];
-            sprintf(t_CF_diff, "(time_CF_corr[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
+            sprintf(t_CF_diff, "(time_CF_corr[%d]-(time_CF_corr[%d]-time_CF_corr[%d])-time_CF_corr[%d])", MCPNumber, clockPos2, clockPos1, trigPos1);
             sprintf(var_timeCFD_vs_TOT, "%s:%s>>%s", t_CF_diff, TOT_diff, pr_timeCFD_vs_TOT_name);
             //---correction
             nt->Draw(var_timeCFD_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
@@ -729,12 +734,15 @@ int main(int argc, char** argv)
             }
             //---create variables
             char t_start_diff[100];
-            sprintf(t_start_diff, "(time_start_150[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
+	    if (strcmp((inverted_MCPList.at(MCPNumber)).c_str(),"MiB3")==0)
+	      sprintf(t_start_diff, "(time_start_150[%d]-(time_start_150[%d]-time_start_150[%d])-time_CF_corr[%d])", MCPNumber, clockPos2, clockPos1, trigPos1);
+	    else
+	      sprintf(t_start_diff, "(time_start_150[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
             //---change TOT for X0 runs
             if(strcmp(scanType, "X0") == 0 && X0Step.at(i) != 0 && MCPNumber < 3) 
             {
                 sprintf(TOT_diff, "(time_stop_500[%d]-time_start_500[%d])", MCPNumber, MCPNumber);
-                sprintf(t_start_diff, "(time_start_500[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
+                sprintf(t_start_diff, "(time_start_500[%d]-(time_start_150[%d]-time_start_150[%d])-time_CF_corr[%d])", MCPNumber, clockPos2, clockPos1,trigPos1);
             }
             sprintf(var_timeLED_vs_TOT, "%s:%s>>%s", t_start_diff, TOT_diff, pr_timeLED_vs_TOT_name);
             //---correction
