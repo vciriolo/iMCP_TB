@@ -144,7 +144,11 @@ int main(int argc, char** argv)
   TH1F *h_TDCY             = new TH1F( "h_TDCY", "", 60, -30., 30.); h_TDCY->GetXaxis()->SetTitle("TDC Y [mm]");
   TH2F *h_Corr_TDC_HODO1_X = new TH2F( "h_Corr_TDC_HODO1_X", "", 60, -30., 30.,60, -30., 30.); h_Corr_TDC_HODO1_X->GetXaxis()->SetTitle("HODO1 X [mm]"); h_Corr_TDC_HODO1_X->GetYaxis()->SetTitle("TDC X [mm]");
   TH2F *h_Corr_TDC_HODO1_Y = new TH2F( "h_Corr_TDC_HODO1_Y", "", 60, -30., 30.,60, -30., 30.); h_Corr_TDC_HODO1_Y->GetXaxis()->SetTitle("HODO1 Y [mm]"); h_Corr_TDC_HODO1_X->GetYaxis()->SetTitle("TDC Y [mm]");
-  TH2F *h_TriggMCP         = new TH2F( "h_TriggMCP", "", 32, -16., 16., 32, -16., 16.); h_TriggMCP->GetXaxis()->SetTitle("HODO2 X [mm]"); h_TriggMCP->GetYaxis()->SetTitle("HODO2 Y [mm]");
+  TH2F *h_TriggM2          = new TH2F( "h_TriggM2", "", 32, -16., 16., 32, -16., 16.); h_TriggM2->GetXaxis()->SetTitle("HODO2 X [mm]"); h_TriggM2->GetYaxis()->SetTitle("HODO2 Y [mm]");
+  TH2F *h_TriggM3          = new TH2F( "h_TriggM3", "", 32, -16., 16., 32, -16., 16.); h_TriggM3->GetXaxis()->SetTitle("HODO2 X [mm]"); h_TriggM3->GetYaxis()->SetTitle("HODO2 Y [mm]");
+  TH2F *h_TriggZ1          = new TH2F( "h_TriggZ1", "", 32, -16., 16., 32, -16., 16.); h_TriggZ1->GetXaxis()->SetTitle("HODO2 X [mm]"); h_TriggZ1->GetYaxis()->SetTitle("HODO2 Y [mm]");
+  TH2F *h_TriggZ2          = new TH2F( "h_TriggZ2", "", 32, -16., 16., 32, -16., 16.); h_TriggZ2->GetXaxis()->SetTitle("HODO2 X [mm]"); h_TriggZ2->GetYaxis()->SetTitle("HODO2 Y [mm]");
+  TH2F *h_TriggSe          = new TH2F( "h_TriggSe", "", 32, -16., 16., 32, -16., 16.); h_TriggSe->GetXaxis()->SetTitle("HODO2 X [mm]"); h_TriggSe->GetYaxis()->SetTitle("HODO2 Y [mm]");
   TH2F *h_NumEff_M2        = new TH2F( "h_NumEff_M2", "", 32, -16, 16, 32, -16, 16); h_NumEff_M2->GetXaxis()->SetTitle("HODO2 X [mm]"); h_NumEff_M2->GetYaxis()->SetTitle("HODO2 Y [mm]");
   TH2F *h_NumEff_M3        = new TH2F( "h_NumEff_M3", "", 32, -16, 16, 32, -16, 16); h_NumEff_M3->GetXaxis()->SetTitle("HODO2 X [mm]"); h_NumEff_M3->GetYaxis()->SetTitle("HODO2 Y [mm]");
   TH2F *h_NumEff_Z1        = new TH2F( "h_NumEff_Z1", "", 32, -16, 16, 32, -16, 16); h_NumEff_Z1->GetXaxis()->SetTitle("HODO2 X [mm]"); h_NumEff_Z1->GetYaxis()->SetTitle("HODO2 Y [mm]");
@@ -168,9 +172,10 @@ int main(int argc, char** argv)
   TH1F * h_N_Trig1Tdc_vsX    = new TH1F( "h_N_Trig1Tdc_vsX", "", 16, -16, 16 );
   TH1F * h_N_Trig1_TDC_vsY   = new TH1F( "h_N_Trig1_TDC_vsY", "", 16, -16, 16 );
   TH1F * h_N_Trig1Tdc_vsY    = new TH1F( "h_N_Trig1Tdc_vsY", "", 16, -16, 16 );
-
-  //----------------------------------------------------------------------------------------
-  //------Get HV / X0 / HODO and MCP channels-----------------------------------------------
+  float HODOX1TDC = 0.283591, HODOY1TDC = 2.45504;
+  float HODOX2TDC = 2.80849, HODOY2TDC = 2.52657;
+  float ShiftX = -4.749, ShiftY = -2.948;
+  //---save list of HV (or X0) step---
   if (strcmp(scanType,"HV")==0) {
     int prev=0;  
     for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++)
@@ -207,12 +212,6 @@ int main(int argc, char** argv)
 	  }
 	}
     }
-    float HODOX1TDC = 0.283591, HODOY1TDC = 2.45504;
-    float HODOX2TDC = 2.80849, HODOY2TDC = 2.52657;
-    //float HODOX1HODOX2 = -2.27337, HODOY1HODOY2 = -2.27337;
-    float ShiftX = -4.749, ShiftY = -2.948;
-    //float ShiftX = 0., ShiftY = 0.;
-
     float N_Trig1(0.), N_Trig1wc(0.), N_Trig1_hodo2(0.), N_Trig1_WC(0.), N_Trig2(0.), N_Trig2_hodo1(0.);
     for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++){
 	nt->GetEntry(iEntry);
@@ -264,21 +263,51 @@ int main(int argc, char** argv)
 	  //Eff as a function of HODO2 position
 	  int binX = int( (16.+pX2_c) );
 	  int binY = int( (16.+pY2_c) );
-	  h_TriggMCP->SetBinContent( binX+1, binY+1, h_TriggMCP->GetBinContent(binX+1, binY+1) + 1 );
-	  if( (charge_corr[ MCPList.at("MiB2") ] > treshold.at( MCPList.at("MiB2") ) ) ){
-	    h_NumEff_M2->SetBinContent( binX+1, binY+1, h_NumEff_M2->GetBinContent(binX+1, binY+1) + 1 );
+	  bool HV1_MiB2( TString(label).Contains("HVScan1") && HV[MCPList.at("MiB2")]==2750 );
+	  bool HV1_MiB3( TString(label).Contains("HVScan1") && HV[MCPList.at("MiB3")]==3100 );
+	  bool HV1_MiZ1( TString(label).Contains("HVScan1") && HV[MCPList.at("ZStack1")]==3150 );
+	  bool HV1_MiZ2( TString(label).Contains("HVScan1") && HV[MCPList.at("ZStack2")]==3300 );
+	  bool HV1_MiSe( TString(label).Contains("HVScan1") && HV[MCPList.at("enSEE")]==2200 );
+	  bool HV2_MiB2( TString(label).Contains("HVScan2") && HV[MCPList.at("MiB2")]==2750 );
+	  bool HV2_MiB3( TString(label).Contains("HVScan2") && HV[MCPList.at("MiB3")]==3100 );
+	  bool HV2_MiZ1( TString(label).Contains("HVScan2") && HV[MCPList.at("ZStack1")]==3300 );
+	  bool HV2_MiZ2( TString(label).Contains("HVScan2") && HV[MCPList.at("ZStack2")]==3100 );
+	  bool HV2_MiSe( TString(label).Contains("HVScan2") && HV[MCPList.at("enSEE")]==2200 );
+	  bool HV68_MiB2( (TString(label).Contains("HVScan6") || TString(label).Contains("HVScan8") ) && HV[MCPList.at("MiB2")]==2750 );
+	  bool HV68_MiB3( (TString(label).Contains("HVScan6") || TString(label).Contains("HVScan8") ) && HV[MCPList.at("MiB3")]==3100 );
+	  bool HV68_MiZ1( (TString(label).Contains("HVScan6") || TString(label).Contains("HVScan8") ) && HV[MCPList.at("ZStack1")]==3300 );
+	  bool HV68_MiZ2( (TString(label).Contains("HVScan6") || TString(label).Contains("HVScan8") ) && HV[MCPList.at("ZStack2")]==3300 );
+	  bool HV68_MiSe( (TString(label).Contains("HVScan6") || TString(label).Contains("HVScan8") ) && HV[MCPList.at("enSEE")]==2200 );
+	  bool X0_0( X0==0 );
+	  if( HV1_MiB2 || HV2_MiB2 || HV68_MiB2 || X0_0 ){
+	    h_TriggM2->SetBinContent( binX+1, binY+1, h_TriggM2->GetBinContent(binX+1, binY+1) + 1 );
+	    if( (charge_corr[ MCPList.at("MiB2") ] > treshold.at( MCPList.at("MiB2") ) ) ){
+	      h_NumEff_M2->SetBinContent( binX+1, binY+1, h_NumEff_M2->GetBinContent(binX+1, binY+1) + 1 );
+	    }
 	  }
-	  if( (charge_corr[ MCPList.at("MiB3") ] > treshold.at( MCPList.at("MiB3") ) ) ){
-	    h_NumEff_M3->SetBinContent( binX+1, binY+1, h_NumEff_M3->GetBinContent(binX+1, binY+1) + 1 );
+	  if( HV1_MiB3 || HV2_MiB3 || HV68_MiB3 || X0_0 ){
+	    h_TriggM3->SetBinContent( binX+1, binY+1, h_TriggM3->GetBinContent(binX+1, binY+1) + 1 );
+	    if( (charge_corr[ MCPList.at("MiB3") ] > treshold.at( MCPList.at("MiB3") ) ) ){
+	      h_NumEff_M3->SetBinContent( binX+1, binY+1, h_NumEff_M3->GetBinContent(binX+1, binY+1) + 1 );
+	    }
 	  }
-	  if( (charge_corr[ MCPList.at("ZStack1") ] > treshold.at( MCPList.at("ZStack1") ) ) ){
-	    h_NumEff_Z1->SetBinContent( binX+1, binY+1, h_NumEff_Z1->GetBinContent(binX+1, binY+1) + 1 );
+	  if( HV1_MiZ1 || HV2_MiZ1 || HV68_MiZ1 || X0_0 ){
+	    h_TriggZ1->SetBinContent( binX+1, binY+1, h_TriggZ1->GetBinContent(binX+1, binY+1) + 1 );
+	    if( (charge_corr[ MCPList.at("ZStack1") ] > treshold.at( MCPList.at("ZStack1") ) ) ){
+	      h_NumEff_Z1->SetBinContent( binX+1, binY+1, h_NumEff_Z1->GetBinContent(binX+1, binY+1) + 1 );
+	    }
 	  }
-	  if( (charge_corr[ MCPList.at("ZStack2") ] > treshold.at( MCPList.at("ZStack2") ) ) ){
-	    h_NumEff_Z2->SetBinContent( binX+1, binY+1, h_NumEff_Z2->GetBinContent(binX+1, binY+1) + 1 );
+	  if( HV1_MiZ2 || HV2_MiZ2 || HV68_MiZ2 || X0_0 ){
+	    h_TriggZ2->SetBinContent( binX+1, binY+1, h_TriggZ2->GetBinContent(binX+1, binY+1) + 1 );
+	    if( (charge_corr[ MCPList.at("ZStack2") ] > treshold.at( MCPList.at("ZStack2") ) ) ){
+	      h_NumEff_Z2->SetBinContent( binX+1, binY+1, h_NumEff_Z2->GetBinContent(binX+1, binY+1) + 1 );
+	    }
 	  }
-	  if( (charge_corr[ MCPList.at("enSEE") ] > treshold.at( MCPList.at("enSEE") ) ) ){
-	    h_NumEff_Se->SetBinContent( binX+1, binY+1, h_NumEff_Se->GetBinContent(binX+1, binY+1) + 1 );
+	  if( HV1_MiSe || HV2_MiSe || HV68_MiSe || X0_0 ){
+	    h_TriggSe->SetBinContent( binX+1, binY+1, h_TriggSe->GetBinContent(binX+1, binY+1) + 1 );
+	    if( (charge_corr[ MCPList.at("enSEE") ] > treshold.at( MCPList.at("enSEE") ) ) ){
+	      h_NumEff_Se->SetBinContent( binX+1, binY+1, h_NumEff_Se->GetBinContent(binX+1, binY+1) + 1 );
+	    }
 	  }
 	}
 	//Efficiensies for HODOS
@@ -367,84 +396,6 @@ int main(int argc, char** argv)
       }
   }
 
-  ///////////HODO!!!!!!!!!
-
-    //HODO
-    if(TString(scanType).Contains("HODO") == 1)
-      {
-	char effRootName[200]="";
-	sprintf(effRootName, "plots/HODO/efficiency_%s_%s_%s_%s.root", MCP.c_str(), doWhat, scanType, label);
-	TFile* out = new TFile(TString(effRootName), "recreate");
-	out->cd();
-	if (strcmp(scanType,"HODO")==0){
-	  h_XDiff_Hodo1TDC->Write();
-	  h_YDiff_Hodo1TDC->Write();
-	  h_XDiff_Hodo2TDC->Write();
-	  h_YDiff_Hodo2TDC->Write();
-	  h_XDiff_Hodo12->Write();
-	  h_YDiff_Hodo12->Write();
-	  h_XDiff_Hodo1TDC_c->Write();
-	  h_YDiff_Hodo1TDC_c->Write();
-	  h_XDiff_Hodo2TDC_c->Write();
-	  h_YDiff_Hodo2TDC_c->Write();
-	  h_XDiff_Hodo12_c->Write();
-	  h_YDiff_Hodo12_c->Write();
-	  h_nX1->Write();
-	  h_nY1->Write();
-	  h_nX2->Write();
-	  h_nY2->Write();
-	  h_pX1->Write();
-	  h_pY1->Write();
-	  h_TDCX->Write();
-	  h_TDCY->Write();
-	  h_Corr_TDC_HODO1_X->Write();
-	  h_Corr_TDC_HODO1_Y->Write();
-	  //Eff Hodos
-	  h_N_Trig1_hodo2_vsX->Write(); h_N_Trig1_vsX->Write();
-	  h_N_Trig1_hodo2_vsY->Write(); h_N_Trig1_vsY->Write();
-	  h_N_Trig2_hodo1_vsX->Write(); h_N_Trig2_vsX->Write();
-	  h_N_Trig2_hodo1_vsY->Write(); h_N_Trig2_vsY->Write();
-	  h_N_Trig1_TDC_vsX->Write();   h_N_Trig1Tdc_vsX->Write();
-	  h_N_Trig1_TDC_vsY->Write();   h_N_Trig1Tdc_vsY->Write();
-	  TG_effHODO2_X->GetXaxis()->SetTitle("HODO2 X [mm]"); TG_effHODO2_X->GetYaxis()->SetTitle("Eff."); TG_effHODO2_X->SetMinimum(0); TG_effHODO2_X->SetMaximum(1);
-	  TG_effHODO2_Y->GetXaxis()->SetTitle("HODO2 Y [mm]"); TG_effHODO2_Y->GetYaxis()->SetTitle("Eff."); TG_effHODO2_Y->SetMinimum(0); TG_effHODO2_Y->SetMaximum(1);
-	  TG_effHODO1_X->GetXaxis()->SetTitle("HODO1 X [mm]"); TG_effHODO1_X->GetYaxis()->SetTitle("Eff."); TG_effHODO1_X->SetMinimum(0); TG_effHODO1_X->SetMaximum(1);
-	  TG_effHODO1_Y->GetXaxis()->SetTitle("HODO1 Y [mm]"); TG_effHODO1_Y->GetYaxis()->SetTitle("Eff."); TG_effHODO1_Y->SetMinimum(0); TG_effHODO1_Y->SetMaximum(1);
-	  TG_effTDC_X->GetXaxis()->SetTitle("TDC X [mm]"); TG_effTDC_X->GetYaxis()->SetTitle("Eff."); TG_effTDC_X->SetMinimum(0); TG_effTDC_X->SetMaximum(1);
-	  TG_effTDC_Y->GetXaxis()->SetTitle("TDC Y [mm]"); TG_effTDC_Y->GetYaxis()->SetTitle("Eff."); TG_effTDC_Y->SetMinimum(0); TG_effTDC_Y->SetMaximum(1);
-	  TG_effHODO2_X->Write();
-	  TG_effHODO2_Y->Write();
-	  TG_effHODO1_X->Write();
-	  TG_effHODO1_Y->Write();
-	  TG_effTDC_X->Write();
-	  TG_effTDC_Y->Write();
-	  //Eff MCP vs hodo2
-	  h_TriggMCP->Write();
-	  h_NumEff_M2->Write();
-	  h_NumEff_Z1->Write();
-	  h_NumEff_Z2->Write();
-	  for(int i=0; i<32; i++){
-	    for(int j=0; j<32; j++){
-	      if( h_TriggMCP->GetBinContent(i+1, j+1) > 150 ) h_Eff_vsH2_M3->SetBinContent( i+1, j+1, h_NumEff_M3->GetBinContent(i+1, j+1)  / h_TriggMCP->GetBinContent(i+1, j+1) );
-	      if( h_TriggMCP->GetBinContent(i+1, j+1) > 150 ) h_Eff_vsH2_M2->SetBinContent( i+1, j+1, h_NumEff_M2->GetBinContent(i+1, j+1)  / h_TriggMCP->GetBinContent(i+1, j+1) );
-	      if( h_TriggMCP->GetBinContent(i+1, j+1) > 150 ) h_Eff_vsH2_Z1->SetBinContent( i+1, j+1, h_NumEff_Z1->GetBinContent(i+1, j+1)  / h_TriggMCP->GetBinContent(i+1, j+1) );
-	      if( h_TriggMCP->GetBinContent(i+1, j+1) > 150 ) h_Eff_vsH2_Z2->SetBinContent( i+1, j+1, h_NumEff_Z2->GetBinContent(i+1, j+1)  / h_TriggMCP->GetBinContent(i+1, j+1) );
-	      if( h_TriggMCP->GetBinContent(i+1, j+1) > 150 ) h_Eff_vsH2_Se->SetBinContent( i+1, j+1, h_NumEff_Se->GetBinContent(i+1, j+1)  / h_TriggMCP->GetBinContent(i+1, j+1) );
-	    }
-	  }
-	  h_Eff_vsH2_M2->Write();
-	  h_Eff_vsH2_M3->Write();
-	  h_Eff_vsH2_Z1->Write();
-	  h_Eff_vsH2_Z2->Write();
-	  h_Eff_vsH2_Se->Write();
-	}
-	out->Close();
-      }
-
-    if (TString(scanType).Contains("HODO") == 1)
-      return 0;
-  /////////////
-
   if (trigPos1==-1) {
     std::cout<<"ERROR!!! trigger not found!!!"<<std::endl;
     return -1;
@@ -498,7 +449,8 @@ int main(int argc, char** argv)
     //---Define Cuts---
     sprintf(str_cut_sig, "charge_corr[%d] > %d", MCPNumber, treshold.at(MCPNumber));
     sprintf(str_cut_trig0, "charge_corr[%d] > %d", trigPos1, treshold.at(trigPos1));
-    sprintf(str_cut_tdc, "tdcX > -8 && tdcX < 0 && tdcY >-2 && tdcY < 6");
+    float cutTDCX_min = -5.-ShiftX, cutTDCX_max = 3.-ShiftX, cutTDCY_min = -3.-ShiftY, cutTDCY_max = 5.-ShiftY; 
+    sprintf(str_cut_tdc, "tdcX > %f && tdcX < %f && tdcY >%f && tdcY < %f", cutTDCX_min, cutTDCX_max, cutTDCY_min, cutTDCY_max);
     sprintf(str_cut_saturated, "amp_max[%d] > 3450", MCPNumber);
     sprintf(str_cut_nFibers, "nhodoX1<=3 && nhodoX2<=3 && nhodoY1<=3 && nhodoY2<=3");
     sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
@@ -875,6 +827,77 @@ int main(int argc, char** argv)
  //
       std::cout<<"results printed in results/"<<std::endl;
       //  outputFile.close();
+  if (strcmp(scanType,"HODO")==0){
+     h_XDiff_Hodo1TDC->Write();
+     h_YDiff_Hodo1TDC->Write();
+     h_XDiff_Hodo2TDC->Write();
+     h_YDiff_Hodo2TDC->Write();
+     h_XDiff_Hodo12->Write();
+     h_YDiff_Hodo12->Write();
+     h_XDiff_Hodo1TDC_c->Write();
+     h_YDiff_Hodo1TDC_c->Write();
+     h_XDiff_Hodo2TDC_c->Write();
+     h_YDiff_Hodo2TDC_c->Write();
+     h_XDiff_Hodo12_c->Write();
+     h_YDiff_Hodo12_c->Write();
+     h_nX1->Write();
+     h_nY1->Write();
+     h_nX2->Write();
+     h_nY2->Write();
+     h_pX1->Write();
+     h_pY1->Write();
+     h_TDCX->Write();
+     h_TDCY->Write();
+     h_Corr_TDC_HODO1_X->Write();
+     h_Corr_TDC_HODO1_Y->Write();
+     //Eff Hodos
+     h_N_Trig1_hodo2_vsX->Write(); h_N_Trig1_vsX->Write();
+     h_N_Trig1_hodo2_vsY->Write(); h_N_Trig1_vsY->Write();
+     h_N_Trig2_hodo1_vsX->Write(); h_N_Trig2_vsX->Write();
+     h_N_Trig2_hodo1_vsY->Write(); h_N_Trig2_vsY->Write();
+     h_N_Trig1_TDC_vsX->Write();   h_N_Trig1Tdc_vsX->Write();
+     h_N_Trig1_TDC_vsY->Write();   h_N_Trig1Tdc_vsY->Write();
+     TG_effHODO2_X->GetXaxis()->SetTitle("HODO2 X [mm]"); TG_effHODO2_X->GetYaxis()->SetTitle("Eff."); TG_effHODO2_X->SetMinimum(0); TG_effHODO2_X->SetMaximum(1);
+     TG_effHODO2_Y->GetXaxis()->SetTitle("HODO2 Y [mm]"); TG_effHODO2_Y->GetYaxis()->SetTitle("Eff."); TG_effHODO2_Y->SetMinimum(0); TG_effHODO2_Y->SetMaximum(1);
+     TG_effHODO1_X->GetXaxis()->SetTitle("HODO1 X [mm]"); TG_effHODO1_X->GetYaxis()->SetTitle("Eff."); TG_effHODO1_X->SetMinimum(0); TG_effHODO1_X->SetMaximum(1);
+     TG_effHODO1_Y->GetXaxis()->SetTitle("HODO1 Y [mm]"); TG_effHODO1_Y->GetYaxis()->SetTitle("Eff."); TG_effHODO1_Y->SetMinimum(0); TG_effHODO1_Y->SetMaximum(1);
+     TG_effTDC_X->GetXaxis()->SetTitle("TDC X [mm]"); TG_effTDC_X->GetYaxis()->SetTitle("Eff."); TG_effTDC_X->SetMinimum(0); TG_effTDC_X->SetMaximum(1);
+     TG_effTDC_Y->GetXaxis()->SetTitle("TDC Y [mm]"); TG_effTDC_Y->GetYaxis()->SetTitle("Eff."); TG_effTDC_Y->SetMinimum(0); TG_effTDC_Y->SetMaximum(1);
+     TG_effHODO2_X->Write();
+     TG_effHODO2_Y->Write();
+     TG_effHODO1_X->Write();
+     TG_effHODO1_Y->Write();
+     TG_effTDC_X->Write();
+     TG_effTDC_Y->Write();
+     //Eff MCP vs hodo2
+     h_TriggM2->Write();
+     h_TriggM3->Write();
+     h_TriggZ1->Write();
+     h_TriggZ2->Write();
+     h_TriggSe->Write();
+     h_NumEff_M2->Write();
+     h_NumEff_M3->Write();
+     h_NumEff_Z1->Write();
+     h_NumEff_Z2->Write();
+     h_NumEff_Se->Write();
+     for(int i=0; i<32; i++){
+	for(int j=0; j<32; j++){
+//cout<<"ECCO: "<<h_NumEff_M3->GetBinContent(i+1, j+1)  <<" / "<< h_TriggM2->GetBinContent(i+1, j+1)<<endl;
+	  if( h_TriggM2->GetBinContent(i+1, j+1) > 10 ) h_Eff_vsH2_M2->SetBinContent( i+1, j+1, h_NumEff_M2->GetBinContent(i+1, j+1)  / h_TriggM2->GetBinContent(i+1, j+1) );
+	  if( h_TriggM3->GetBinContent(i+1, j+1) > 10 ) h_Eff_vsH2_M3->SetBinContent( i+1, j+1, h_NumEff_M3->GetBinContent(i+1, j+1)  / h_TriggM3->GetBinContent(i+1, j+1) );
+	  if( h_TriggZ1->GetBinContent(i+1, j+1) > 10 ) h_Eff_vsH2_Z1->SetBinContent( i+1, j+1, h_NumEff_Z1->GetBinContent(i+1, j+1)  / h_TriggZ1->GetBinContent(i+1, j+1) );
+	  if( h_TriggZ2->GetBinContent(i+1, j+1) > 10 ) h_Eff_vsH2_Z2->SetBinContent( i+1, j+1, h_NumEff_Z2->GetBinContent(i+1, j+1)  / h_TriggZ2->GetBinContent(i+1, j+1) );
+	  if( h_TriggSe->GetBinContent(i+1, j+1) > 10 ) h_Eff_vsH2_Se->SetBinContent( i+1, j+1, h_NumEff_Se->GetBinContent(i+1, j+1)  / h_TriggSe->GetBinContent(i+1, j+1) );
+	}
+     }
+     h_Eff_vsH2_M2->Write();
+     h_Eff_vsH2_M3->Write();
+     h_Eff_vsH2_Z1->Write();
+     h_Eff_vsH2_Z2->Write();
+     h_Eff_vsH2_Se->Write();
+  }
+
+
       inFile->Close();
   	
       return 0;     
