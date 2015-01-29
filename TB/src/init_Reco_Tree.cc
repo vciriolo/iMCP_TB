@@ -1,37 +1,37 @@
 #include "../interface/init_Reco_Tree.h"
 
 int event;
-float                 time_CF[10];
-float                 time_CF_corr[10];
-float                 time_CF30[10];
-float                 time_OT[10];
-float                 time_start[10];
-float                 time_stop[10];
-float                 time_start_1000[10];
-float                 time_stop_1000[10];
-float                 time_start_150[10];
-float                 time_stop_150[10];
-float                 time_start_200[10];
-float                 time_stop_200[10];
-float                 time_start_500[10];
-float                 time_stop_500[10];
-float                 time_start_300[10];
-float                 time_stop_300[10];
-float                 time_Max[10];
-float                 amp_max[10];
-float                 amp_max_corr[10];
-float                 amp_max_time[10];
-float                 charge[10];
-float                 charge_corr[10];
-float                 baseline[10];
+float                 time_CF[11];
+float                 time_CF_corr[11];
+float                 time_CF30[11];
+float                 time_OT[11];
+float                 time_start[11];
+float                 time_stop[11];
+float                 time_start_1000[11];
+float                 time_stop_1000[11];
+float                 time_start_150[11];
+float                 time_stop_150[11];
+float                 time_start_200[11];
+float                 time_stop_200[11];
+float                 time_start_500[11];
+float                 time_stop_500[11];
+float                 time_start_300[11];
+float                 time_stop_300[11];
+float                 time_Max[11];
+float                 amp_max[11];
+float                 amp_max_corr[11];
+float                 amp_max_time[11];
+float                 charge[11];
+float                 charge_corr[11];
+float                 baseline[11];
 /*int                   fibreX[8];
 int                   fibreY[8];
 int                   sci_front_adc;
 */
 int                   run_id;
-int                   isPCOn[10];
-int                   HV[10];
-int                   isTrigger[10];
+int                   isPCOn[11];
+int                   HV[11];
+int                   isTrigger[11];
 float                 X0;
 float tdcX;
 float tdcY;
@@ -98,29 +98,29 @@ void SetOutTree(TTree* outTree)
 {
   //---standard analysis branches
   outTree->Branch("event",&event,"event/I");
-  outTree->Branch("time_CF",&time_CF,"time_CF[10]/F");
-  outTree->Branch("time_CF_corr",&time_CF_corr,"time_CF_corr[10]/F");
-  outTree->Branch("time_CF30",&time_CF30,"time_CF30[10]/F");
-  outTree->Branch("time_OT",&time_OT,"time_OT[10]/F");
-  outTree->Branch("time_start",&time_start,"time_start[10]/F");
-  outTree->Branch("time_stop",&time_stop,"time_stop[10]/F");
-  outTree->Branch("time_start_1000",&time_start_1000,"time_start_1000[10]/F");
-  outTree->Branch("time_stop_1000",&time_stop_1000,"time_stop_1000[10]/F");
-  outTree->Branch("time_start_150",&time_start_150,"time_start_150[10]/F");
-  outTree->Branch("time_stop_150",&time_stop_150,"time_stop_150[10]/F");
-  outTree->Branch("time_start_200",&time_start_200,"time_start_200[10]/F");
-  outTree->Branch("time_stop_200",&time_stop_200,"time_stop_200[10]/F");
-  outTree->Branch("time_start_500",&time_start_500,"time_start_500[10]/F");
-  outTree->Branch("time_stop_500",&time_stop_500,"time_stop_500[10]/F");
-  outTree->Branch("time_start_300",&time_start_300,"time_start_300[10]/F");
-  outTree->Branch("time_stop_300",&time_stop_300,"time_stop_300[10]/F");
-  outTree->Branch("time_Max",&time_Max,"time_Max[10]/F");
-  outTree->Branch("amp_max",&amp_max,"amp_max[10]/F");
-  outTree->Branch("amp_max_corr",&amp_max_corr,"amp_max_corr[10]/F");
-  outTree->Branch("amp_max_time",&amp_max_time,"amp_max_time[10]/F");
-  outTree->Branch("charge",&charge,"charge[10]/F"); 
-  outTree->Branch("charge_corr",&charge_corr,"charge_corr[10]/F");
-  outTree->Branch("baseline",&baseline,"baseline[10]/F");
+  outTree->Branch("time_CF",&time_CF,"time_CF[11]/F");
+  outTree->Branch("time_CF_corr",&time_CF_corr,"time_CF_corr[11]/F");
+  outTree->Branch("time_CF30",&time_CF30,"time_CF30[11]/F");
+  outTree->Branch("time_OT",&time_OT,"time_OT[11]/F");
+  outTree->Branch("time_start",&time_start,"time_start[11]/F");
+  outTree->Branch("time_stop",&time_stop,"time_stop[11]/F");
+  outTree->Branch("time_start_1000",&time_start_1000,"time_start_1000[11]/F");
+  outTree->Branch("time_stop_1000",&time_stop_1000,"time_stop_1000[11]/F");
+  outTree->Branch("time_start_150",&time_start_150,"time_start_150[11]/F");
+  outTree->Branch("time_stop_150",&time_stop_150,"time_stop_150[11]/F");
+  outTree->Branch("time_start_200",&time_start_200,"time_start_200[11]/F");
+  outTree->Branch("time_stop_200",&time_stop_200,"time_stop_200[11]/F");
+  outTree->Branch("time_start_500",&time_start_500,"time_start_500[11]/F");
+  outTree->Branch("time_stop_500",&time_stop_500,"time_stop_500[11]/F");
+  outTree->Branch("time_start_300",&time_start_300,"time_start_300[11]/F");
+  outTree->Branch("time_stop_300",&time_stop_300,"time_stop_300[11]/F");
+  outTree->Branch("time_Max",&time_Max,"time_Max[11]/F");
+  outTree->Branch("amp_max",&amp_max,"amp_max[11]/F");
+  outTree->Branch("amp_max_corr",&amp_max_corr,"amp_max_corr[11]/F");
+  outTree->Branch("amp_max_time",&amp_max_time,"amp_max_time[11]/F");
+  outTree->Branch("charge",&charge,"charge[11]/F"); 
+  outTree->Branch("charge_corr",&charge_corr,"charge_corr[11]/F");
+  outTree->Branch("baseline",&baseline,"baseline[11]/F");
   
   //---hodoscope branches       
   //  outTree->Branch("fibreX",&fibreX,"fibreX[8]/I");
@@ -131,9 +131,9 @@ void SetOutTree(TTree* outTree)
   outTree->Branch("run_id",&run_id,"run_id/I");
 
   //---additional branches
-  outTree->Branch("isPCOn",&isPCOn,"isPCOn[10]/I");
-  outTree->Branch("HV",&HV,"HV[10]/I");
-  outTree->Branch("isTrigger",&isTrigger,"isTrigger[10]/I");
+  outTree->Branch("isPCOn",&isPCOn,"isPCOn[11]/I");
+  outTree->Branch("HV",&HV,"HV[11]/I");
+  outTree->Branch("isTrigger",&isTrigger,"isTrigger[11]/I");
   outTree->Branch("X0",&X0,"X0/F");
 
   outTree->Branch("tdcX",&tdcX,"tdcX/F");
