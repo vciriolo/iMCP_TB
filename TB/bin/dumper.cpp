@@ -66,8 +66,8 @@ int main (int argc, char** argv)
     TFile* outROOT = TFile::Open(("ntuples/reco_"+outputFile+".root").c_str(),"recreate");  
     outROOT->cd();
 
-    TProfile** wf_promed = new TProfile*[10];
-    for(int iCh=0; iCh<10; ++iCh) wf_promed[iCh] = new TProfile(Form("wf_promed_%d",iCh), "", 102400, 0., 1024.);
+    TProfile** wf_promed = new TProfile*[11];
+    for(int iCh=0; iCh<11; ++iCh) wf_promed[iCh] = new TProfile(Form("wf_promed_%d",iCh), "", 102400, 0., 1024.);
 
     TTree* outTree = new TTree("reco_tree", "reco_tree");
     outTree->SetDirectory(0);
@@ -98,20 +98,30 @@ int main (int argc, char** argv)
       //-----fill maps--------
       for (int count=0; count<nChannels; count++)   //read exactly nChannels lines of the cfg file -> be careful to give the right number in input!!!!
 	{
+	  if (count==10) {
+	    PCOn.insert(std::make_pair(10,-1)); 
+	    HVVal.insert(std::make_pair(10,-1)); 
+	    MCPName.insert(std::make_pair(10,string("trig2"))); 	  
+	    continue;
+	  }
+
 	  inputCfg >> run >> chNumber >> HVtemp >> X0temp >> PC >> name;
 
 	  PCOn.insert(std::make_pair(chNumber,PC)); 
 	  HVVal.insert(std::make_pair(chNumber,HVtemp)); 
-	  MCPName.insert(std::make_pair(chNumber,name)); 
+	  if (count==8)
+	    MCPName.insert(std::make_pair(chNumber,string("trig1"))); 
+	  else
+	    MCPName.insert(std::make_pair(chNumber,name)); 
 	}
 
       //-----Definitions
-      vector<float> digiCh[10];
-      float timeCF[10], timeCFcorr[10], timeCF30[10];
-      float timeOT[10], timeStart[10], timeStop[10], ampMaxT[10];
-      float timeStart_1000[10], timeStop_1000[10], timeStart_150[10], timeStop_150[10];
-      float timeStart_200[10], timeStop_200[10], timeStart_500[10], timeStop_500[10], timeStart_300[10], timeStop_300[10];
-      float intBase[10], intSignal[10], intSignalcorr[10], ampMax[10], ampMaxcorr[10];
+      vector<float> digiCh[11];
+      float timeCF[11], timeCFcorr[11], timeCF30[11];
+      float timeOT[11], timeStart[11], timeStop[11], ampMaxT[11];
+      float timeStart_1000[11], timeStop_1000[11], timeStart_150[11], timeStop_150[11];
+      float timeStart_200[11], timeStop_200[11], timeStart_500[11], timeStop_500[11], timeStart_300[11], timeStop_300[11];
+      float intBase[11], intSignal[11], intSignalcorr[11], ampMax[11], ampMaxcorr[11];
       ///int fibreX[8], hodoYchannels[8];
       float tStart, tStop;
 
@@ -216,11 +226,13 @@ int main (int argc, char** argv)
 	    //---Read digitizer samples
 	    //	    std::cout << " nDigiSamples = " << nDigiSamples << std::endl;
 	    for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
-	      if(iSample > 1024*10 - 1) break;
-	      if (digiGroup[iSample] == 1 && digiChannel[iSample] == 0)
-		digiCh[9].push_back(digiSampleValue[iSample]);
-	      else
+	      if (digiGroup[iSample] == 0)
 		digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
+	      else if (digiGroup[iSample] == 1 && digiChannel[iSample] == 0)
+		digiCh[9].push_back(digiSampleValue[iSample]);
+	      else if (digiGroup[iSample] == 1 && digiChannel[iSample] == 8) 
+		digiCh[10].push_back(digiSampleValue[iSample]);
+		//	      if(iSample > 1024*10 - 1) break;
 	    }
 
 
@@ -243,7 +255,41 @@ int main (int argc, char** argv)
 		  timeOT[iCh] = TimeOverThreshold(51, 1000, &digiCh[iCh], -1000., tStart, tStop);
 		  //		  if( iCh == 3) std::cout << " FINE CeF3 " << std::endl;
 		}
+		else if (iCh==8 || iCh==10) { //clock digitization info
+		  SubtractBaseline(5, 25, &digiCh[iCh]);  //baseline subtraction
+		  ampMax[iCh] = AmpMax(51, 1000, &digiCh[iCh]);
+		  intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
+		  intSignal[iCh] = ComputeIntegral(51, 1000, &digiCh[iCh]);
+		  timeCF[iCh] = TimeConstFracAbs(51, 1000, &digiCh[iCh], 0.5, ampMax[iCh]);
 
+		  TimeOverThreshold(51, 1000, &digiCh[iCh], -150., tStart, tStop);		  
+		  timeStart_150[iCh]=tStart;
+		  timeStop_150[iCh]=tStop;
+
+		  TimeOverThreshold(51, 1000, &digiCh[iCh], -200., tStart, tStop);
+		  timeStart_200[iCh]=tStart;
+		  timeStop_200[iCh]=tStop;
+		  
+		  TimeOverThreshold(51, 1000, &digiCh[iCh], -300., tStart, tStop);
+		  timeStart_300[iCh]=tStart;
+		  timeStop_300[iCh]=tStop;
+
+		  TimeOverThreshold(51, 1000, &digiCh[iCh], -500., tStart, tStop);
+		  timeStart_500[iCh]=tStart;
+		  timeStop_500[iCh]=tStop;
+
+		  TimeOverThreshold(51, 1000, &digiCh[iCh], -1000., tStart, tStop);
+		  timeStart_1000[iCh]=tStart;
+		  timeStop_1000[iCh]=tStop;
+
+		  timeOT[iCh] = TimeOverThreshold(51, 1000, &digiCh[iCh], -1000., tStart, tStop);
+		  timeStart[iCh]=tStart;
+		  timeStop[iCh]=tStop;
+
+		  ampMaxcorr[iCh] = -1.*ampMax[iCh];
+		  intSignalcorr[iCh] = -1.*intSignal[iCh];
+		  timeCFcorr[iCh] = timeCF[iCh];
+		  		}
 		//save infos for MCPs
 		else {
 
