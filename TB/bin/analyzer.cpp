@@ -449,8 +449,8 @@ int main(int argc, char** argv)
     //---Define Cuts---
     sprintf(str_cut_sig, "charge_corr[%d] > %d", MCPNumber, treshold.at(MCPNumber));
     sprintf(str_cut_trig0, "charge_corr[%d] > %d", trigPos1, treshold.at(trigPos1));
-    float cutTDCX_min = -8-ShiftX, cutTDCX_max = 0-ShiftX, cutTDCY_min = -2-ShiftY, cutTDCY_max = -6-ShiftY; 
-    sprintf(str_cut_tdc, "tdcX > %d && tdcX < %d && tdcY >%d && tdcY < %d", cutTDCX_min, cutTDCX_max, cutTDCY_min, cutTDCY_max);
+    float cutTDCX_min = -5.-ShiftX, cutTDCX_max = 3.-ShiftX, cutTDCY_min = -3.-ShiftY, cutTDCY_max = 5.-ShiftY; 
+    sprintf(str_cut_tdc, "tdcX > %f && tdcX < %f && tdcY >%f && tdcY < %f", cutTDCX_min, cutTDCX_max, cutTDCY_min, cutTDCY_max);
     sprintf(str_cut_saturated, "amp_max[%d] > 3450", MCPNumber);
     sprintf(str_cut_nFibers, "nhodoX1<=3 && nhodoX2<=3 && nhodoY1<=3 && nhodoY2<=3");
     sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
