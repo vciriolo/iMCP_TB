@@ -138,7 +138,7 @@ int main(int argc, char** argv)
     mg->GetXaxis()->SetRangeUser(1400,3400);
     mg->GetXaxis()->SetTitle("HV (V)");
     mg->GetYaxis()->SetTitle("Time Resolution, ps (trigger included)");
-    mg->SetMaximum(200);
+    mg->SetMaximum(100);
     mg->SetMinimum(0);
     mg->Draw("APL");  
     legC->Draw("same");
@@ -288,7 +288,7 @@ int main(int argc, char** argv)
 	mg->SetTitle(plot_type.c_str());
       }
 
-    mg->SetMaximum(200);
+    mg->SetMaximum(100);
     mg->SetMinimum(0);
     mg->Draw("APL");  
     legC->Draw("same");
