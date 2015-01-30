@@ -454,7 +454,7 @@ int main(int argc, char** argv)
     //---Define Cuts---
     sprintf(str_cut_sig, "charge_corr[%d] > %d", MCPNumber, treshold.at(MCPNumber));
     sprintf(str_cut_trig0, "charge_corr[%d] > %d", trigPos1, treshold.at(trigPos1));
-    float cutTDCX_min = -5.-ShiftX, cutTDCX_max = 3.-ShiftX, cutTDCY_min = -3.-ShiftY, cutTDCY_max = 5.-ShiftY; 
+    float cutTDCX_min = -5.+ShiftX, cutTDCX_max = 3.+ShiftX, cutTDCY_min = -2.+ShiftY, cutTDCY_max = 6.+ShiftY; 
     sprintf(str_cut_tdc, "tdcX > %f && tdcX < %f && tdcY >%f && tdcY < %f", cutTDCX_min, cutTDCX_max, cutTDCY_min, cutTDCY_max);
     sprintf(str_cut_saturated, "amp_max[%d] > 3450", MCPNumber);
     sprintf(str_cut_nFibers, "nhodoX1<=3 && nhodoX2<=3 && nhodoY1<=3 && nhodoY2<=3");
@@ -669,7 +669,10 @@ int main(int argc, char** argv)
                 sprintf(TOT_diff, "(time_stop_500[%d]-time_start_500[%d])", MCPNumber, MCPNumber);
             //---create variables
             char t_CF_diff[100];
-            sprintf(t_CF_diff, "(time_CF_corr[%d]-(time_CF_corr[%d]-time_CF_corr[%d])-time_CF_corr[%d])", MCPNumber, clockPos2, clockPos1, trigPos1);
+	    if (strcmp((inverted_MCPList.at(MCPNumber)).c_str(),"MiB3")==0)
+	      sprintf(t_CF_diff, "(time_CF_corr[%d]-(time_CF_corr[%d]-time_CF_corr[%d])-time_CF_corr[%d])", MCPNumber, clockPos2, clockPos1, trigPos1);
+	    else
+	      sprintf(t_CF_diff, "(time_CF_corr[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
             sprintf(var_timeCFD_vs_TOT, "%s:%s>>%s", t_CF_diff, TOT_diff, pr_timeCFD_vs_TOT_name);
             //---correction
             nt->Draw(var_timeCFD_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
@@ -742,7 +745,10 @@ int main(int argc, char** argv)
             if(strcmp(scanType, "X0") == 0 && X0Step.at(i) != 0 && MCPNumber < 3) 
             {
                 sprintf(TOT_diff, "(time_stop_500[%d]-time_start_500[%d])", MCPNumber, MCPNumber);
-                sprintf(t_start_diff, "(time_start_500[%d]-(time_start_150[%d]-time_start_150[%d])-time_CF_corr[%d])", MCPNumber, clockPos2, clockPos1,trigPos1);
+		if (strcmp((inverted_MCPList.at(MCPNumber)).c_str(),"MiB3")==0)
+		  sprintf(t_start_diff, "(time_start_500[%d]-(time_start_500[%d]-time_start_500[%d])-time_CF_corr[%d])", MCPNumber,clockPos2,clockPos1,trigPos1);
+		else
+		  sprintf(t_start_diff, "(time_start_500[%d]-time_CF_corr[%d])", MCPNumber,trigPos1);
             }
             sprintf(var_timeLED_vs_TOT, "%s:%s>>%s", t_start_diff, TOT_diff, pr_timeLED_vs_TOT_name);
             //---correction
