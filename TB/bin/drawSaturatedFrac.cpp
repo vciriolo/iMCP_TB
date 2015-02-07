@@ -93,12 +93,15 @@ int main(int argc, char** argv)
   //
     eff_MiB3_ON->SetMarkerStyle(20);
     eff_MiB3_ON->SetLineWidth(2);
+    eff_MiB3_ON->SetMarkerSize(0.7);
     eff_MiB3_OFF->SetMarkerStyle(22);
     eff_MiB3_OFF->SetLineWidth(2);
     eff_ZStack2_ON->SetMarkerStyle(20);
     eff_ZStack2_ON->SetLineWidth(2);
+    eff_ZStack2_ON->SetMarkerSize(0.7);
     eff_ZStack1_ON->SetMarkerStyle(20);
     eff_ZStack1_ON->SetLineWidth(2);
+    eff_ZStack1_ON->SetMarkerSize(0.7);
     eff_ZStack2_OFF->SetMarkerStyle(22);
     eff_ZStack2_OFF->SetLineWidth(2);
     eff_ZStack1_OFF->SetMarkerStyle(22);
@@ -137,13 +140,13 @@ int main(int argc, char** argv)
     system(command.c_str());
     sprintf(plot_name, "final_plots/saturatedFrac_%s.pdf", plot_type.c_str());
 
-    mg->Draw("APL");
+    mg->Draw("AP");
     mg->GetXaxis()->SetRangeUser(-0.1,5.1);
     mg->GetXaxis()->SetTitle("HV (V)");
     mg->GetYaxis()->SetTitle("SaturatedFrac");
     mg->SetMaximum(100);
     mg->SetMinimum(0);
-    mg->Draw("APL");  
+    mg->Draw("AP");  
     legC->Draw("same");
 
     c->Print(plot_name, "pdf");
@@ -218,14 +221,18 @@ int main(int argc, char** argv)
     //
     eff_MiB3->SetMarkerStyle(20);
     eff_MiB3->SetLineWidth(2);
+    eff_MiB3->SetMarkerSize(0.7);
     if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20" || plot_type=="scanX0_HVHigh_50" || plot_type=="scanX0_HVLow_50") {
       eff_ZStack2->SetMarkerStyle(20);
       eff_ZStack2->SetLineWidth(2);
+      eff_ZStack2->SetMarkerSize(0.7);
     }
     eff_ZStack1->SetMarkerStyle(20);
     eff_ZStack1->SetLineWidth(2);
-    eff_enSEE->SetMarkerStyle(22);
+    eff_ZStack1->SetMarkerSize(0.7);
+    eff_enSEE->SetMarkerStyle(20);
     eff_enSEE->SetLineWidth(2);
+    eff_enSEE->SetMarkerSize(0.7);
     
     legC->SetTextFont(42);
     legC->SetTextSize(0.03);
@@ -271,7 +278,7 @@ int main(int argc, char** argv)
     system(command.c_str());
     sprintf(plot_name, "final_plots/saturatedFrac_%s.pdf", plot_type.c_str());
 
-    mg->Draw("APL");
+    mg->Draw("AP");
     if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20" || plot_type=="scanX0_HVHigh_50" || plot_type=="scanX0_HVLow_50") 
       {
 	mg->GetXaxis()->SetRangeUser(-0.1,5.1);
@@ -289,7 +296,7 @@ int main(int argc, char** argv)
 
     mg->SetMaximum(100);
     mg->SetMinimum(0);
-    mg->Draw("APL");  
+    mg->Draw("AP");  
     legC->Draw("same");
 
     c->Print(plot_name, "pdf");
