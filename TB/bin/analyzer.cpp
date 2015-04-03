@@ -115,6 +115,7 @@ int main(int argc, char** argv)
         outROOT_LED = TFile::Open(Form("plots/resLED_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
     }
 
+
     //---open tree and get: run list and corresponding HV/X0---
     std::vector<int> HVVal;
     HVVal.clear();
@@ -536,7 +537,13 @@ int main(int argc, char** argv)
         sprintf(f_resCFD_name, "f_resCFD_%d", i);    
         sprintf(f_corrCFD_name, "f_corrCFD_%d", i);
         sprintf(f_corrCFD_name, "f_corrCFD2_%d", i);
-        TH1F* h_resCFD = new TH1F(h_resCFD_name, "time res with CFD method", 250, -1, 1);
+        TH1F* h_resCFD = new TH1F(h_resCFD_name, "Electron Beam 50 GeV", 250, -1, 1);
+	h_resCFD->GetXaxis()->SetTitle("time_{MCP}-time_{TRIG} (ns)");
+	h_resCFD->GetYaxis()->SetTitle("Entries");
+	h_resCFD->GetXaxis()->SetTitleSize(0.045);
+	h_resCFD->GetYaxis()->SetTitleSize(0.045);
+	h_resCFD->GetXaxis()->SetTitleOffset(1.06);
+	h_resCFD->GetYaxis()->SetTitleOffset(1.06);
         TF1* f_resCFD = new TF1(f_resCFD_name, "gausn", -1, 1);
         TProfile* pr_timeCFD_vs_TOT;
         TProfile* pr_timeCFD_vs_ampMaxCorr;
@@ -648,10 +655,43 @@ int main(int argc, char** argv)
 	    }
 	    else 
             {
-                printf("%.3f\t%.3f\t%.3f\t%.3f\n", X0Step.at(i), eff, 0., e_eff);
-                outputFile << X0Step.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
-                g_eff->SetPoint(i, X0Step.at(i), eff);
-                g_eff->SetPointError(i, 0, e_eff);
+	      if (TString(label).Contains("scanX0_HVHigh50GeV")) { //correct efficiencies at 0X0
+		if (TString(MCP).Contains("ZStack2") && X0Step.at(i)==0.) {
+		  eff = 0.6635633;
+		  e_eff = 0.009062424;
+		}
+		else if (TString(MCP).Contains("enSEE") && X0Step.at(i)==0.) {
+		  eff = 0.6846591;
+		  e_eff = 0.009360672;
+		}
+		else if (TString(MCP).Contains("ZStack1") && X0Step.at(i)==0.) {
+		  eff = 0.6325325;
+		  e_eff = 0.009567964;
+		}
+		else if (TString(MCP).Contains("MiB3") && X0Step.at(i)==0.) {
+		  eff = 0.5150362;
+		  e_eff = 0.009750873;
+		}
+	      } 
+	      if (TString(label).Contains("AngScan_HVHigh")) { //correct efficiencies at 0 degrees for angular scan
+		if (TString(MCP).Contains("enSEE") ) {
+		  eff -= 0.08;
+		  //		  e_eff = 0.009360672;
+		}
+		else if (TString(MCP).Contains("ZStack1") ) {
+		  eff -= 0.034;
+		  //		  e_eff = 0.009567964;
+		}
+		else if (TString(MCP).Contains("MiB3") ) {
+		  eff -= 0.08;
+		  if (X0Step.at(i)==0.) eff-=0.012;
+		  //		  e_eff = 0.009750873;
+		}
+	      }
+	      printf("%.3f\t%.3f\t%.3f\t%.3f\n", X0Step.at(i), eff, 0., e_eff);
+	      outputFile << X0Step.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
+	      g_eff->SetPoint(i, X0Step.at(i), eff);
+	      g_eff->SetPointError(i, 0, e_eff);
 	    }
 	    if(i == (ScanList.size()-1))    
 		printf("-----------------------------\n");
@@ -774,6 +814,8 @@ int main(int argc, char** argv)
             outROOT_CFD->cd();
             pr_timeCFD_vs_TOT->Write();
             pr_timeCFD_vs_ampMaxCorr->Write();
+	    gStyle->SetOptStat(0000);
+	    gStyle->SetOptFit(1111);
             h_resCFD->Write();
             pr_timeCFD_vs_TOT->Delete();
             pr_timeCFD_vs_ampMaxCorr->Delete();
@@ -872,6 +914,8 @@ int main(int argc, char** argv)
             outROOT_LED->cd();
             pr_timeLED_vs_TOT->Write();
             pr_timeLED_vs_ampMaxCorr->Write();
+	    gStyle->SetOptStat(0000);
+	    gStyle->SetOptFit(1111);
             h_resLED->Write();
             pr_timeLED_vs_TOT->Delete();
             pr_timeLED_vs_ampMaxCorr->Delete();

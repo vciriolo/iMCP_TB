@@ -27,8 +27,24 @@
 #include "TStyle.h"
 #include "TMultiGraph.h"
 #include "TLegend.h"
+#include "TPaveLabel.h"
+#include "TPaveText.h"
 
 using namespace std;
+
+void banner4Plot (){
+  TPaveText* pt ;
+  pt = new TPaveText(.14,0.91,.25,.94,"NDC");
+  pt->AddText("Preliminary");
+  pt->SetFillColor(0);
+  pt->SetTextSize(0.035);
+  pt->SetFillStyle(0);
+  pt->SetLineColor(0);
+  pt->SetLineWidth(0);
+  pt->SetMargin(0);
+  pt->SetShadowColor(0);
+  pt->Draw();
+}
 
 int main(int argc, char** argv)
 {
@@ -93,15 +109,15 @@ int main(int argc, char** argv)
   //
     eff_MiB3_ON->SetMarkerStyle(20);
     eff_MiB3_ON->SetLineWidth(2);
-    eff_MiB3_ON->SetMarkerSize(0.7);
+    eff_MiB3_ON->SetMarkerSize(0.9);
     eff_MiB3_OFF->SetMarkerStyle(22);
     eff_MiB3_OFF->SetLineWidth(2);
     eff_ZStack2_ON->SetMarkerStyle(20);
     eff_ZStack2_ON->SetLineWidth(2);
-    eff_ZStack2_ON->SetMarkerSize(0.7);
+    eff_ZStack2_ON->SetMarkerSize(0.9);
     eff_ZStack1_ON->SetMarkerStyle(20);
     eff_ZStack1_ON->SetLineWidth(2);
-    eff_ZStack1_ON->SetMarkerSize(0.7);
+    eff_ZStack1_ON->SetMarkerSize(0.9);
     eff_ZStack2_OFF->SetMarkerStyle(22);
     eff_ZStack2_OFF->SetLineWidth(2);
     eff_ZStack1_OFF->SetMarkerStyle(22);
@@ -116,13 +132,13 @@ int main(int argc, char** argv)
     legC->SetLineColor(kWhite);
     legC->SetShadowColor(kWhite);
 
-    legC->AddEntry(eff_MiB3_ON, "MiB3 chevron-ON", "p");
-    legC->AddEntry(eff_MiB3_OFF, "MiB3 chevron-OFF", "p");
-    legC->AddEntry(eff_ZStack2_ON, "ZStack2 ON", "p");
-    legC->AddEntry(eff_ZStack2_OFF, "ZStack2 OFF", "p");
-    legC->AddEntry(eff_ZStack1_ON, "ZStack1 ON", "p");
-    legC->AddEntry(eff_ZStack1_OFF, "ZStack1 OFF", "p");
-    legC->AddEntry(eff_enSEE, "SEE OFF", "p");
+    legC->AddEntry(eff_MiB3_ON, "Double layer - PMT-MCP mode", "p");
+    legC->AddEntry(eff_MiB3_OFF, "Double layer - iMCP mode", "p");
+    legC->AddEntry(eff_ZStack2_ON, "ZStack2 - PMT-MCP mode", "p");
+    legC->AddEntry(eff_ZStack2_OFF, "ZStack2 - iMCP mode", "p");
+    legC->AddEntry(eff_ZStack1_ON, "ZStack1 PMT-MCP mode", "p");
+    legC->AddEntry(eff_ZStack1_OFF, "ZStack1 - iMCP mode", "p");
+    legC->AddEntry(eff_enSEE, "SEE - iMCP mode", "p");
   
     mg->Add(eff_MiB3_ON);
     mg->Add(eff_MiB3_OFF);
@@ -133,6 +149,7 @@ int main(int argc, char** argv)
     mg->Add(eff_ZStack2_OFF);
     mg->Add(eff_enSEE);
 
+    //    TCanvas* c = new TCanvas("cEff","cEff",400,800);
     TCanvas* c = new TCanvas();
     gPad->SetTicks();
     char plot_name[100];
@@ -141,13 +158,18 @@ int main(int argc, char** argv)
     sprintf(plot_name, "final_plots/efficiency_%s.pdf", plot_type.c_str());
 
     mg->Draw("APL");
+    mg->SetTitle("Electron Beam 50 GeV");
     mg->GetXaxis()->SetRangeUser(1200,3400);
-    mg->GetXaxis()->SetTitle("HV (V)");
+    mg->GetXaxis()->SetTitle("Bias Voltage (V)");
+    mg->GetXaxis()->SetTitleSize(0.045);
     mg->GetYaxis()->SetTitle("Efficiency");
+    mg->GetYaxis()->SetTitleSize(0.045);
     mg->SetMaximum(1);
     mg->SetMinimum(0);
     mg->Draw("APL");  
     legC->Draw("same");
+    banner4Plot();
+    c->Update();
 
     c->Print(plot_name, "pdf");
     sprintf(plot_name, "final_plots/efficiency_%s.png", plot_type.c_str());
@@ -161,7 +183,7 @@ int main(int argc, char** argv)
 
   else {
 
-    legC = new TLegend(0.50,0.20,0.79,0.4,NULL,"brNDC");
+    legC = new TLegend(0.45,0.15,0.7,0.32,NULL,"brNDC");
 
     TGraphErrors* eff_MiB3;
     TGraphErrors* eff_enSEE;
@@ -225,18 +247,18 @@ int main(int argc, char** argv)
     //
     eff_MiB3->SetMarkerStyle(20);
     eff_MiB3->SetLineWidth(2);
-    eff_MiB3->SetMarkerSize(0.7);
+    eff_MiB3->SetMarkerSize(0.9);
     if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20" || plot_type=="scanX0_HVHigh_50" || plot_type=="scanX0_HVLow_50") {
       eff_ZStack2->SetMarkerStyle(20);
       eff_ZStack2->SetLineWidth(2);
-      eff_ZStack2->SetMarkerSize(0.7);
+      eff_ZStack2->SetMarkerSize(0.9);
     }
     eff_ZStack1->SetMarkerStyle(20);
     eff_ZStack1->SetLineWidth(2);
-    eff_ZStack1->SetMarkerSize(0.7);
+    eff_ZStack1->SetMarkerSize(0.9);
     eff_enSEE->SetMarkerStyle(20);
     eff_enSEE->SetLineWidth(2);
-    eff_enSEE->SetMarkerSize(0.7);
+    eff_enSEE->SetMarkerSize(0.9);
     
     legC->SetTextFont(42);
     legC->SetTextSize(0.03);
@@ -245,28 +267,28 @@ int main(int argc, char** argv)
     legC->SetShadowColor(kWhite);
         
     if(plot_type == "AngScanLow"){
-      legC->AddEntry(eff_MiB3, "MiB3 chevron-OFF HV 3000", "p");
-      legC->AddEntry(eff_ZStack1, "ZStack1 OFF HV 3000", "p");
-      legC->AddEntry(eff_enSEE, "SEE OFF HV 1900", "p");
+      legC->AddEntry(eff_MiB3, "Double layer - iMCP mode - 3000 V", "p");
+      legC->AddEntry(eff_ZStack1, "ZStack1 - iMCP mode - 3000 V", "p");
+      legC->AddEntry(eff_enSEE, "SEE - iMCP mode - 1900 V", "p");
     }
     if(plot_type == "AngScanHigh"){
-      legC->AddEntry(eff_MiB3, "MiB3 chevron-OFF HV 3200", "p");
-      legC->AddEntry(eff_ZStack1, "ZStack1 OFF HV 3200", "p");
-      legC->AddEntry(eff_enSEE, "SEE OFF HV 2200", "p");
+      legC->AddEntry(eff_MiB3, "Double layer - iMCP mode - 3200 V", "p");
+      legC->AddEntry(eff_ZStack1, "ZStack1 - iMCP mode - 3200 V", "p");
+      legC->AddEntry(eff_enSEE, "SEE - iMCP mode - 2200 V", "p");
     }
 
     if(plot_type == "scanX0_HVHigh_50" || plot_type == "scanX0_HVHigh_20"){
-      legC->AddEntry(eff_MiB3, "MiB3 chevron-OFF HV 3200", "p");
-      legC->AddEntry(eff_ZStack1, "ZStack1 OFF HV 3200", "p");
-      legC->AddEntry(eff_ZStack2, "ZStack2 OFF HV 3200", "p");
-      legC->AddEntry(eff_enSEE, "SEE OFF  HV 2200", "p");
+      legC->AddEntry(eff_MiB3, "Double layer - iMCP mode - 3200 V", "p");
+      legC->AddEntry(eff_ZStack1, "ZStack1 - iMCP mode - 3200 V", "p");
+      legC->AddEntry(eff_ZStack2, "ZStack2 - iMCP mode - 3200 V", "p");
+      legC->AddEntry(eff_enSEE, "SEE - iMCP mode - 2200 V", "p");
     }
 
     if(plot_type == "scanX0_HVLow_50" || plot_type == "scanX0_HVLow_20"){
-      legC->AddEntry(eff_MiB3, "MiB3 chevron-OFF HV 3000", "p");
-      legC->AddEntry(eff_ZStack1, "ZStack1 OFF HV 3000", "p");
-      legC->AddEntry(eff_ZStack2, "ZStack2 OFF HV 3000", "p");
-      legC->AddEntry(eff_enSEE, "SEE OFF  HV 1900", "p");
+      legC->AddEntry(eff_MiB3, "Double layer - iMCP mode - 3000 V", "p");
+      legC->AddEntry(eff_ZStack1, "ZStack1 - iMCP mode - 3000 V", "p");
+      legC->AddEntry(eff_ZStack2, "ZStack2 - iMCP mode - 3000 V", "p");
+      legC->AddEntry(eff_enSEE, "SEE - iMCP mode - 1900 V", "p");
     }
 
     mg->Add(eff_MiB3);
@@ -285,26 +307,41 @@ int main(int argc, char** argv)
     mg->Draw("APL");
     if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20" || plot_type=="scanX0_HVHigh_50" || plot_type=="scanX0_HVLow_50") 
       {
-	if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20") 
+	if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20") {
+	  mg->SetTitle("Electron Beam 20 GeV");
 	  mg->GetXaxis()->SetRangeUser(-0.1,5.1);
-	else 
+	}
+	else {
+	  mg->SetTitle("Electron Beam 50 GeV");
 	  mg->GetXaxis()->SetRangeUser(-0.1,5.1);
-	mg->GetXaxis()->SetTitle("X0");
+	}
+	mg->GetXaxis()->SetTitle("Number of X_{0}");
+	mg->GetXaxis()->SetTitleSize(0.045);
 	mg->GetYaxis()->SetTitle("Efficiency");
-	mg->SetTitle(plot_type.c_str());
+	mg->GetYaxis()->SetTitleSize(0.045);
+	//	mg->SetTitle(plot_type.c_str());
+	mg->SetMaximum(1);
+	mg->SetMinimum(0);
       }
     else
       {
-	mg->GetXaxis()->SetRangeUser(-0.1, 50);
+	mg->SetTitle("Electron Beam 50 GeV");
+	mg->GetXaxis()->SetRangeUser(-1., 46.);
 	mg->GetXaxis()->SetTitle("Angle (degrees)");
+	mg->GetXaxis()->SetTitleSize(0.045);
 	mg->GetYaxis()->SetTitle("Efficiency");
-	mg->SetTitle(plot_type.c_str());
+	mg->GetYaxis()->SetTitleSize(0.045);
+	mg->GetYaxis()->SetTitleOffset(1.12); //damned root
+	//	mg->SetTitle(plot_type.c_str());
+	mg->SetMaximum(0.8);
+	mg->SetMinimum(0.4);
+	c->SetCanvasSize(500,400);
       }
 
-    mg->SetMaximum(1);
-    mg->SetMinimum(0);
     mg->Draw("APL");  
     legC->Draw("same");
+    banner4Plot();
+    c->Update();
 
     c->Print(plot_name, "pdf");
     sprintf(plot_name, "final_plots/efficiency_%s.png", plot_type.c_str());
