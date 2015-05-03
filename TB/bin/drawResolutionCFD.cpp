@@ -70,7 +70,7 @@ int main(int argc, char** argv)
   TLegend *legC;
 
   if(plot_type == "HVScanON"){
-    legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
+    legC = new TLegend(0.15,0.60,0.35,0.85,NULL,"brNDC");
 
     inF_MiB3_ON = TFile::Open("plots/resCFD_studies/MiB3_HV_HVScan2.root");
     inF_MiB3_OFF = TFile::Open("plots/resCFD_studies/MiB3_HV_HVScan7.root");
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
 
 
     legC->SetTextFont(42);
-    legC->SetTextSize(0.03);
+    legC->SetTextSize(0.048);
     legC->SetFillColor(kWhite);
     legC->SetLineColor(kWhite);
     legC->SetShadowColor(kWhite);
@@ -157,9 +157,9 @@ int main(int argc, char** argv)
     mg->SetTitle("Electron Beam 50 GeV");
     mg->GetXaxis()->SetRangeUser(1400,3400);
     mg->GetXaxis()->SetTitle("Bias voltage (V)");
-    mg->GetXaxis()->SetTitleSize(0.045);
-    mg->GetYaxis()->SetTitle("Time Resolution (ps, trigger included)");
-    mg->GetYaxis()->SetTitleSize(0.045);
+    mg->GetXaxis()->SetTitleSize(0.048);
+    mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
+    mg->GetYaxis()->SetTitleSize(0.048);
     mg->SetMaximum(100);
     mg->SetMinimum(0);
     mg->Draw("AP");  
@@ -232,7 +232,7 @@ int main(int argc, char** argv)
 
 
     legC->SetTextFont(42);
-    legC->SetTextSize(0.03);
+    legC->SetTextSize(0.045);
     legC->SetFillColor(kWhite);
     legC->SetLineColor(kWhite);
     legC->SetShadowColor(kWhite);
@@ -265,9 +265,9 @@ int main(int argc, char** argv)
     mg->SetTitle("Electron Beam 50 GeV");
     mg->GetXaxis()->SetRangeUser(1400,3400);
     mg->GetXaxis()->SetTitle("Bias voltage (V)");
-    mg->GetXaxis()->SetTitleSize(0.045);
-    mg->GetYaxis()->SetTitle("Time Resolution (ps, trigger included)");
-    mg->GetYaxis()->SetTitleSize(0.045);
+    mg->GetXaxis()->SetTitleSize(0.048);
+    mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
+    mg->GetYaxis()->SetTitleSize(0.048);
     mg->SetMaximum(100);
     mg->SetMinimum(0);
     mg->Draw("AP");  
@@ -286,7 +286,7 @@ int main(int argc, char** argv)
   }
 
   else {
-    legC = new TLegend(0.45,0.70,0.65,0.85,NULL,"brNDC");
+    legC = new TLegend(0.45,0.60,0.65,0.80,NULL,"brNDC");
 
     TGraphErrors* eff_MiB3;
     TGraphErrors* eff_enSEE;
@@ -364,7 +364,7 @@ int main(int argc, char** argv)
     eff_enSEE->SetMarkerSize(0.7);
     
     legC->SetTextFont(42);
-    legC->SetTextSize(0.03);
+    legC->SetTextSize(0.04);
     legC->SetFillColor(kWhite);
     legC->SetLineColor(kWhite);
     legC->SetShadowColor(kWhite);
@@ -419,7 +419,7 @@ int main(int argc, char** argv)
 	  mg->GetXaxis()->SetRangeUser(-0.1,5.1);
 	}
 	mg->GetXaxis()->SetTitle("Number of X_{0}");
-	mg->GetYaxis()->SetTitle("Time Resolution (ps, trigger included)");
+	mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
 	mg->GetXaxis()->SetTitleSize(0.045);
 	mg->GetYaxis()->SetTitleSize(0.045);
 	//	mg->SetTitle(plot_type.c_str());
@@ -429,7 +429,7 @@ int main(int argc, char** argv)
 	mg->SetTitle("Electron Beam 50 GeV");
 	mg->GetXaxis()->SetRangeUser(-0.1, 50);
 	mg->GetXaxis()->SetTitle("Angle (degrees)");
-	mg->GetYaxis()->SetTitle("Time Resolution (ps, trigger included)");
+	mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
 	mg->GetXaxis()->SetTitleSize(0.045);
 	mg->GetYaxis()->SetTitleSize(0.045);
 	//	mg->SetTitle(plot_type.c_str());
