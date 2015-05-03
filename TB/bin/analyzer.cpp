@@ -540,10 +540,10 @@ int main(int argc, char** argv)
         TH1F* h_resCFD = new TH1F(h_resCFD_name, "Electron Beam 50 GeV", 250, -1, 1);
 	h_resCFD->GetXaxis()->SetTitle("time_{MCP}-time_{TRIG} (ns)");
 	h_resCFD->GetYaxis()->SetTitle("Entries");
-	h_resCFD->GetXaxis()->SetTitleSize(0.045);
-	h_resCFD->GetYaxis()->SetTitleSize(0.045);
-	h_resCFD->GetXaxis()->SetTitleOffset(1.06);
-	h_resCFD->GetYaxis()->SetTitleOffset(1.06);
+	h_resCFD->GetXaxis()->SetTitleSize(0.05);
+	h_resCFD->GetYaxis()->SetTitleSize(0.05);
+	h_resCFD->GetXaxis()->SetTitleOffset(0.9);
+	h_resCFD->GetYaxis()->SetTitleOffset(0.9);
         TF1* f_resCFD = new TF1(f_resCFD_name, "gausn", -1, 1);
         TProfile* pr_timeCFD_vs_TOT;
         TProfile* pr_timeCFD_vs_ampMaxCorr;
