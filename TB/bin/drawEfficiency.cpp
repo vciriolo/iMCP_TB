@@ -73,7 +73,7 @@ int main(int argc, char** argv)
   TLegend *legC;
 
   if(plot_type == "HVScan"){
-    legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
+    legC = new TLegend(0.12,0.62,0.40,0.87,NULL,"brNDC");
 
     inF_MiB3_ON = TFile::Open("plots/efficiency_studies/MiB3_HV_HVScan2.root");
     inF_MiB3_OFF = TFile::Open("plots/efficiency_studies/MiB3_HV_HVScan7.root");
@@ -127,7 +127,7 @@ int main(int argc, char** argv)
 
 
     legC->SetTextFont(42);
-    legC->SetTextSize(0.03);
+    legC->SetTextSize(0.034);
     legC->SetFillColor(kWhite);
     legC->SetLineColor(kWhite);
     legC->SetShadowColor(kWhite);
@@ -161,9 +161,9 @@ int main(int argc, char** argv)
     mg->SetTitle("Electron Beam 50 GeV");
     mg->GetXaxis()->SetRangeUser(1200,3400);
     mg->GetXaxis()->SetTitle("Bias Voltage (V)");
-    mg->GetXaxis()->SetTitleSize(0.045);
+    mg->GetXaxis()->SetTitleSize(0.05);
     mg->GetYaxis()->SetTitle("Efficiency");
-    mg->GetYaxis()->SetTitleSize(0.045);
+    mg->GetYaxis()->SetTitleSize(0.05);
     mg->SetMaximum(1);
     mg->SetMinimum(0);
     mg->Draw("APL");  
@@ -183,7 +183,7 @@ int main(int argc, char** argv)
 
   else {
 
-    legC = new TLegend(0.45,0.15,0.7,0.32,NULL,"brNDC");
+    legC = new TLegend(0.4,0.15,0.65,0.42,NULL,"brNDC");
 
     TGraphErrors* eff_MiB3;
     TGraphErrors* eff_enSEE;
@@ -261,7 +261,7 @@ int main(int argc, char** argv)
     eff_enSEE->SetMarkerSize(0.9);
     
     legC->SetTextFont(42);
-    legC->SetTextSize(0.03);
+    legC->SetTextSize(0.037);
     legC->SetFillColor(kWhite);
     legC->SetLineColor(kWhite);
     legC->SetShadowColor(kWhite);
@@ -316,9 +316,9 @@ int main(int argc, char** argv)
 	  mg->GetXaxis()->SetRangeUser(-0.1,5.1);
 	}
 	mg->GetXaxis()->SetTitle("Number of X_{0}");
-	mg->GetXaxis()->SetTitleSize(0.045);
+	mg->GetXaxis()->SetTitleSize(0.046);
 	mg->GetYaxis()->SetTitle("Efficiency");
-	mg->GetYaxis()->SetTitleSize(0.045);
+	mg->GetYaxis()->SetTitleSize(0.046);
 	//	mg->SetTitle(plot_type.c_str());
 	mg->SetMaximum(1);
 	mg->SetMinimum(0);
