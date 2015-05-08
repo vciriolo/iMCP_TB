@@ -59,6 +59,7 @@ int main (int argc, char** argv)
     int channel = atoi (argv[3]);
     int firstEntry = atoi (argv[4]);
     int nEvents = atoi (argv[5]);
+    int trigPos = atoi(argv[6]);
     nEvents += firstEntry;
 
     std::cout << " >>> run = " << run << std::endl;
@@ -78,8 +79,8 @@ int main (int argc, char** argv)
 
     int triggerTime;
       //--reading wire chamber from other tree --
-      TChain* t1 = new TChain("outputTree");
-      InitTree2(t1);
+      TChain* tC = new TChain("outputTree");
+      InitTree2(tC);
 
       //---Chain
       TChain* chain = new TChain("H4tree");
@@ -109,7 +110,7 @@ int main (int argc, char** argv)
 
 	if (tTemp->GetEntries() == tTempH4->GetEntries())
 	  {
-	    t1->Add(iRun_tW);	
+	    tC->Add(iRun_tW);	
 	    chain->Add(iRun_str);	
 	  }
 	else
@@ -120,7 +121,7 @@ int main (int argc, char** argv)
     system("rm listTemp2.txt");
 
     int ampMaxTimeTemp;
-    int timeCF;
+    int timeCF,t1,t2;
     float tStart, tStop;
     TLine *line;    
     TLine *line2;
@@ -146,15 +147,8 @@ int main (int argc, char** argv)
 	  for(int iCh=0; iCh<18; iCh++) digiCh[iCh].clear();
 
 	  //---Read digitizer samples
-	  for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
-	    if (digiGroup[iSample] == 0)
-	      digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
-	    else if (digiGroup[iSample] == 1 && digiChannel[iSample] == 0 && channel == 9) 
-	      digiCh[9].push_back(digiSampleValue[iSample]);
-	    else if (digiGroup[iSample] == 1 && digiChannel[iSample] == 8 && channel == 17) {
-	      digiCh[17].push_back(digiSampleValue[iSample]);
-	    }
-	   	    
+	    for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
+	      digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(digiSampleValue[iSample]);
 	    //	    if(iSample > 1024*10 - 1) break;
 	    // std::cout << " >>> iSample = " << iSample << std::endl;
 	    // std::cout << " >>> digiChannel[iSample] = " << digiChannel[iSample] << std::endl;
@@ -163,23 +157,23 @@ int main (int argc, char** argv)
 	  int i=0;
 
 	  //---loop over MPC's channels                                                                                                               
-    triggerTime=100;
+	  triggerTime=100;
 
 	  if (iEntry>=firstEntry) {
 
-
-	    SubtractBaseline(5, 25, &digiCh[4]);
-	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[4], 1.)/0.2);
+	    SubtractBaseline(5, 25, &digiCh[trigPos]);
+	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[trigPos], 1.)/0.2);
 	    if (triggerTime<100 || triggerTime >800)  continue;
+		int ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[channel], 1)/0.2;
 
-		  int intTrigger = -ComputeIntegral(triggerTime-18, triggerTime+12, &digiCh[4]);              
-		  if (intTrigger<125) continue;
+		  t1 = ampMaxTimeTemp-13;
+		  t2 = ampMaxTimeTemp+12;
 
-		ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[channel], 1)/0.2;
-		if (channel!=4)  SubtractBaseline(ampMaxTimeTemp-40, ampMaxTimeTemp-20, &digiCh[channel]);
+		if (channel!=trigPos)  SubtractBaseline(t1-27, t1-7, &digiCh[channel]);
+		  if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024) ampMaxTimeTemp = AmpMax(t1, t2, &digiCh[channel]);
+		  ampMaxTimeTemp = AmpMax(47, 500, &digiCh[channel]);
 
-		int ampMax = AmpMax(ampMaxTimeTemp-13, ampMaxTimeTemp+12, &digiCh[channel]);
-		timeCF = TimeConstFracAbs(ampMaxTimeTemp-23, ampMaxTimeTemp+22, &digiCh[channel], 0.5, ampMax);		    
+		  timeCF = TimeConstFracAbs(t1-10, t2+10, &digiCh[channel], 0.5, ampMaxTimeTemp);		    
 		    //		    if (-AmpMax(5, 25, &digiCh[channel])<-200)  std::cout<<iEntry<<" "<<-AmpMax(5, 25, &digiCh[channel])<<std::endl;
 		if (channel==8 || channel==17) {
 		  TimeOverThreshold(200, 1000, &digiCh[channel], -150., tStart, tStop);
@@ -199,26 +193,26 @@ int main (int argc, char** argv)
 	  // else gWF->Draw("PL,same");      
       }
 
-      if (channel!=4) {
-      line = new TLine(ampMaxTimeTemp-13, -2000, ampMaxTimeTemp-13, 200);
-      line2 = new TLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
-      line3 = new TLine(ampMaxTimeTemp-20, -2000, ampMaxTimeTemp-20, 200);
-      line4 = new TLine(ampMaxTimeTemp-40, -2000, ampMaxTimeTemp-40, 200);
+      if (channel!=trigPos) {
+      line = new TLine(t1, -2000, t1, 200);
+      line2 = new TLine(t2, -2000, t2, 200);
+      line3 = new TLine(t1-7, -2000, t1-7, 200);
+      line4 = new TLine(t1-27, -2000, t1-27, 200);
       line5 = new TLine(triggerTime-50, -2000, triggerTime-50, 200);
       line6 = new TLine(triggerTime+50, -2000, triggerTime+50, 200);
       line7 = new TLine(timeCF, -2000, timeCF, 200);
       
       mgWF->Draw("apl");
-      line->DrawLine(ampMaxTimeTemp-13, -2000, ampMaxTimeTemp-13, 200);
+      line->DrawLine(t1, -2000, t1, 200);
       line->SetLineColor(2);
       line->Draw("same");
-      line2->DrawLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
+      line2->DrawLine(t2, -2000, t2, 200);
       line2->SetLineColor(2);
       line2->Draw("same");
-      line3->DrawLine(ampMaxTimeTemp-20, -2000, ampMaxTimeTemp-20, 200);
+      line3->DrawLine(t1-7, -2000, t1-7, 200);
       line3->SetLineColor(4);
       line3->Draw("same");
-      line4->DrawLine(ampMaxTimeTemp-40, -2000, ampMaxTimeTemp-40, 200);
+      line4->DrawLine(t1-27, -2000, t1-27, 200);
       line4->SetLineColor(4);
       line4->Draw("same");
       line7->DrawLine(timeCF, -2000, timeCF, 200);
@@ -234,8 +228,8 @@ int main (int argc, char** argv)
       }
 
       else {
-      line = new TLine(ampMaxTimeTemp-13, -2000, ampMaxTimeTemp-13, 200);
-      line2 = new TLine(ampMaxTimeTemp+12, -2000, ampMaxTimeTemp+12, 200);
+      line = new TLine(t1, -2000, t1, 200);
+      line2 = new TLine(t2, -2000, t2, 200);
       line3 = new TLine(5, -2000, 5, 200);
       line4 = new TLine(25, -2000, 25, 200);
       line5 = new TLine(triggerTime-50, -2000, triggerTime-50, 200);
