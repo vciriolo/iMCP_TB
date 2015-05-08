@@ -61,13 +61,14 @@ int main (int argc, char** argv)
     std::string inputFolder = argv[2];
     int nChannels = atoi (argv[3]);
     std::string outputFile = argv[4];
+    int trigPos = atoi(argv[5]);
 
     //---------output tree----------------
     TFile* outROOT = TFile::Open(("ntuples/reco_"+outputFile+".root").c_str(),"recreate");  
     outROOT->cd();
 
-    TProfile** wf_promed = new TProfile*[11];
-    for(int iCh=0; iCh<11; ++iCh) wf_promed[iCh] = new TProfile(Form("wf_promed_%d",iCh), "", 102400, 0., 1024.);
+    TProfile** wf_promed = new TProfile*[18];
+    for(int iCh=0; iCh<18; ++iCh) wf_promed[iCh] = new TProfile(Form("wf_promed_%d",iCh), "", 102400, 0., 1024.);
 
     TTree* outTree = new TTree("reco_tree", "reco_tree");
     outTree->SetDirectory(0);
@@ -98,30 +99,20 @@ int main (int argc, char** argv)
       //-----fill maps--------
       for (int count=0; count<nChannels; count++)   //read exactly nChannels lines of the cfg file -> be careful to give the right number in input!!!!
 	{
-	  if (count==10) {
-	    PCOn.insert(std::make_pair(10,-1)); 
-	    HVVal.insert(std::make_pair(10,-1)); 
-	    MCPName.insert(std::make_pair(10,string("trig2"))); 	  
-	    continue;
-	  }
-
 	  inputCfg >> run >> chNumber >> HVtemp >> X0temp >> PC >> name;
 
 	  PCOn.insert(std::make_pair(chNumber,PC)); 
 	  HVVal.insert(std::make_pair(chNumber,HVtemp)); 
-	  if (count==8)
-	    MCPName.insert(std::make_pair(chNumber,string("trig1"))); 
-	  else
-	    MCPName.insert(std::make_pair(chNumber,name)); 
+	  MCPName.insert(std::make_pair(chNumber,name)); 
 	}
 
       //-----Definitions
-      vector<float> digiCh[11];
-      float timeCF[11], timeCFcorr[11], timeCF30[11];
-      float timeOT[11], timeStart[11], timeStop[11], ampMaxT[11];
-      float timeStart_1000[11], timeStop_1000[11], timeStart_150[11], timeStop_150[11];
-      float timeStart_200[11], timeStop_200[11], timeStart_500[11], timeStop_500[11], timeStart_300[11], timeStop_300[11];
-      float intBase[11], intSignal[11], intSignalcorr[11], ampMax[11], ampMaxcorr[11];
+      vector<float> digiCh[18];
+      float timeCF[18], timeCFcorr[18], timeCF30[18];
+      float timeOT[18], timeStart[18], timeStop[18], ampMaxT[18];
+      float timeStart_1000[18], timeStop_1000[18], timeStart_150[18], timeStop_150[18];
+      float timeStart_200[18], timeStop_200[18], timeStart_500[18], timeStop_500[18], timeStart_300[18], timeStop_300[18];
+      float intBase[18], intSignal[18], intSignalcorr[18], ampMax[18], ampMaxcorr[18];
       ///int fibreX[8], hodoYchannels[8];
       float tStart, tStop;
 
@@ -210,52 +201,37 @@ int main (int argc, char** argv)
 	       continue;
 	    }
 
-	    /*	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
+	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
 		{
                     if(adcBoard[iCh] == 1 && adcChannel[iCh] == 0) 
                         sci_front_adc = adcData[iCh];
-		    if(adcBoard[iCh] == 1 && adcChannel[iCh] >= HODOX_ADC_START_CHANNEL &&
+		    /*		    if(adcBoard[iCh] == 1 && adcChannel[iCh] >= HODOX_ADC_START_CHANNEL &&
 		       adcChannel[iCh] <= HODOX_ADC_END_CHANNEL)
 			fibreX[(adcChannel[iCh]-HODOX_ADC_START_CHANNEL)] = adcData[iCh];
 		    if(adcBoard[iCh] == 1 && adcChannel[iCh] >= HODOY_ADC_START_CHANNEL &&
 		       adcChannel[iCh] <= HODOY_ADC_END_CHANNEL)
 			fibreY[(adcChannel[iCh]-HODOY_ADC_START_CHANNEL)] = adcData[iCh];
+		    */
 		}
-	    */	    
+	    	    
 
 	    //---Read digitizer samples
 	    //	    std::cout << " nDigiSamples = " << nDigiSamples << std::endl;
 	    for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
-	      if (digiGroup[iSample] == 0)
-		digiCh[digiChannel[iSample]].push_back(digiSampleValue[iSample]);
-	      else if (digiGroup[iSample] == 1 && digiChannel[iSample] == 0)
-		digiCh[9].push_back(digiSampleValue[iSample]);
-	      else if (digiGroup[iSample] == 1 && digiChannel[iSample] == 8) 
-		digiCh[10].push_back(digiSampleValue[iSample]);
-		//	      if(iSample > 1024*10 - 1) break;
+	      digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(digiSampleValue[iSample]);
 	    }
 
-
 	    int triggerTime=100;                  //DON'T CHANGE THIS!!!!!
-	    SubtractBaseline(5, 25, &digiCh[4]);  //trigger baseline subtraction
-	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[4], 1.)/0.2); //trigger
+	    //SubtractBaseline(5, 25, &digiCh[MCPList.at(trig1)]);  //trigger baseline subtraction
+	    //	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[MCPList.at(trig1)], 1.)/0.2); //trigger
+	    SubtractBaseline(5, 25, &digiCh[trigPos]);  //trigger baseline subtraction
+	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[trigPos], 1.)/0.2); //trigger
 	    if (triggerTime<100 || triggerTime >800)  continue;
 
 	    //---loop over MPC's channels
 	    for(int iCh=0; iCh<nChannels; iCh++)
 	      {
-		//Save infos for CeF3
-		//		std::cout << " INIZIO CeF3 " << std::endl;
-		if (iCh<4) {
-		  SubtractBaseline(5, 25, &digiCh[iCh]);  //baseline subtraction
-		  ampMax[iCh] = AmpMax(51, 1000, &digiCh[iCh]);
-		  intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
-		  intSignal[iCh] = ComputeIntegral(51, 1000, &digiCh[iCh]);
-		  timeCF[iCh] = TimeConstFracAbs(51, 1000, &digiCh[iCh], 0.5, ampMax[iCh]);
-		  timeOT[iCh] = TimeOverThreshold(51, 1000, &digiCh[iCh], -1000., tStart, tStop);
-		  //		  if( iCh == 3) std::cout << " FINE CeF3 " << std::endl;
-		}
-		else if (iCh==8 || iCh==10) { //clock digitization info
+		if (iCh==8 || iCh==17) { //clock digitization info
 		  SubtractBaseline(5, 25, &digiCh[iCh]);  //baseline subtraction
 		  ampMax[iCh] = AmpMax(51, 1000, &digiCh[iCh]);
 		  intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
@@ -299,7 +275,7 @@ int main (int argc, char** argv)
 		  int t2 = ampMaxTimeTemp+12;
 		  ampMaxT[iCh]=ampMaxTimeTemp;
 		
-		  if (iCh!=4)SubtractBaseline(t1-27, t1-7, &digiCh[iCh]);  //subtract baseline immediately before pulse		
+		  if (iCh!=trigPos) SubtractBaseline(t1-27, t1-7, &digiCh[iCh]);  //subtract baseline immediately before pulse		
 		  intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
 
 		  //fill pro-medio
@@ -401,7 +377,7 @@ int main (int argc, char** argv)
 		  */
 		}
 	      }
-	    
+
 	    //--------dump ntuple - impulses are negative, invert the sign
 	    for (int iCh=0; iCh<nChannels; iCh++)
 	      {
@@ -425,13 +401,18 @@ int main (int argc, char** argv)
 		    amp_max_corr[MCPList.at(MCPName.at(iCh))]   = ampMaxcorr[iCh];
 		    amp_max_time[MCPList.at(MCPName.at(iCh))]   = ampMaxT[iCh]*0.2;
 		    charge[MCPList.at(MCPName.at(iCh))]    = -intSignal[iCh];
+		    /*                    if (strcmp((MCPName.at(iCh)).c_str(),"MiB3")==0){
+		      std::cout<<(MCPName.at(iCh)).c_str()<<" "<<iCh<<" "<<-intSignal[iCh]<<std::endl;
+		      getchar();
+		      }*/
+
 		    charge_corr[MCPList.at(MCPName.at(iCh))]    = intSignalcorr[iCh];
 		    baseline[MCPList.at(MCPName.at(iCh))]  = -intBase[iCh];
 
 		    isPCOn[MCPList.at(MCPName.at(iCh))]      = PCOn.at(iCh);
 		    HV[MCPList.at(MCPName.at(iCh))]          = HVVal.at(iCh);
 		    if (strcmp((MCPName.at(iCh)).c_str(),trig1.c_str())==0)          isTrigger[MCPList.at(MCPName.at(iCh))] = 1;
-		    //		    else if (strcmp((MCPName.at(iCh)).c_str(),trig2.c_str())==0)     isTrigger[MCPList.at(MCPName.at(iCh))] = 2;
+		    else if (strcmp((MCPName.at(iCh)).c_str(),trig2.c_str())==0)     isTrigger[MCPList.at(MCPName.at(iCh))] = 2;
 		    else                                           isTrigger[MCPList.at(MCPName.at(iCh))] = 0;
 		  }
 
