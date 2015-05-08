@@ -57,7 +57,7 @@ int main (int argc, char** argv)
   std::cout<<"NB: MCP is analyzed only if HV>treshold and PC is ON---------"<<std::endl;
 
   int SBTreshold=1000;
-  int nChannels=9;
+  int nChannels=18;
   int HVtresh=2000;
 
   std::string inputFileName = argv[1];  
@@ -87,10 +87,10 @@ int main (int argc, char** argv)
   TLegend* leg = new TLegend(0.88,0.45,0.98,0.65);
   TGraph* g_SoB[20];
 
-  TF1* base[10];
-  TF1* base2sig[10];
+  TF1* base[18];
+  TF1* base2sig[18];
 
-  TCanvas* baseFit[10];
+  TCanvas* baseFit[18];
   //------analyze the good channels and compute the charge tresholds--------
   std::cout<<"\n--------------------------------\n-->OK, now computing tresholds:"<<std::endl;
   for (int iCh=0; iCh<nChannels; iCh++)
