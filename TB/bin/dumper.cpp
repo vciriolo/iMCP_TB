@@ -1,9 +1,6 @@
 /*******************************************************************************
 THIS PROGRAM READ THE RAW DATA AND PRODUCE THE RECO FILE USED FOR THE ANALYSIS
 -
-    compile with --> c++ -o dumper bin/dumper.cpp `root-config --cflags --glibs`
-    run with --> ./dumper cfg/example_cfg_file.cfg /gwteray/users/marzocchi/iMCP/dataTrees 9 prova
-                    where arguments are:  -cfg_file  -inputFolder  -# of channels  -suffix for the output File
 
 BE CAREFUL: the number of channels MUST coincide with the number of channel in the cfg file
 
