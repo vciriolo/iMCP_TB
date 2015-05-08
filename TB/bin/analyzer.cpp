@@ -57,7 +57,8 @@ int main(int argc, char** argv)
     std::map <int,int> treshold;
     int ch, tresh;
     int nChannels=0;
-    int trigPos1 = -1;  //positions of the trigger chamber in the reco tree 
+    int trigPos1 = -1;  //position of the trigger chamber in the reco tree 
+    int trigPos2 = -1;  //position of 2nd the trigger chamber in the reco tree 
     int clockPos1 = -1, clockPos2 = -1;
 
     //---Open cfg file and fill map with treshold for each channel---
@@ -193,6 +194,7 @@ int main(int argc, char** argv)
 	    for (int i=0; i<nChannels; i++)  //save trigger position!
 	      {
 		if (isTrigger[i]==1)       trigPos1 = i;
+		if (isTrigger[i]==2)       trigPos2 = i;
 	      }
 	  }
 	}
@@ -211,6 +213,7 @@ int main(int argc, char** argv)
 	  if (iEntry==0) {
 	    for (int i=0; i<nChannels; i++){  //save trigger position!
 		if (isTrigger[i]==1)       trigPos1 = i;
+		if (isTrigger[i]==2)       trigPos2 = i;
 	    }
 	  }
 	}
@@ -393,6 +396,7 @@ int main(int argc, char** argv)
 	    for (int i=0; i<nChannels; i++)  //save trigger position!!
 	      {
 		if (isTrigger[i]==1)       trigPos1 = i;
+		if (isTrigger[i]==2)       trigPos2 = i;
 	      }
 	  }
 	}
@@ -497,8 +501,8 @@ int main(int argc, char** argv)
             sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
         else  
             sprintf(cut_scan, "X0 == %f", X0Step.at(i));
-        if(MCPNumber == 2) 
-            sprintf(str_cut_saturated, "run_id > 796 && amp_max[%d] > 4000", MCPNumber);
+	//        if(MCPNumber == 2) 
+	//            sprintf(str_cut_saturated, "run_id > 796 && amp_max[%d] > 4000", MCPNumber);
         //---and print infos
         char var_name[3] = "X0";
         if(TString(scanType).Contains("HV") == 1)    
@@ -655,39 +659,6 @@ int main(int argc, char** argv)
 	    }
 	    else 
             {
-	      if (TString(label).Contains("scanX0_HVHigh50GeV")) { //correct efficiencies at 0X0
-		if (TString(MCP).Contains("ZStack2") && X0Step.at(i)==0.) {
-		  eff = 0.6635633;
-		  e_eff = 0.009062424;
-		}
-		else if (TString(MCP).Contains("enSEE") && X0Step.at(i)==0.) {
-		  eff = 0.6846591;
-		  e_eff = 0.009360672;
-		}
-		else if (TString(MCP).Contains("ZStack1") && X0Step.at(i)==0.) {
-		  eff = 0.6325325;
-		  e_eff = 0.009567964;
-		}
-		else if (TString(MCP).Contains("MiB3") && X0Step.at(i)==0.) {
-		  eff = 0.5150362;
-		  e_eff = 0.009750873;
-		}
-	      } 
-	      if (TString(label).Contains("AngScan_HVHigh")) { //correct efficiencies at 0 degrees for angular scan
-		if (TString(MCP).Contains("enSEE") ) {
-		  eff -= 0.08;
-		  //		  e_eff = 0.009360672;
-		}
-		else if (TString(MCP).Contains("ZStack1") ) {
-		  eff -= 0.034;
-		  //		  e_eff = 0.009567964;
-		}
-		else if (TString(MCP).Contains("MiB3") ) {
-		  eff -= 0.08;
-		  if (X0Step.at(i)==0.) eff-=0.012;
-		  //		  e_eff = 0.009750873;
-		}
-	      }
 	      printf("%.3f\t%.3f\t%.3f\t%.3f\n", X0Step.at(i), eff, 0., e_eff);
 	      outputFile << X0Step.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
 	      g_eff->SetPoint(i, X0Step.at(i), eff);
@@ -741,10 +712,10 @@ int main(int argc, char** argv)
                 sprintf(TOT_diff, "(time_stop_500[%d]-time_start_500[%d])", MCPNumber, MCPNumber);
             //---create variables
             char t_CF_diff[100];
-	    if (strcmp((inverted_MCPList.at(MCPNumber)).c_str(),"MiB3")==0)
-	      sprintf(t_CF_diff, "(time_CF_corr[%d]-(time_CF_corr[%d]-time_CF_corr[%d])-time_CF_corr[%d])", MCPNumber, clockPos2, clockPos1, trigPos1);
-	    else
-	      sprintf(t_CF_diff, "(time_CF_corr[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
+	    //	    if (strcmp((inverted_MCPList.at(MCPNumber)).c_str(),"MiB3")==0)
+	    //   sprintf(t_CF_diff, "(time_CF_corr[%d]-(time_CF_corr[%d]-time_CF_corr[%d])-time_CF_corr[%d])", MCPNumber, clockPos2, clockPos1, trigPos1);
+	    // else
+	    sprintf(t_CF_diff, "(time_CF_corr[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
 	    sprintf(var_timeCFD_vs_TOT, "%s:%s>>%s", t_CF_diff, TOT_diff, pr_timeCFD_vs_TOT_name);
             //---correction
             nt->Draw(var_timeCFD_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
@@ -833,18 +804,18 @@ int main(int argc, char** argv)
             }
             //---create variables
             char t_start_diff[100];
-	    if (strcmp((inverted_MCPList.at(MCPNumber)).c_str(),"MiB3")==0)
-	      sprintf(t_start_diff, "(time_start_150[%d]-(time_start_150[%d]-time_start_150[%d])-time_CF_corr[%d])", MCPNumber, clockPos2, clockPos1, trigPos1);
-	    else
-	      sprintf(t_start_diff, "(time_start_150[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
+	    //	    if (strcmp((inverted_MCPList.at(MCPNumber)).c_str(),"MiB3")==0)
+	    //  sprintf(t_start_diff, "(time_start_150[%d]-(time_start_150[%d]-time_start_150[%d])-time_CF_corr[%d])", MCPNumber, clockPos2, clockPos1, trigPos1);
+	    //else
+	    sprintf(t_start_diff, "(time_start_150[%d]-time_CF_corr[%d])", MCPNumber, trigPos1);
             //---change TOT for X0 runs
             if(strcmp(scanType, "X0") == 0 && X0Step.at(i) != 0 && MCPNumber < 3) 
             {
                 sprintf(TOT_diff, "(time_stop_500[%d]-time_start_500[%d])", MCPNumber, MCPNumber);
-		if (strcmp((inverted_MCPList.at(MCPNumber)).c_str(),"MiB3")==0)
-		  sprintf(t_start_diff, "(time_start_500[%d]-(time_start_500[%d]-time_start_500[%d])-time_CF_corr[%d])", MCPNumber,clockPos2,clockPos1,trigPos1);
-		else
-		  sprintf(t_start_diff, "(time_start_500[%d]-time_CF_corr[%d])", MCPNumber,trigPos1);
+		//	if (strcmp((inverted_MCPList.at(MCPNumber)).c_str(),"MiB3")==0)
+		//  sprintf(t_start_diff, "(time_start_500[%d]-(time_start_500[%d]-time_start_500[%d])-time_CF_corr[%d])", MCPNumber,clockPos2,clockPos1,trigPos1);
+		//else
+		sprintf(t_start_diff, "(time_start_500[%d]-time_CF_corr[%d])", MCPNumber,trigPos1);
             }
             sprintf(var_timeLED_vs_TOT, "%s:%s>>%s", t_start_diff, TOT_diff, pr_timeLED_vs_TOT_name);
             //---correction
