@@ -1,37 +1,37 @@
 #include "../interface/init_Reco_Tree.h"
 
 int event;
-float                 time_CF[11];
-float                 time_CF_corr[11];
-float                 time_CF30[11];
-float                 time_OT[11];
-float                 time_start[11];
-float                 time_stop[11];
-float                 time_start_1000[11];
-float                 time_stop_1000[11];
-float                 time_start_150[11];
-float                 time_stop_150[11];
-float                 time_start_200[11];
-float                 time_stop_200[11];
-float                 time_start_500[11];
-float                 time_stop_500[11];
-float                 time_start_300[11];
-float                 time_stop_300[11];
-float                 time_Max[11];
-float                 amp_max[11];
-float                 amp_max_corr[11];
-float                 amp_max_time[11];
-float                 charge[11];
-float                 charge_corr[11];
-float                 baseline[11];
+float                 time_CF[18];
+float                 time_CF_corr[18];
+float                 time_CF30[18];
+float                 time_OT[18];
+float                 time_start[18];
+float                 time_stop[18];
+float                 time_start_1000[18];
+float                 time_stop_1000[18];
+float                 time_start_150[18];
+float                 time_stop_150[18];
+float                 time_start_200[18];
+float                 time_stop_200[18];
+float                 time_start_500[18];
+float                 time_stop_500[18];
+float                 time_start_300[18];
+float                 time_stop_300[18];
+float                 time_Max[18];
+float                 amp_max[18];
+float                 amp_max_corr[18];
+float                 amp_max_time[18];
+float                 charge[18];
+float                 charge_corr[18];
+float                 baseline[18];
+int                   sci_front_adc;
 /*int                   fibreX[8];
 int                   fibreY[8];
-int                   sci_front_adc;
 */
 int                   run_id;
-int                   isPCOn[11];
-int                   HV[11];
-int                   isTrigger[11];
+int                   isPCOn[18];
+int                   HV[18];
+int                   isTrigger[18];
 float                 X0;
 float tdcX;
 float tdcY;
@@ -69,10 +69,10 @@ TBranch        *b_amp_max_time;   //!
 TBranch        *b_baseline;   //!   
 TBranch        *b_charge;   //!    
 TBranch        *b_charge_corr;   //!  
+TBranch        *b_sci_front_adc;   //! 
 /*
 TBranch        *b_fibreX;   //!  
 TBranch        *b_fibreY;   //!  
-TBranch        *b_sci_front_adc;   //! 
 */
 TBranch        *b_run_id;   //!   
 TBranch        *b_isPCOn;   //! 
@@ -98,42 +98,42 @@ void SetOutTree(TTree* outTree)
 {
   //---standard analysis branches
   outTree->Branch("event",&event,"event/I");
-  outTree->Branch("time_CF",&time_CF,"time_CF[11]/F");
-  outTree->Branch("time_CF_corr",&time_CF_corr,"time_CF_corr[11]/F");
-  outTree->Branch("time_CF30",&time_CF30,"time_CF30[11]/F");
-  outTree->Branch("time_OT",&time_OT,"time_OT[11]/F");
-  outTree->Branch("time_start",&time_start,"time_start[11]/F");
-  outTree->Branch("time_stop",&time_stop,"time_stop[11]/F");
-  outTree->Branch("time_start_1000",&time_start_1000,"time_start_1000[11]/F");
-  outTree->Branch("time_stop_1000",&time_stop_1000,"time_stop_1000[11]/F");
-  outTree->Branch("time_start_150",&time_start_150,"time_start_150[11]/F");
-  outTree->Branch("time_stop_150",&time_stop_150,"time_stop_150[11]/F");
-  outTree->Branch("time_start_200",&time_start_200,"time_start_200[11]/F");
-  outTree->Branch("time_stop_200",&time_stop_200,"time_stop_200[11]/F");
-  outTree->Branch("time_start_500",&time_start_500,"time_start_500[11]/F");
-  outTree->Branch("time_stop_500",&time_stop_500,"time_stop_500[11]/F");
-  outTree->Branch("time_start_300",&time_start_300,"time_start_300[11]/F");
-  outTree->Branch("time_stop_300",&time_stop_300,"time_stop_300[11]/F");
-  outTree->Branch("time_Max",&time_Max,"time_Max[11]/F");
-  outTree->Branch("amp_max",&amp_max,"amp_max[11]/F");
-  outTree->Branch("amp_max_corr",&amp_max_corr,"amp_max_corr[11]/F");
-  outTree->Branch("amp_max_time",&amp_max_time,"amp_max_time[11]/F");
-  outTree->Branch("charge",&charge,"charge[11]/F"); 
-  outTree->Branch("charge_corr",&charge_corr,"charge_corr[11]/F");
-  outTree->Branch("baseline",&baseline,"baseline[11]/F");
+  outTree->Branch("time_CF",&time_CF,"time_CF[18]/F");
+  outTree->Branch("time_CF_corr",&time_CF_corr,"time_CF_corr[18]/F");
+  outTree->Branch("time_CF30",&time_CF30,"time_CF30[18]/F");
+  outTree->Branch("time_OT",&time_OT,"time_OT[18]/F");
+  outTree->Branch("time_start",&time_start,"time_start[18]/F");
+  outTree->Branch("time_stop",&time_stop,"time_stop[18]/F");
+  outTree->Branch("time_start_1000",&time_start_1000,"time_start_1000[18]/F");
+  outTree->Branch("time_stop_1000",&time_stop_1000,"time_stop_1000[18]/F");
+  outTree->Branch("time_start_150",&time_start_150,"time_start_150[18]/F");
+  outTree->Branch("time_stop_150",&time_stop_150,"time_stop_150[18]/F");
+  outTree->Branch("time_start_200",&time_start_200,"time_start_200[18]/F");
+  outTree->Branch("time_stop_200",&time_stop_200,"time_stop_200[18]/F");
+  outTree->Branch("time_start_500",&time_start_500,"time_start_500[18]/F");
+  outTree->Branch("time_stop_500",&time_stop_500,"time_stop_500[18]/F");
+  outTree->Branch("time_start_300",&time_start_300,"time_start_300[18]/F");
+  outTree->Branch("time_stop_300",&time_stop_300,"time_stop_300[18]/F");
+  outTree->Branch("time_Max",&time_Max,"time_Max[18]/F");
+  outTree->Branch("amp_max",&amp_max,"amp_max[18]/F");
+  outTree->Branch("amp_max_corr",&amp_max_corr,"amp_max_corr[18]/F");
+  outTree->Branch("amp_max_time",&amp_max_time,"amp_max_time[18]/F");
+  outTree->Branch("charge",&charge,"charge[18]/F"); 
+  outTree->Branch("charge_corr",&charge_corr,"charge_corr[18]/F");
+  outTree->Branch("baseline",&baseline,"baseline[18]/F");
   
   //---hodoscope branches       
   //  outTree->Branch("fibreX",&fibreX,"fibreX[8]/I");
   //  outTree->Branch("fibreY",&fibreY,"fibreY[8]/I");
   
   //---global branches    
-  //  outTree->Branch("sci_front_adc",&sci_front_adc,"sci_front_adc/I");
+  outTree->Branch("sci_front_adc",&sci_front_adc,"sci_front_adc/I");
   outTree->Branch("run_id",&run_id,"run_id/I");
 
   //---additional branches
-  outTree->Branch("isPCOn",&isPCOn,"isPCOn[11]/I");
-  outTree->Branch("HV",&HV,"HV[11]/I");
-  outTree->Branch("isTrigger",&isTrigger,"isTrigger[11]/I");
+  outTree->Branch("isPCOn",&isPCOn,"isPCOn[18]/I");
+  outTree->Branch("HV",&HV,"HV[18]/I");
+  outTree->Branch("isTrigger",&isTrigger,"isTrigger[18]/I");
   outTree->Branch("X0",&X0,"X0/F");
 
   outTree->Branch("tdcX",&tdcX,"tdcX/F");
@@ -193,10 +193,10 @@ void InitRecoTree(TTree* nt)
   nt->SetBranchAddress("nhodoY1", &nhodoY1, &b_nhodoY1);
   nt->SetBranchAddress("nhodoX2", &nhodoX2, &b_nhodoX2);
   nt->SetBranchAddress("nhodoY2", &nhodoY2, &b_nhodoY2);
+  nt->SetBranchAddress("sci_front_adc", &sci_front_adc, &b_sci_front_adc);
 
   /*
   nt->SetBranchAddress("fibreX", &fibreX, &b_fibreX);
   nt->SetBranchAddress("fibreY", &fibreY, &b_fibreY);
-  nt->SetBranchAddress("sci_front_adc", &sci_front_adc, &b_sci_front_adc);
   */
 }
