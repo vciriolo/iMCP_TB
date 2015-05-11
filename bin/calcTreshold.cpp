@@ -109,12 +109,13 @@ int main (int argc, char** argv)
 	  base[iCh] = new TF1(fitName,"gaus",-1000,1000);
 	      
 	  char hSDraw[100], hBDraw[100], hBDrawFit[100];
-	  sprintf(hSDraw, "charge_corr[%d]>>%s", iCh, hSName);
+	  sprintf(hSDraw, "charge[%d]>>%s", iCh, hSName);
 	  sprintf(hBDraw, "baseline[%d]>>%s", iCh, hBName);
 	  sprintf(hBDrawFit, "baseline[%d]>>%s", iCh, hBNameFit);
 
 	  char cut[300];
-	  sprintf(cut, "isPCOn[%d]!=2 && HV[%d]>=%d && tdcX > -8 && tdcX < 0 && tdcY >-2 && tdcY < 6", iCh, iCh, HVtresh); 
+	  //	  sprintf(cut, "isPCOn[%d]!=2 && HV[%d]>=%d && tdcX > -8 && tdcX < 0 && tdcY >-2 && tdcY < 6", iCh, iCh, HVtresh); 
+	  sprintf(cut, "isPCOn[%d]!=2 && HV[%d]>=%d", iCh, iCh, HVtresh); 
 
 	  inputTree->Draw(hSDraw,cut,"goff");
 	  inputTree->Draw(hBDraw,cut);
