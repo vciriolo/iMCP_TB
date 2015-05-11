@@ -9,7 +9,7 @@ void Fill_MCPList (void)
       MCPList.insert(std::make_pair("GaAsEm",1));
       MCPList.insert(std::make_pair("MultiAlkEm",2));
       MCPList.insert(std::make_pair("Double9090",3));
-      MCPList.insert(std::make_pair("Double4040",4));
+      MCPList.insert(std::make_pair("Double9040",4));
       MCPList.insert(std::make_pair("clock1",5));
       MCPList.insert(std::make_pair("clock2",6));
       MCPList.insert(std::make_pair("Off1",7));
