@@ -31,6 +31,7 @@ int                   fibreY[8];
 int                   run_id;
 int                   isPCOn[18];
 int                   HV[18];
+int                   HV2[18];
 int                   isTrigger[18];
 float                 X0;
 float tdcX;
@@ -77,6 +78,7 @@ TBranch        *b_fibreY;   //!
 TBranch        *b_run_id;   //!   
 TBranch        *b_isPCOn;   //! 
 TBranch        *b_HV;   //!     
+TBranch        *b_HV2;   //!     
 TBranch        *b_isTrigger;
 TBranch        *b_X0;
 TBranch *b_tdcX;
@@ -133,6 +135,7 @@ void SetOutTree(TTree* outTree)
   //---additional branches
   outTree->Branch("isPCOn",&isPCOn,"isPCOn[18]/I");
   outTree->Branch("HV",&HV,"HV[18]/I");
+  outTree->Branch("HV2",&HV2,"HV2[18]/I");
   outTree->Branch("isTrigger",&isTrigger,"isTrigger[18]/I");
   outTree->Branch("X0",&X0,"X0/F");
 
@@ -181,6 +184,7 @@ void InitRecoTree(TTree* nt)
   nt->SetBranchAddress("run_id", &run_id, &b_run_id);
   nt->SetBranchAddress("isPCOn", &isPCOn, &b_isPCOn);
   nt->SetBranchAddress("HV", &HV, &b_HV);
+  nt->SetBranchAddress("HV2", &HV2, &b_HV2);
   nt->SetBranchAddress("isTrigger", &isTrigger, &b_isTrigger);
   nt->SetBranchAddress("X0", &X0, &b_X0);
   nt->SetBranchAddress("tdcX", &tdcX, &b_tdcX);
