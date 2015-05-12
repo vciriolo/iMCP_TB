@@ -46,6 +46,7 @@ extern int nhodoX2;
 extern int nhodoY1;
 extern int nhodoY2;
 extern int                   sci_front_adc;
+extern int                   bgo_back_adc;
 /*
 extern int                   fibreX[8];
 extern int                   fibreY[8];
@@ -92,7 +93,8 @@ extern TBranch *b_nhodoX1;
 extern TBranch *b_nhodoY1;
 extern TBranch *b_nhodoX2;
 extern TBranch *b_nhodoY2;
-extern TBranch        *b_sci_front_adc;   //!                               
+extern TBranch        *b_sci_front_adc;
+extern TBranch        *b_bgo_back_adc;
 /*
 extern TBranch        *b_fibreX;   //!                                    
 extern TBranch        *b_fibreY;   //!                                        
