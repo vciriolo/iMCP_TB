@@ -159,12 +159,12 @@ int main (int argc, char** argv)
 	  int i=0;
 
 	  //---loop over MPC's channels                                                                                                               
-	  triggerTime=100;
+	  triggerTime=400;
 
 	  if (iEntry>=firstEntry) {
 
 	    SubtractBaseline(5, 25, &digiCh[trigPos]);
-	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[trigPos], 1.)/0.2);
+	    triggerTime=int(TimeConstFrac(triggerTime, 600, &digiCh[trigPos], 1.)/0.2);
 	    if (triggerTime<100 || triggerTime >800)  continue;
 		int ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[channel], 1)/0.2;
 
