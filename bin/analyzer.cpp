@@ -230,7 +230,7 @@ int main(int argc, char** argv)
     char str_cut_trig_not_sat[500]="";
     char str_cut_bad_timeCFD[500]="";
     char str_cut_bad_timeLED[500]="";
-    char str_cut_sci[500]="";
+    char str_cut_multiplicity[500]="";
     //---Define Cuts---
     //    sprintf(str_cut_sig, "charge_corr[%d] > %d", MCPNumber, treshold.at(MCPNumber));
     //    sprintf(str_cut_trig0, "charge_corr[%d] > %d", trigPos1, treshold.at(trigPos1));
@@ -249,7 +249,7 @@ int main(int argc, char** argv)
     sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
     sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
     //    sprintf(str_cut_sci, "sci_front_adc > 400 && sci_front_adc <550");
-    sprintf(str_cut_sci, "1==1");
+    sprintf(str_cut_multiplicity, "sci_front_adc > 80 && sci_front_adc < 330 && bgo_back_adc > 420 && bgo_back_adc < 640");
 
     /*    if (MCPList.at(MCP)==4)
     {
@@ -273,7 +273,7 @@ int main(int argc, char** argv)
     TCut cut_trig_not_sat = str_cut_trig_not_sat;
     TCut cut_bad_timeCFD = str_cut_bad_timeCFD;
     TCut cut_bad_timeLED = str_cut_bad_timeLED;
-    TCut cut_sci = str_cut_sci;
+    TCut cut_multiplicity = str_cut_multiplicity;
 
 
 //-------Runs loop------------------------------------------------------------------------
@@ -422,8 +422,8 @@ int main(int argc, char** argv)
 	{
             sprintf(var_sig, "charge[%d]>>%s", MCPNumber, h_sig_name);
             sprintf(var_trig0, "charge[%d]>>%s", trigPos1, h_trig0_name);
-            nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_sci, "goff");
-            nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_tdc && cut_sci, "goff");
+            nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_multiplicity, "goff");
+            nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_tdc && cut_multiplicity, "goff");
             float eff = h_sig->GetEntries()/h_trig0->GetEntries();
             float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->GetEntries());
             if(eff < 0)   
@@ -517,7 +517,7 @@ int main(int argc, char** argv)
 	    sprintf(var_timeCFD_vs_TOT, "%s:%s>>%s", t_CF_diff, TOT_diff, pr_timeCFD_vs_TOT_name);
             //---correction
             nt->Draw(var_timeCFD_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
-                     && cut_tdc && cut_trig_not_sat && cut_bad_timeCFD && cut_sci, "goff");
+                     && cut_tdc && cut_trig_not_sat && cut_bad_timeCFD && cut_multiplicity, "goff");
             //---skip run with low stat
             if(pr_timeCFD_vs_TOT->GetEntries() < 200)
                 h_resCFD->Rebin(2);
@@ -531,7 +531,7 @@ int main(int argc, char** argv)
 		    f_corrCFD->GetParameter(2), TOT_diff, TOT_diff, h_resCFD_name);
                     //f_corrCFD->GetParameter(3), TOT_diff, TOT_diff, TOT_diff, h_resCFD_name);
             nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers
-                     && cut_trig_not_sat && cut_bad_timeCFD && cut_sci, "goff");  
+                     && cut_trig_not_sat && cut_bad_timeCFD && cut_multiplicity, "goff");  
 	    
 	    //correction vs ampMax
 	    sprintf(var_timeCFD_red, "(%s-(%f + %f*%s + %f*%s*%s))",
@@ -539,7 +539,7 @@ int main(int argc, char** argv)
 		    f_corrCFD->GetParameter(2), TOT_diff, TOT_diff);	    
             sprintf(var_timeCFD_vs_ampMax, "%s:amp_max_corr[%d]>>%s", var_timeCFD_red, MCPNumber, pr_timeCFD_vs_ampMaxCorr_name);
             nt->Draw(var_timeCFD_vs_ampMax, cut_trig0 && cut_sig && cut_scan && cut_nFibers
-                     && cut_tdc && cut_trig_not_sat && cut_bad_timeCFD && cut_sci, "goff");
+                     && cut_tdc && cut_trig_not_sat && cut_bad_timeCFD && cut_multiplicity, "goff");
 	    //	    pr_timeCFD_vs_ampMaxCorr->Fit(f_corrCFD2, "QR");    
 
             //---draw res histo with corrections
@@ -549,7 +549,7 @@ int main(int argc, char** argv)
                     f_corrCFD2->GetParameter(3), MCPNumber, MCPNumber, MCPNumber,
 		    f_corrCFD2->GetParameter(4), MCPNumber, MCPNumber, MCPNumber, MCPNumber, h_resCFD_name);
             nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers
-                     && cut_trig_not_sat && cut_bad_timeCFD && cut_sci, "goff");  
+                     && cut_trig_not_sat && cut_bad_timeCFD && cut_multiplicity, "goff");  
 	    */
             //---fit coincidence peak
             f_resCFD->SetParameters(h_resCFD->GetEntries(), h_resCFD->GetMean(), h_resCFD->GetRMS());
