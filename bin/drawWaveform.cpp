@@ -79,45 +79,47 @@ int main (int argc, char** argv)
 
     int triggerTime;
       //--reading wire chamber from other tree --
-      TChain* tC = new TChain("outputTree");
-      InitTree2(tC);
+    //      TChain* tC = new TChain("outputTree");
+    //      InitTree2(tC);
 
       //---Chain
       TChain* chain = new TChain("H4tree");
       InitTree(chain);
 
-      char command1[300];
-      sprintf(command1, "find  %s/%d/*/dqmPlotstotal.root > listTemp.txt", (inputFolder).c_str(), run);
-      system(command1);
+      //      char command1[300];
+      //      sprintf(command1, "find  %s/%d/*/dqmPlotstotal.root > listTemp.txt", (inputFolder).c_str(), run);
+      //      system(command1);
       char command2[300];
       sprintf(command2, "find  %s/%d/[0-9]*.root > listTemp2.txt", (inputFolder).c_str(), run);
       system(command2);
 
-    ifstream rootList ("listTemp.txt");
+      //    ifstream rootList ("listTemp.txt");
     ifstream rootList2 ("listTemp2.txt");
 
-    while (!rootList.eof() && !rootList2.eof())
+    //    while (!rootList.eof() && !rootList2.eof())
+    while (!rootList2.eof())
       {
-	char iRun_tW[70];
-	rootList >> iRun_tW;
+	//	char iRun_tW[70];
+	//	rootList >> iRun_tW;
 	char iRun_str[70];
 	rootList2 >> iRun_str;
 
-	TChain* tTemp = new TChain("outputTree");
-	tTemp->Add(iRun_tW);
+	//	TChain* tTemp = new TChain("outputTree");
+	//	tTemp->Add(iRun_tW);
 	TChain* tTempH4 = new TChain("H4tree");
 	tTempH4->Add(iRun_str);
 
-	if (tTemp->GetEntries() == tTempH4->GetEntries())
+	//	if (tTemp->GetEntries() == tTempH4->GetEntries())
+	if (tTempH4->GetEntries())
 	  {
-	    tC->Add(iRun_tW);	
+	    //	    tC->Add(iRun_tW);	
 	    chain->Add(iRun_str);	
 	  }
 	else
 	  std::cout<<"Bad spill found.. Skipped"<<std::endl;
       }
 
-    system("rm listTemp.txt");
+    //    system("rm listTemp.txt");
     system("rm listTemp2.txt");
 
     int ampMaxTimeTemp;
