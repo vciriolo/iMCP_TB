@@ -32,6 +32,7 @@ extern float                 baseline[18];
 extern int                   run_id;
 extern int                   isPCOn[18];
 extern int                   HV[18];
+extern int                   HV2[18];
 extern int                   isTrigger[18];
 extern float                 X0;
 extern float tdcX;
@@ -78,6 +79,7 @@ extern TBranch        *b_charge_corr;   //!
 extern TBranch        *b_run_id;   //!                              
 extern TBranch        *b_isPCOn;   //!  
 extern TBranch        *b_HV;   //!     
+extern TBranch        *b_HV2;   //!     
 extern TBranch        *b_isTrigger;
 extern TBranch        *b_X0;
 extern TBranch *b_tdcX;
