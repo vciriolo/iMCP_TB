@@ -101,50 +101,58 @@ int main (int argc, char** argv)
         TChain* chain = new TChain("H4tree");
         InitTree(chain);
 
-        char command1[300];
-        sprintf(command1, "find  %s/%d/*/dqmPlotstotal.root > ntuples/listTemp_%d.txt", (inputFolder).c_str(), run, run);
-        system(command1);
+        // char command1[300];
+        // sprintf(command1, "find  %s/%d/*/dqmPlotstotal.root > ntuples/listTemp_%d.txt", (inputFolder).c_str(), run, run);
+        // system(command1);
         char command2[300];
         sprintf(command2, "find  %s/%d/[0-9]*.root > ntuples/listTemp2_%d.txt", (inputFolder).c_str(), run, run);
         system(command2);
 
-        char list1[200];
+        // char list1[200];
         char list2[200];
-        sprintf (list1, "ntuples/listTemp_%d.txt", run);
+        // sprintf (list1, "ntuples/listTemp_%d.txt", run);
         sprintf (list2, "ntuples/listTemp2_%d.txt", run);
 
-        ifstream rootList (list1);
+        // ifstream rootList (list1);
         ifstream rootList2 (list2);
 
-        while (!rootList.eof() && !rootList2.eof())
+        // while (!rootList.eof() && !rootList2.eof())
+	// {
+        //     char iRun_tW[70];
+        //     rootList >> iRun_tW;
+        //     char iRun_str[70];
+        //     rootList2 >> iRun_str;
+
+        //     TChain* tTemp = new TChain("outputTree");
+        //     tTemp->Add(iRun_tW);
+        //     TChain* tTempH4 = new TChain("H4tree");
+        //     tTempH4->Add(iRun_str);
+	  
+        //     if (tTemp->GetEntries() == tTempH4->GetEntries())
+	//     {
+        //         positionTree->Add(iRun_tW);	
+        //         chain->Add(iRun_str);	
+	//     }
+        //     else
+        //         cout<<"Bad spill found.. Skipped"<<endl;
+        //     tTemp->Delete();
+        //     tTempH4->Delete();
+	// }
+
+        while(!rootList2.eof())
 	{
-            char iRun_tW[70];
-            rootList >> iRun_tW;
             char iRun_str[70];
             rootList2 >> iRun_str;
-
-            TChain* tTemp = new TChain("outputTree");
-            tTemp->Add(iRun_tW);
-            TChain* tTempH4 = new TChain("H4tree");
-            tTempH4->Add(iRun_str);
-	  
-            if (tTemp->GetEntries() == tTempH4->GetEntries())
-	    {
-                positionTree->Add(iRun_tW);	
-                chain->Add(iRun_str);	
-	    }
-            else
-                cout<<"Bad spill found.. Skipped"<<endl;
-            tTemp->Delete();
-            tTempH4->Delete();
+            
+            chain->Add(iRun_str);	
 	}
 
-        char command3[300];
-        sprintf(command3, "rm ntuples/listTemp_%d.txt", run);
+        // char command3[300];
+        // sprintf(command3, "rm ntuples/listTemp_%d.txt", run);
         char command4[300];
         sprintf(command4, "rm ntuples/listTemp2_%d.txt", run);
       
-        system(command3);
+        // system(command3);
         system(command4);
       
         cout << "start reading run: " << run << endl;
@@ -155,7 +163,7 @@ int main (int argc, char** argv)
 	    if(iEntry % 1000 == 0)
 		cout << "read entry: " << iEntry << " / " << chain->GetEntriesFast() << endl;
             //-----Unpack data--------------------------------------------------
-            for(int iCh=0; iCh<nCh; iCh++)
+            for(int iCh=0; iCh<18; iCh++)
             {
                 digiCh[iCh].clear();
 
@@ -173,8 +181,10 @@ int main (int argc, char** argv)
 
 	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
             {
-                if(adcBoard[iCh] == 1 && adcChannel[iCh] == 0) 
-                    sci_front_adc = adcData[iCh];
+                if(adcBoard[iCh] == 100728833 && adcChannel[iCh] == 0) 
+                    sci_front_adc = adcData[iCh];                
+                if(adcBoard[iCh] == 100728833 && adcChannel[iCh] == 1) 
+                    bgo_back_adc = adcData[iCh];
                 /*		    if(adcBoard[iCh] == 1 && adcChannel[iCh] >= HODOX_ADC_START_CHANNEL &&
                                     adcChannel[iCh] <= HODOX_ADC_END_CHANNEL)
                                     fibreX[(adcChannel[iCh]-HODOX_ADC_START_CHANNEL)] = adcData[iCh];
@@ -188,9 +198,9 @@ int main (int argc, char** argv)
 	    for(unsigned int iSample=0; iSample<nDigiSamples; iSample++)
                 digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(digiSampleValue[iSample]);
 
-	    int triggerTime=100;                  //DON'T CHANGE THIS!!!!!
+	    int triggerTime=400;                  //DON'T CHANGE THIS!!!!!
 	    SubtractBaseline(5, 25, &digiCh[trigPos]);  //trigger baseline subtraction
-	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[trigPos], 1.)/0.2); //trigger
+	    triggerTime=int(TimeConstFrac(triggerTime, 600, &digiCh[trigPos], 1.)/0.2); //trigger
 	    if (triggerTime<100 || triggerTime >800)  
                 continue;
 
@@ -198,7 +208,7 @@ int main (int argc, char** argv)
 	    for(int jCh=0; jCh<nCh; jCh++)
             {
                 string currentMCP = CFG.GetOpt<string>("global", "MCPs", jCh);
-                int iCh = CFG.GetOpt<int>(currentMCP, "DigiChannel");
+                int iCh = CFG.GetOpt<int>(currentMCP, "digiChannel");
 
 		if(currentMCP.find("clock") != string::npos) 
                 { 
@@ -336,33 +346,33 @@ int main (int argc, char** argv)
             run_id = run;
             X0     = CFG.GetOpt<float>("global", "nX0");
 
-            positionTree->GetEntry(iEntry);
-            tdcX = (*TDCreco)[0];
-            tdcY = (*TDCreco)[1];
-            // event = evtNumber;
+            // positionTree->GetEntry(iEntry);
+            // tdcX = (*TDCreco)[0];
+            // tdcY = (*TDCreco)[1];
+            // // event = evtNumber;
 
-            nhodoX1=0;
-            nhodoX2=0;
-            nhodoY1=0;
-            nhodoY2=0;
+            // nhodoX1=0;
+            // nhodoX2=0;
+            // nhodoY1=0;
+            // nhodoY2=0;
 
-            for (int i=0; i<64; i++)
-            {
-                hodoX1[i] = (*HODOX1)[i];		 
-                hodoX2[i] = (*HODOX2)[i];
-                hodoY1[i] = (*HODOY1)[i];
-                hodoY2[i] = (*HODOY2)[i];		      
-                //cout<<(*HODOX1)[i]<<" "<<hodoX1[i]<<endl;	  //DEBUG    
-                if (hodoX1[i]==true)   nhodoX1++;
-                if (hodoX2[i]==true)   nhodoX2++;
-                if (hodoY1[i]==true)   nhodoY1++;
-                if (hodoY2[i]==true)   nhodoY2++;
-            }
+            // for (int i=0; i<64; i++)
+            // {
+            //     hodoX1[i] = (*HODOX1)[i];		 
+            //     hodoX2[i] = (*HODOX2)[i];
+            //     hodoY1[i] = (*HODOY1)[i];
+            //     hodoY2[i] = (*HODOY2)[i];		      
+            //     //cout<<(*HODOX1)[i]<<" "<<hodoX1[i]<<endl;	  //DEBUG    
+            //     if (hodoX1[i]==true)   nhodoX1++;
+            //     if (hodoX2[i]==true)   nhodoX2++;
+            //     if (hodoY1[i]==true)   nhodoY1++;
+            //     if (hodoY2[i]==true)   nhodoY2++;
+            // }
             outTree->Fill();    
 	}     
         //---Get ready for next run
         chain->Delete();
-	positionTree->Delete();
+	// positionTree->Delete();
         ++iRun;
     }
     //-----close everything-----------------------------------------------------

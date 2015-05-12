@@ -25,6 +25,7 @@ float                 charge[18];
 float                 charge_corr[18];
 float                 baseline[18];
 int                   sci_front_adc;
+int                   bgo_back_adc;
 /*int                   fibreX[8];
 int                   fibreY[8];
 */
@@ -70,7 +71,8 @@ TBranch        *b_amp_max_time;   //!
 TBranch        *b_baseline;   //!   
 TBranch        *b_charge;   //!    
 TBranch        *b_charge_corr;   //!  
-TBranch        *b_sci_front_adc;   //! 
+TBranch        *b_sci_front_adc;   //!
+TBranch        *b_bgo_back_adc;   //! 
 /*
 TBranch        *b_fibreX;   //!  
 TBranch        *b_fibreY;   //!  
@@ -130,6 +132,7 @@ void SetOutTree(TTree* outTree)
   
   //---global branches    
   outTree->Branch("sci_front_adc",&sci_front_adc,"sci_front_adc/I");
+  outTree->Branch("bgo_back_adc",&bgo_back_adc,"bgo_back_adc/I");
   outTree->Branch("run_id",&run_id,"run_id/I");
 
   //---additional branches
@@ -198,6 +201,7 @@ void InitRecoTree(TTree* nt)
   nt->SetBranchAddress("nhodoX2", &nhodoX2, &b_nhodoX2);
   nt->SetBranchAddress("nhodoY2", &nhodoY2, &b_nhodoY2);
   nt->SetBranchAddress("sci_front_adc", &sci_front_adc, &b_sci_front_adc);
+  nt->SetBranchAddress("bgo_back_adc", &bgo_back_adc, &b_bgo_back_adc);
 
   /*
   nt->SetBranchAddress("fibreX", &fibreX, &b_fibreX);
