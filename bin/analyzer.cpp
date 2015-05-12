@@ -2,9 +2,10 @@
     This program compute charge or efficiency for all the run in a selected Scan for
     selected MCP under test.
 
-    compile with ---> c++ -o analyzer bin/analyzer.cpp `root-config --cflags --glibs --libs`
-    run with:      ./analyzer cfg/treshold.txt MiB3 all eff HVScan Scan2
-          where the arguments are: 1) cfg file with the tresholds 2) MCP to analyze 4) analysis type (eff,time) 5) Scan type (HV or X0) 6) suffix of reco file in input
+NEW - FOR BTF:
+- options "HV1" means HV1 varying while HV2 fixed
+- options "HV2" means HV2 varying while HV1 fixed
+- options "HV12" means both HV varying
 
 ****************************************************************************************/
 #include <iostream>
@@ -120,6 +121,8 @@ int main(int argc, char** argv)
     //---open tree and get: run list and corresponding HV/X0---
     std::vector<int> HVVal;
     HVVal.clear();
+    std::vector<int> HV2Val;
+    HV2Val.clear();
     std::vector<float> X0Step;
     X0Step.clear();
     std::vector<float> ScanList;
@@ -127,15 +130,17 @@ int main(int argc, char** argv)
 
   //---save list of HV (or X0) step---
   if (strcmp(scanType,"HV")==0) {
-    int prev=0;  
+    int prev=0, prev2=0;  
     for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++)
       {
 	nt->GetEntry(iEntry);
-	if (HV[MCPNumber]!=prev) {
+	if (HV[MCPNumber]!=prev || HV2[MCPNumber]!=prev2) {
 	  ScanList.push_back((float)HV[MCPNumber]);
 	  HVVal.push_back(HV[MCPNumber]);
+	  HV2Val.push_back(HV2[MCPNumber]);
 	  X0Step.push_back(X0);
 	  prev=HV[MCPNumber];
+	  prev2=HV2[MCPNumber];
 	  if (iEntry==0) {
 	    for (int i=0; i<nChannels; i++)  //save trigger position!
 	      {
@@ -154,6 +159,7 @@ int main(int argc, char** argv)
 	if (X0>(prev+0.001)||X0<(prev-0.001)) {
 	  ScanList.push_back(X0);
 	  HVVal.push_back(HV[MCPNumber]);
+	  HV2Val.push_back(HV2[MCPNumber]);
 	  X0Step.push_back(X0);
 	  prev=X0;
 	  if (iEntry==0) {
@@ -272,7 +278,7 @@ int main(int argc, char** argv)
         //---Define run dependend cut---
         char cut_scan[100];
         if (strcmp(scanType,"HV")==0)  
-            sprintf(cut_scan, "HV[%d] == %d", MCPNumber, HVVal.at(i));
+	  sprintf(cut_scan, "HV[%d] == %d && HV2[%d] == %d", MCPNumber, HVVal.at(i), MCPNumber, HV2Val.at(i));
         else  
             sprintf(cut_scan, "X0 == %f", X0Step.at(i));
 	//        if(MCPNumber == 2) 
@@ -424,9 +430,23 @@ int main(int argc, char** argv)
 		printf(" %s\teff\te_%s\te_eff\n", var_name, var_name);
 		printf("-----------------------------\n");
 	    }
-	    if(TString(scanType).Contains("HV") == 1) 
+	    if(TString(scanType).Contains("HV1") == 1) 
             {
-                printf("%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i), eff, 0., e_eff);
+	      printf("%d\t%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i), HV2Val.at(i), eff, 0., e_eff);
+                outputFile << HVVal.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
+                g_eff->SetPoint(i, HVVal.at(i), eff);
+                g_eff->SetPointError(i, 0, e_eff);
+	    }
+	    else if(TString(scanType).Contains("HV2") == 1) 
+            {
+	      printf("%d\t%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i), HV2Val.at(i), eff, 0., e_eff);
+                outputFile << HV2Val.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
+                g_eff->SetPoint(i, HV2Val.at(i), eff);
+                g_eff->SetPointError(i, 0, e_eff);
+	    }
+	    else if(TString(scanType).Contains("HV12") == 1) 
+            {
+	      printf("%d\t%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i), HV2Val.at(i), eff, 0., e_eff);
                 outputFile << HVVal.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
                 g_eff->SetPoint(i, HVVal.at(i), eff);
                 g_eff->SetPointError(i, 0, e_eff);
@@ -442,7 +462,7 @@ int main(int argc, char** argv)
 		printf("-----------------------------\n");
 	}
         //-----Charge study-----
-        if(strcmp(doWhat, "Q") == 0)// || strcmp(doWhat, "all") == 0)
+	/*        if(strcmp(doWhat, "Q") == 0)// || strcmp(doWhat, "all") == 0)
 	{
 	    if(i == 0)
 	    {
@@ -469,7 +489,7 @@ int main(int argc, char** argv)
 	    }
 	    if(i == (ScanList.size()-1))    
 		printf("-----------------------------\n");
-	}
+		} */
         //-----TIME RESOLUTION STUDY----- 
         //---time resolution with CFD---
         if(strcmp(doWhat, "timeCFD") == 0 || strcmp(doWhat, "all") == 0)
@@ -539,9 +559,23 @@ int main(int argc, char** argv)
             float t_res = f_resCFD->GetParameter(2)*1000.;
             float prob = f_resCFD->GetProb();
             //---print results + graph
-            if(TString(scanType).Contains("HV") == 1) 
+            if(TString(scanType).Contains("HV1") == 1) 
             {
-                printf("%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i), t_res, 0., e_t_res, prob);
+                printf("%d\t%d\t%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i),i, HV2Val.at(i), t_res, 0., e_t_res, prob);
+                outputFile << HVVal.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
+                g_resCFD->SetPoint(g_resCFD->GetN(),  HVVal.at(i), t_res);
+                g_resCFD->SetPointError(g_resCFD->GetN()-1, 0, e_t_res);
+            } 
+            else if(TString(scanType).Contains("HV2") == 1) 
+            {
+                printf("%d\t%d\t%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i),i, HV2Val.at(i), t_res, 0., e_t_res, prob);
+                outputFile << HV2Val.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
+                g_resCFD->SetPoint(g_resCFD->GetN(),  HV2Val.at(i), t_res);
+                g_resCFD->SetPointError(g_resCFD->GetN()-1, 0, e_t_res);
+            } 
+            else if(TString(scanType).Contains("HV12") == 1) 
+            {
+                printf("%d\t%d\t%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i),i, HV2Val.at(i), t_res, 0., e_t_res, prob);
                 outputFile << HVVal.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
                 g_resCFD->SetPoint(g_resCFD->GetN(),  HVVal.at(i), t_res);
                 g_resCFD->SetPointError(g_resCFD->GetN()-1, 0, e_t_res);
@@ -639,9 +673,23 @@ int main(int argc, char** argv)
             float t_res = f_resLED->GetParameter(2)*1000.;
             float prob = f_resLED->GetProb();
             //---print results + graph
-            if(TString(scanType).Contains("HV") == 1) 
+            if(TString(scanType).Contains("HV1") == 1) 
             {
-                printf("%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i), t_res, 0., e_t_res, prob);
+                printf("%d\t%d\t%%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i),i, HV2Val.at(i), t_res, 0., e_t_res, prob);
+                outputFile << HVVal.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
+                g_resLED->SetPoint(g_resLED->GetN(),  HVVal.at(i), t_res);
+                g_resLED->SetPointError(g_resLED->GetN()-1, 0, e_t_res);
+            } 
+            else if(TString(scanType).Contains("HV12") == 1) 
+            {
+                printf("%d\t%d\t%%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i),i, HV2Val.at(i), t_res, 0., e_t_res, prob);
+                outputFile << HV2Val.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
+                g_resLED->SetPoint(g_resLED->GetN(),  HV2Val.at(i), t_res);
+                g_resLED->SetPointError(g_resLED->GetN()-1, 0, e_t_res);
+            } 
+            else if(TString(scanType).Contains("HV12") == 1) 
+            {
+                printf("%d\t%d\t%%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i),i, HV2Val.at(i), t_res, 0., e_t_res, prob);
                 outputFile << HVVal.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
                 g_resLED->SetPoint(g_resLED->GetN(),  HVVal.at(i), t_res);
                 g_resLED->SetPointError(g_resLED->GetN()-1, 0, e_t_res);
