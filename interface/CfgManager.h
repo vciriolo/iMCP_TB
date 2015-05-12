@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include <algorithm> 
+#include <iomanip>
 
 using namespace std;
 
@@ -33,6 +34,9 @@ public:
     //---utils---
     inline void            ParseConfigFile(string* file) {ParseConfigFile(file->c_str());};
     void                   ParseConfigFile(const char* file);
+
+    //---operators---
+    friend ostream& operator<<(ostream& out, const CfgManager& obj);
 
 private:
     map<string, map<string, vector<string> > >  opts_;

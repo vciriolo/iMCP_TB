@@ -35,9 +35,9 @@ void CfgManager::ParseConfigFile(const char* file)
     string buffer;
     string current_block="global";
     map<string, vector<string> > block_opts;
-    while(cfgFile >> buffer)
+    while(getline(cfgFile, buffer))
     {
-        if(buffer.at(0) == '#')
+        if(buffer.size() == 0 || buffer.at(0) == '#')
             continue;        
         istringstream splitter(buffer);
         vector<string> tokens = vector<string>(istream_iterator<string>(splitter), 
@@ -46,7 +46,7 @@ void CfgManager::ParseConfigFile(const char* file)
         {
             if(tokens.at(0).at(1) == '/')
             {
-                tokens.at(0).erase(tokens.at(0).begin(), ++tokens.at(0).begin());
+                tokens.at(0).erase(tokens.at(0).begin(), tokens.at(0).begin()+2);
                 tokens.at(0).erase(--tokens.at(0).end());
                 if(tokens.at(0) == current_block)
                 {
@@ -74,3 +74,28 @@ void CfgManager::ParseConfigFile(const char* file)
     cfgFile.close();
 }
 
+//**********operators*********************************************************************
+
+ostream& operator<<(ostream& out, const CfgManager& obj)
+{
+    map<string, map<string, vector<string> > >::const_iterator itBlock;
+    //---banner
+    out << "current configuration:" << endl;
+    //---options
+    for(itBlock=obj.opts_.begin(); itBlock!=obj.opts_.end(); ++itBlock)
+    {
+        out << setw(20) << itBlock->first;
+        map<string, vector<string> >::const_iterator itOpt;
+        for(itOpt=itBlock->second.begin(); itOpt!=itBlock->second.end(); ++itOpt)
+        {
+            for(int iOpt=0; iOpt<itOpt->second.size(); ++iOpt)
+            {
+                out << setw(itOpt->first.size()+3) << itOpt->first;
+                out << setw(itOpt->second.at(iOpt).size()+3) << itOpt->second.at(iOpt);
+                out << endl;
+            }
+        }
+        out << endl;
+    }
+    return out;
+}

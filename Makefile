@@ -7,7 +7,7 @@ DEPS= interface/MCPMap.h interface/init_Reco_Tree.h interface/init_tree_H4.h int
 DEPS_OBJ= lib/MCPMap.o lib/init_Reco_Tree.o lib/init_tree_H4.o lib/analysis_tools.o lib/histoFuncT.o lib/ScaleEstimators.o lib/CfgManager.o
 
 CC = g++
-CFLAGS = -Wall
+CFLAGS = -std=c++11
 
 lib/%.o: src/%.cc $(DEPS)
 	$(CC) $(CFLAGS) -c -o $@ $< $(ROOT_LIB) $(ROOT_FLAGS)

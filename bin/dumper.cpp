@@ -56,31 +56,33 @@ int main (int argc, char** argv)
   
     //--------Read Options--------------------------------
     CfgManager CFG(argv[1]);
+    cout << CFG << endl;
 
     string inputFolder = CFG.GetOpt<string>("global", "inputDir");
     string outputFile = CFG.GetOpt<string>("global", "outputFile");
     int nRuns = CFG.GetOpt<int>("global", "nRuns");
-    int nChannels = CFG.GetOpt<int>("global", "nCh");
+    int nCh = CFG.GetOpt<int>("global", "nChannels");
     int trigPos = CFG.GetOpt<int>("global", "trigPos");
-    
+
     //---------output tree----------------
     TFile* outROOT = TFile::Open(outputFile.c_str(), "recreate");  
     outROOT->cd();
 
     TProfile** wf_promed = new TProfile*[18];
-    for(int iCh=0; iCh<18; ++iCh) wf_promed[iCh] = new TProfile(Form("wf_promed_%d",iCh), "", 102400, 0., 1024.);
+    for(int iCh=0; iCh<18; ++iCh) 
+        wf_promed[iCh] = new TProfile(Form("wf_promed_%d",iCh), "", 102400, 0., 1024.);
 
     TTree* outTree = new TTree("reco_tree", "reco_tree");
     outTree->SetDirectory(0);
     SetOutTree(outTree);
 
-    int iRun=-1;
+    int iRun=0;
     int start=0;
     //-------runs loop    
     while(iRun < nRuns) 
     {
-        ++iRun;
         int run = CFG.GetOpt<int>("global", "runs", iRun);
+
         //-----Definitions
         vector<float> digiCh[18];
         float timeCF[18], timeCFcorr[18], timeCF30[18];
@@ -92,24 +94,24 @@ int main (int argc, char** argv)
         float tStart, tStop;
 
         //--reading wire chamber from other tree --
-        TChain* t1 = new TChain("outputTree");
-        InitTree2(t1);
+        TChain* positionTree = new TChain("outputTree");
+        InitTree2(positionTree);
 
         //---Chain
         TChain* chain = new TChain("H4tree");
         InitTree(chain);
 
         char command1[300];
-        sprintf(command1, "find  %s/%d/*/dqmPlotstotal.root > listTemp_%s_%d.txt", (inputFolder).c_str(), run, outputFile.c_str(), run);
+        sprintf(command1, "find  %s/%d/*/dqmPlotstotal.root > ntuples/listTemp_%d.txt", (inputFolder).c_str(), run, run);
         system(command1);
         char command2[300];
-        sprintf(command2, "find  %s/%d/[0-9]*.root > listTemp2_%s_%d.txt", (inputFolder).c_str(), run, outputFile.c_str(), run);
+        sprintf(command2, "find  %s/%d/[0-9]*.root > ntuples/listTemp2_%d.txt", (inputFolder).c_str(), run, run);
         system(command2);
 
         char list1[200];
         char list2[200];
-        sprintf (list1, "listTemp_%s_%d.txt", outputFile.c_str(), run);
-        sprintf (list2, "listTemp2_%s_%d.txt", outputFile.c_str(), run);
+        sprintf (list1, "ntuples/listTemp_%d.txt", run);
+        sprintf (list2, "ntuples/listTemp2_%d.txt", run);
 
         ifstream rootList (list1);
         ifstream rootList2 (list2);
@@ -120,7 +122,7 @@ int main (int argc, char** argv)
             rootList >> iRun_tW;
             char iRun_str[70];
             rootList2 >> iRun_str;
-	  
+
             TChain* tTemp = new TChain("outputTree");
             tTemp->Add(iRun_tW);
             TChain* tTempH4 = new TChain("H4tree");
@@ -128,7 +130,7 @@ int main (int argc, char** argv)
 	  
             if (tTemp->GetEntries() == tTempH4->GetEntries())
 	    {
-                t1->Add(iRun_tW);	
+                positionTree->Add(iRun_tW);	
                 chain->Add(iRun_str);	
 	    }
             else
@@ -138,35 +140,29 @@ int main (int argc, char** argv)
 	}
 
         char command3[300];
-        sprintf(command3, "rm listTemp_%s_%d.txt", outputFile.c_str(), run);
+        sprintf(command3, "rm ntuples/listTemp_%d.txt", run);
         char command4[300];
-        sprintf(command4, "rm listTemp2_%s_%d.txt", outputFile.c_str(), run);
+        sprintf(command4, "rm ntuples/listTemp2_%d.txt", run);
       
         system(command3);
         system(command4);
       
-        cout<<"start reading run: "<<run<<endl;
-      
-        /*      //-----Read raw data tree-----------------------------------------------
-                char iRun_str[70];
-                sprintf(iRun_str, "%s/%d/[0-9]*.root", (inputFolder).c_str(), run);
-                chain->Add(iRun_str);
-                cout << "\nReading:  "<<iRun_str << endl;
-        */
+        cout << "start reading run: " << run << endl;
+
         //-----Data loop--------------------------------------------------------
         for(int iEntry=0; iEntry<chain->GetEntries(); iEntry++)
         {
 	    if(iEntry % 1000 == 0)
-		cout << "read entry: " << iEntry << endl;
+		cout << "read entry: " << iEntry << " / " << chain->GetEntriesFast() << endl;
             //-----Unpack data--------------------------------------------------
-            for(int iCh=0; iCh<nChannels; iCh++)
+            for(int iCh=0; iCh<nCh; iCh++)
             {
                 digiCh[iCh].clear();
 
             }
             //---Read the entry
             chain->GetEntry(iEntry);
- 
+
 	    unsigned int spill=spillNumber;
 	    event=evtNumber;
 
@@ -187,27 +183,27 @@ int main (int argc, char** argv)
                                     fibreY[(adcChannel[iCh]-HODOY_ADC_START_CHANNEL)] = adcData[iCh];
                 */
             }
-	    	    
 
 	    //---Read digitizer samples
-	    //	    cout << " nDigiSamples = " << nDigiSamples << endl;
-	    for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
+	    for(unsigned int iSample=0; iSample<nDigiSamples; iSample++)
                 digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(digiSampleValue[iSample]);
-	    }
 
 	    int triggerTime=100;                  //DON'T CHANGE THIS!!!!!
-	    //SubtractBaseline(5, 25, &digiCh[MCPList.at(trig1)]);  //trigger baseline subtraction
-	    //	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[MCPList.at(trig1)], 1.)/0.2); //trigger
 	    SubtractBaseline(5, 25, &digiCh[trigPos]);  //trigger baseline subtraction
 	    triggerTime=int(TimeConstFrac(triggerTime, 300, &digiCh[trigPos], 1.)/0.2); //trigger
-	    if (triggerTime<100 || triggerTime >800)  continue;
+	    if (triggerTime<100 || triggerTime >800)  
+                continue;
 
 	    //---loop over MPC's channels
-	    for(int iCh=0; iCh<nChannels; iCh++)
+	    for(int jCh=0; jCh<nCh; jCh++)
             {
-                string currentMCP = CFG.GetOpt<string>("global", "MCPs", iCh);
-		if (iCh==8 || iCh==17) { //clock digitization info
-                    SubtractBaseline(5, 25, &digiCh[iCh]);  //baseline subtraction
+                string currentMCP = CFG.GetOpt<string>("global", "MCPs", jCh);
+                int iCh = CFG.GetOpt<int>(currentMCP, "DigiChannel");
+
+		if(currentMCP.find("clock") != string::npos) 
+                { 
+                    //---clock digitization info
+                    SubtractBaseline(5, 25, &digiCh[iCh]);  
                     ampMax[iCh] = AmpMax(51, 1000, &digiCh[iCh]);
                     intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
                     intSignal[iCh] = ComputeIntegral(51, 1000, &digiCh[iCh]);
@@ -241,38 +237,27 @@ int main (int argc, char** argv)
                     intSignalcorr[iCh] = -1.*intSignal[iCh];
                     timeCFcorr[iCh] = timeCF[iCh];
                 }
-		//save infos for MCPs
-		else {
-
-                    int ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[iCh], 1)/0.2; //time of max sample (window's coincidence:-50,50)
+		else 
+                {
+                    int ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[iCh], 1)/0.2; 
+                    //time of max sample (window's coincidence:-50,50)
                     //window for charge calculation
                     int t1 = ampMaxTimeTemp-13;
                     int t2 = ampMaxTimeTemp+12;
                     ampMaxT[iCh]=ampMaxTimeTemp;
 		
-                    if (iCh!=trigPos) SubtractBaseline(t1-27, t1-7, &digiCh[iCh]);  //subtract baseline immediately before pulse		
+                    //subtract baseline immediately before pulse		
+                    if(iCh!=trigPos) 
+                        SubtractBaseline(t1-27, t1-7, &digiCh[iCh]);  
                     intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
 
-                    //fill pro-medio
-                    if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024) ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
-                    ampMax[iCh] = AmpMax(47, 500, &digiCh[iCh]);
-                    if(ampMax[iCh] < -30. && ampMax[iCh] > -3000.){			
-                        double timeCFpm = TimeConstFracAbs(47, 800, &digiCh[iCh], 0.5, ampMax[iCh]);
-                        for(unsigned int iSample=0; iSample<digiCh[iCh].size(); ++iSample) {
-                            if(timeCFpm > 80. && timeCFpm < 220.) wf_promed[iCh]->Fill( (iSample + 300 - timeCFpm) , (-1.*digiCh[iCh].at(iSample)/ampMax[iCh]));
-                        }
-                    }//unsaturated
-		
                     if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024){
                         ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
                         intSignal[iCh] = ComputeIntegral(t1, t2, &digiCh[iCh]);
                     }
-                    /*		  else{    //A COSA SERVE????
-                                  intSignal[iCh] = ComputeIntegral(50, 70, &digiCh[iCh]);	
-                                  ampMax[iCh] = AmpMax(0, 1024, &digiCh[iCh]);
-                                  }*/
-
-                    //time OT
+                    else
+                        ampMax[iCh] = AmpMax(47, 500, &digiCh[iCh]);
+                    //---time OT
                     TimeOverThreshold(t1-10, t2+30, &digiCh[iCh], -150., tStart, tStop);
                     timeStart_150[iCh]=tStart;
                     timeStop_150[iCh]=tStop;
@@ -293,24 +278,6 @@ int main (int argc, char** argv)
                     timeStart_1000[iCh]=tStart;
                     timeStop_1000[iCh]=tStop;
 
-                    /*
-                      if( (tStart < 0. || tStop < 0.) && tStart != -100){
-                      cout << "iEntry =  " << iEntry << endl;
-                      cout << " channel iCh = " << iCh << " tStart = " << tStart 
-                      << " tStop = " << tStop 
-                      << " ampMax[iCh] = " << ampMax[iCh] << endl;
-
-                      TH1F* histo = new TH1F("histo", "", 1024, 0., 1024.);
-                      for(int iBinni=0; iBinni<1024; ++iBinni)
-		      histo->SetBinContent(iBinni+1, digiCh[iCh].at(iBinni));
-                      TFile outF("outF.root", "recreate");
-                      outF.cd();
-                      histo->Write();
-                      outF.Close();
-                      return 1000;
-                      }
-                    */
-
                     timeOT[iCh] = TimeOverThreshold(t1-10, t2+10, &digiCh[iCh], -1000., tStart, tStop);
                     timeStart[iCh]=tStart;
                     timeStop[iCh]=tStop;
@@ -318,7 +285,8 @@ int main (int argc, char** argv)
                     timeCF[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMax[iCh]);
                     timeCF30[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.3, ampMax[iCh]);
 
-                    if(ampMax[iCh] < -3300.) {
+                    if(ampMax[iCh] < -3300.) 
+                    {
                         ampMaxcorr[iCh] =
                             get_amp_max_from_time_OT(iCh, timeOT[iCh]*0.2, CFG.GetOpt<int>(currentMCP, "isPCON"), run);
                         intSignalcorr[iCh] =
@@ -327,26 +295,15 @@ int main (int argc, char** argv)
                             get_time_CF_from_time_OT(iCh, timeOT[iCh]*0.2, CFG.GetOpt<int>(currentMCP, "isPCON"),
                                                      run, tStart*0.2)/0.2; 
                     }
-                    else {
+                    else 
+                    {
                         ampMaxcorr[iCh] = -1.*ampMax[iCh];
                         intSignalcorr[iCh] = -1.*intSignal[iCh];
                         timeCFcorr[iCh] = timeCF[iCh];
                     }
-
-                    //		  cout<<iEntry<<" "<<iCh<<" "<<t1<<" "<<t2<<" "<<ampMax[iCh]<<" "<<timeCF[iCh]<<" "<<timeStart[iCh]<<endl;
-                    //		  if (timeCF[iCh]<0 || timeCF[iCh]>1024) {  cout<<iEntry<<" "<<iCh<<" "<<timeCF[iCh]<<endl; getchar();}
-                    //		  if (ampMax[iCh]<-1000.)  {cout<<amp_max[iCh]<<endl; getchar(); }
-                    //		  		  if(iCh==7 && ampMax[iCh]<-1000.) { cout<<timeCF[iCh]<<" "<<tStart<<" "<<endl; getchar();}
-		  		  
-                    /*		  if(ampMax[iCh] < -1000.){
-                                  if(ampMaxcorr[iCh]*0.5 > -6000.) timeCFcorr[iCh] = TimeConstFracAbs(t1-10, t2+10, &digiCh[iCh], 0.5, ampMaxcorr[iCh]);
-                                  else timeCFcorr[iCh] = -999.;
-                                  }
-		  
-                                  else timeCFcorr[iCh] = timeCF[iCh];
-                    */
 		}
-                
+
+                //---fill the MCP reco variables
                 time_CF[MCPList.at(currentMCP)]   = timeCF[iCh]*0.2;
                 time_CF_corr[MCPList.at(currentMCP)]   = timeCFcorr[iCh]*0.2;
                 time_CF30[MCPList.at(currentMCP)]   = timeCF30[iCh]*0.2;
@@ -371,14 +328,15 @@ int main (int argc, char** argv)
                 baseline[MCPList.at(currentMCP)]  = -intBase[iCh];
 
                 isPCOn[MCPList.at(currentMCP)] = CFG.GetOpt<int>(currentMCP, "isPCON");
-                HV[MCPList.at(currentMCP)] = CFG.GetOpt<float>(currentMCP, "HV", run);
-                isTrigger[MCPList.at(currentMCP)] = CFG.GetOpt<int>(currentMCP, "isTrigger");
+                HV[MCPList.at(currentMCP)] = CFG.GetOpt<float>(currentMCP, "HV", iRun);
+                HV2[MCPList.at(currentMCP)] = CFG.GetOpt<float>(currentMCP, "HV2", iRun);
+                isTrigger[MCPList.at(currentMCP)] = CFG.GetOpt<int>(currentMCP, "isTrigger");            
             }
 
             run_id = run;
             X0     = CFG.GetOpt<float>("global", "nX0");
 
-            t1->GetEntry(iEntry);
+            positionTree->GetEntry(iEntry);
             tdcX = (*TDCreco)[0];
             tdcY = (*TDCreco)[1];
             // event = evtNumber;
@@ -400,17 +358,16 @@ int main (int argc, char** argv)
                 if (hodoY1[i]==true)   nhodoY1++;
                 if (hodoY2[i]==true)   nhodoY2++;
             }
-
             outTree->Fill();    
-
-            //  }
 	}     
         //---Get ready for next run
         chain->Delete();
-	t1->Delete();
+	positionTree->Delete();
+        ++iRun;
     }
     //-----close everything-----------------------------------------------------
-    for(int iCh=0; iCh<nChannels; iCh++) wf_promed[iCh]->Write();
+    for(int iCh=0; iCh<nCh; iCh++) 
+        wf_promed[iCh]->Write();
 
     outTree->Write();
     outROOT->Close();
