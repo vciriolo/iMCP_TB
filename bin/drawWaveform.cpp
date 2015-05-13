@@ -171,7 +171,8 @@ int main (int argc, char** argv)
 		  t1 = ampMaxTimeTemp-13;
 		  t2 = ampMaxTimeTemp+12;
 
-		if (channel!=trigPos)  SubtractBaseline(t1-27, t1-7, &digiCh[channel]);
+		  //		if (channel!=trigPos)  SubtractBaseline(t1-27, t1-7, &digiCh[channel]);
+		if (channel!=trigPos)  SubtractBaseline(25, 50, &digiCh[channel]);
 		  if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024) ampMaxTimeTemp = AmpMax(t1, t2, &digiCh[channel]);
 		  ampMaxTimeTemp = AmpMax(47, 500, &digiCh[channel]);
 
