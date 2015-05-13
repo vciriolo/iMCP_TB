@@ -242,6 +242,7 @@ int main(int argc, char** argv)
     //    sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
 
     sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
+    //    std::cout<<"DEBUG: "<<str_cut_sig<<std::endl;
     sprintf(str_cut_trig0, "charge[%d] > %d", trigPos1, treshold.at(trigPos1));
     //sprintf(str_cut_tdc, "1==1"); //selection OFF
     sprintf(str_cut_saturated, "amp_max[%d] > 3450", MCPNumber);
@@ -249,7 +250,8 @@ int main(int argc, char** argv)
     sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
     sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
     //    sprintf(str_cut_sci, "sci_front_adc > 400 && sci_front_adc <550");
-    sprintf(str_cut_multiplicity, "sci_front_adc > 80 && sci_front_adc < 300");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+    sprintf(str_cut_multiplicity, "sci_front_adc > 80 && sci_front_adc < 350");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+    //sprintf(str_cut_multiplicity, "1==1");// && bgo_back_adc > 420 && bgo_back_adc < 640");
 
     /*    if (MCPList.at(MCP)==4)
     {
@@ -422,8 +424,12 @@ int main(int argc, char** argv)
 	{
             sprintf(var_sig, "charge[%d]>>%s", MCPNumber, h_sig_name);
             sprintf(var_trig0, "charge[%d]>>%s", trigPos1, h_trig0_name);
-            nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_multiplicity, "goff");
-            nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_tdc && cut_multiplicity, "goff");
+	    //	    nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_multiplicity, "goff");
+	    //	    nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_tdc && cut_multiplicity, "goff");
+	    nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_multiplicity, "goff");
+            nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_multiplicity, "goff");
+	    //	    std::cout<<"DEBUG - sign: "<<h_sig->Integral(0, h_sig->GetNbinsX()+1)<<" - trig: "<<h_trig0->Integral(0, h_trig0->GetNbinsX()+1)<<std::endl;
+	    
             float eff = h_sig->Integral(0, h_sig->GetNbinsX()+1)/h_trig0->Integral(0, h_trig0->GetNbinsX()+1);
             float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->Integral(0, h_trig0->GetNbinsX()+1));
             if(eff < 0)   
