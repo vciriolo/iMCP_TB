@@ -56,6 +56,8 @@ int main (int argc, char** argv)
   std::cout<<"-----------COMPUTING CHARGE TRESHOLDS FOR EACH CHANNEL------------"<<std::endl;
   std::cout<<"NB: MCP is analyzed only if HV>treshold and PC is ON---------"<<std::endl;
 
+  gSystem->Load("libTree");
+
   int SBTreshold=1000;
   int nChannels=18;
   int HVtresh=2000;
