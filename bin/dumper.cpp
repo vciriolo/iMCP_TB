@@ -257,8 +257,9 @@ int main (int argc, char** argv)
                     ampMaxT[iCh]=ampMaxTimeTemp;
 		
                     //subtract baseline immediately before pulse		
-                    if(iCh!=trigPos) 
-                        SubtractBaseline(t1-27, t1-7, &digiCh[iCh]);  
+		    //                    if(iCh!=trigPos) 
+		    //		    SubtractBaseline(t1-27, t1-7, &digiCh[iCh]);  
+		    SubtractBaseline(25, 50, &digiCh[iCh]);  
                     intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
 
                     if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024){
