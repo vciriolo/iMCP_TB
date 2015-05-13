@@ -206,6 +206,7 @@ int main (int argc, char** argv)
     int nRuns = CFG.GetOpt<int>("global", "nRuns");
     int nCh = CFG.GetOpt<int>("global", "nChannels");
     int trigPos = CFG.GetOpt<int>("global", "trigPos");
+    int trigPos2 = CFG.GetOpt<int>("global", "trigPos2");
 
     //---------output tree----------------
     TFile* outROOT = TFile::Open(outputFile.c_str(), "recreate");  
