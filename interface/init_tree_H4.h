@@ -26,10 +26,8 @@ extern    unsigned int          digiSampleIndex[100000];
 extern    float                 digiSampleValue[100000];   
 
 extern std::vector<float>   *TDCreco;
-extern std::vector<bool> *HODOX1;
-extern std::vector<bool> *HODOX2;
-extern std::vector<bool> *HODOY1;
-extern std::vector<bool> *HODOY2;
+extern float HODOX[32];
+extern float HODOY[32];
 
 extern unsigned int spillNumber;
 
@@ -55,10 +53,8 @@ extern    TBranch        *b_digiSampleIndex;   //!
 extern    TBranch        *b_digiSampleValue;   //!
 
 extern TBranch  *b_TDCreco;
-extern TBranch  *b_HODOX1;
-extern TBranch  *b_HODOX2;
-extern TBranch  *b_HODOY1;
-extern TBranch  *b_HODOY2;
+extern TBranch  *b_HODOX;
+extern TBranch  *b_HODOY;
 extern TBranch  *b_spillNumber;
    
 void InitTree(TChain* nt);
