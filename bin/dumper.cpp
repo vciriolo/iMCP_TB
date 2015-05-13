@@ -344,7 +344,8 @@ int main (int argc, char** argv)
             }
 
             run_id = run;
-            X0     = CFG.GetOpt<float>("global", "nX0");
+
+            X0     = CFG.GetOpt<float>("global", "nX0", iRun);
 
             // positionTree->GetEntry(iEntry);
             // tdcX = (*TDCreco)[0];
