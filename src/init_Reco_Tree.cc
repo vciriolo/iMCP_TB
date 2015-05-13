@@ -41,6 +41,8 @@ bool hodoX1[64];
 bool hodoY1[64];
 bool hodoX2[64];
 bool hodoY2[64];
+int hodoXpos;
+int hodoYpos;
 int nhodoX1;
 int nhodoX2;
 int nhodoY1;
@@ -89,6 +91,8 @@ TBranch *b_hodoX1;
 TBranch *b_hodoY1;
 TBranch *b_hodoX2;
 TBranch *b_hodoY2;
+TBranch *b_hodoXpos;
+TBranch *b_hodoYpos;
 TBranch *b_nhodoX1;
 TBranch *b_nhodoY1;
 TBranch *b_nhodoX2;
@@ -149,12 +153,13 @@ void SetOutTree(TTree* outTree)
   outTree->Branch("hodoY1",&hodoY1,"hodoY1[64]/O");
   outTree->Branch("hodoX2",&hodoX2,"hodoX2[64]/O");
   outTree->Branch("hodoY2",&hodoY2,"hodoY2[64]/O");
+  outTree->Branch("hodoXpos",&hodoXpos,"hodoXpos/I");
+  outTree->Branch("hodoYpos",&hodoYpos,"hodoYpos/I");
 
   outTree->Branch("nhodoX1",&nhodoX1,"nhodoX1/I");
   outTree->Branch("nhodoY1",&nhodoY1,"nhodoY1/I");
   outTree->Branch("nhodoX2",&nhodoX2,"nhodoX2/I");
   outTree->Branch("nhodoY2",&nhodoY2,"nhodoY2/I");
-  //    outTree->Branch("MCPName"+nameMCP->at(Ch_1),&baseline_Ch1,"baseline_"+nameMCP->at(Ch_1)+"/F");          
 }
 
    

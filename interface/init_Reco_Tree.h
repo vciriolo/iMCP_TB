@@ -41,16 +41,14 @@ extern bool hodoX1[64];
 extern bool hodoY1[64];
 extern bool hodoX2[64];
 extern bool hodoY2[64];
+extern int hodoXpos;
+extern int hodoYpos;
 extern int nhodoX1;
 extern int nhodoX2;
 extern int nhodoY1;
 extern int nhodoY2;
 extern int                   sci_front_adc;
 extern int                   bgo_back_adc;
-/*
-extern int                   fibreX[8];
-extern int                   fibreY[8];
-*/
 
 // List of branches                 
 extern TBranch        *b_event;
@@ -89,16 +87,14 @@ extern TBranch *b_hodoX1;
 extern TBranch *b_hodoY1;
 extern TBranch *b_hodoX2;
 extern TBranch *b_hodoY2;
+extern TBranch *b_hodoXpos;
+extern TBranch *b_hodoYpos;
 extern TBranch *b_nhodoX1;
 extern TBranch *b_nhodoY1;
 extern TBranch *b_nhodoX2;
 extern TBranch *b_nhodoY2;
-extern TBranch        *b_sci_front_adc;
-extern TBranch        *b_bgo_back_adc;
-/*
-extern TBranch        *b_fibreX;   //!                                    
-extern TBranch        *b_fibreY;   //!                                        
-*/
+extern TBranch *b_sci_front_adc;
+extern TBranch *b_bgo_back_adc;
 
 void InitRecoTree(TTree* nt);
 
