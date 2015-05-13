@@ -431,7 +431,8 @@ int main(int argc, char** argv)
 	    //	    std::cout<<"DEBUG - sign: "<<h_sig->Integral(0, h_sig->GetNbinsX()+1)<<" - trig: "<<h_trig0->Integral(0, h_trig0->GetNbinsX()+1)<<std::endl;
 	    
             float eff = h_sig->Integral(0, h_sig->GetNbinsX()+1)/h_trig0->Integral(0, h_trig0->GetNbinsX()+1);
-            float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->Integral(0, h_trig0->GetNbinsX()+1));
+	    //            float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->Integral(0, h_trig0->GetNbinsX()+1)); //BUG
+            float e_eff = eff*TMath::Sqrt(1/(float)h_sig->Integral(0, h_sig->GetNbinsX()+1)+1/(float)h_trig0->Integral(0, h_trig0->GetNbinsX()+1));
             if(eff < 0)   
                 eff = 0;
 	    if(i == 0)
