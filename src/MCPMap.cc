@@ -12,7 +12,7 @@ void Fill_MCPList (void)
       MCPList.insert(std::make_pair("Double9040",4));
       MCPList.insert(std::make_pair("clock1",5));
       MCPList.insert(std::make_pair("clock2",6));
-      MCPList.insert(std::make_pair("Off1",7));
+      MCPList.insert(std::make_pair("Roma1",7));
       MCPList.insert(std::make_pair("Off2",8));
       MCPList.insert(std::make_pair("Off3",9));
       MCPList.insert(std::make_pair("Off4",10));
@@ -34,7 +34,7 @@ void Fill_inverted_MCPList (void)
       inverted_MCPList.insert(std::make_pair(4,"Double9040"));
       inverted_MCPList.insert(std::make_pair(5,"clock1"));
       inverted_MCPList.insert(std::make_pair(6,"clock2"));
-      inverted_MCPList.insert(std::make_pair(7,"Off1"));
+      inverted_MCPList.insert(std::make_pair(7,"Roma1"));
       inverted_MCPList.insert(std::make_pair(8,"Off2"));
       inverted_MCPList.insert(std::make_pair(9,"Off3"));
       inverted_MCPList.insert(std::make_pair(10,"Off4"));
