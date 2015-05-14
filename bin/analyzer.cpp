@@ -431,8 +431,8 @@ int main(int argc, char** argv)
 	    //	    std::cout<<"DEBUG - sign: "<<h_sig->Integral(0, h_sig->GetNbinsX()+1)<<" - trig: "<<h_trig0->Integral(0, h_trig0->GetNbinsX()+1)<<std::endl;
 	    
             float eff = h_sig->GetEntries()/h_trig0->GetEntries();
-	    //            float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->Integral(0, h_trig0->GetNbinsX()+1)); //BUG
-            float e_eff = eff*TMath::Sqrt(1/(float)h_sig->GetEntries()+1)+1/(float)h_trig0->GetEntries();
+	    float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->Integral(0, h_trig0->GetNbinsX()+1)); //BUG
+            // float e_eff = eff*TMath::Sqrt(1/(float)h_sig->GetEntries()+1)+1/(float)h_trig0->GetEntries();
             if(eff < 0)   
                 eff = 0;
 	    if(i == 0)
@@ -445,7 +445,7 @@ int main(int argc, char** argv)
             {
 	      printf("%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i) - HV2Val.at(i), eff, 0., e_eff);
                 outputFile << HVVal.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
-                g_eff->SetPoint(i, HVVal.at(i), eff);
+                g_eff->SetPoint(i, - HVVal.at(i) + HV2Val.at(i), eff);
                 g_eff->SetPointError(i, 0, e_eff);
 	    }
 	    else if(TString(scanType).Contains("HV1") == 1) 
