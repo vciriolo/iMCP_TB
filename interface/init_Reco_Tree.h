@@ -35,18 +35,14 @@ extern int                   HV[18];
 extern int                   HV2[18];
 extern int                   isTrigger[18];
 extern float                 X0;
-extern float tdcX;
-extern float tdcY;
-extern bool hodoX1[64];
-extern bool hodoY1[64];
-extern bool hodoX2[64];
-extern bool hodoY2[64];
+// extern float tdcX;
+// extern float tdcY;
+extern bool hodoX[32];
+extern bool hodoY[32];
 extern int hodoXpos;
 extern int hodoYpos;
 extern int nhodoX1;
-extern int nhodoX2;
 extern int nhodoY1;
-extern int nhodoY2;
 extern int                   sci_front_adc;
 extern int                   bgo_back_adc;
 
@@ -81,18 +77,14 @@ extern TBranch        *b_HV;   //!
 extern TBranch        *b_HV2;   //!     
 extern TBranch        *b_isTrigger;
 extern TBranch        *b_X0;
-extern TBranch *b_tdcX;
-extern TBranch *b_tdcY;
-extern TBranch *b_hodoX1;
-extern TBranch *b_hodoY1;
-extern TBranch *b_hodoX2;
-extern TBranch *b_hodoY2;
+// extern TBranch *b_tdcX;
+// extern TBranch *b_tdcY;
+extern TBranch *b_hodoX;
+extern TBranch *b_hodoY;
 extern TBranch *b_hodoXpos;
 extern TBranch *b_hodoYpos;
-extern TBranch *b_nhodoX1;
-extern TBranch *b_nhodoY1;
-extern TBranch *b_nhodoX2;
-extern TBranch *b_nhodoY2;
+extern TBranch *b_nhodoX;
+extern TBranch *b_nhodoY;
 extern TBranch *b_sci_front_adc;
 extern TBranch *b_bgo_back_adc;
 

@@ -32,6 +32,7 @@ public:
         {opts_ = *defaultCfg;};
 
     //---utils---
+    void                   Errors(string block, string key, int opt=0);
     inline void            ParseConfigFile(string* file) {ParseConfigFile(file->c_str());};
     void                   ParseConfigFile(const char* file);
 

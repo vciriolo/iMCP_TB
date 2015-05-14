@@ -473,8 +473,7 @@ float ComputeIntegral(int t1, int t2, const vector<float>* samples)
 {
     float integral=0;
     for(int bin=t1; bin<t2; bin++)
-      //      if (samples->at(bin)>0)    integral+=0;
-                             integral += samples->at(bin);
+        integral += samples->at(bin);
 
     return integral;
 }

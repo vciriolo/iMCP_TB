@@ -203,6 +203,7 @@ int main (int argc, char** argv)
 
     string inputFolder = CFG.GetOpt<string>("global", "inputDir");
     string outputFile = CFG.GetOpt<string>("global", "outputFile");
+    string runType = CFG.GetOpt<string>("global", "runType");
     int nRuns = CFG.GetOpt<int>("global", "nRuns");
     int nCh = CFG.GetOpt<int>("global", "nChannels");
     int trigPos = CFG.GetOpt<int>("global", "trigPos");
@@ -339,20 +340,20 @@ int main (int argc, char** argv)
                         if(adcData[iCh] > 700)
                         {
                             hodoXpos = PMT_to_hodoX_map[tmpPAD];
-                            hodoX1[PMT_to_hodoX_map[tmpPAD]] = 1;
+                            hodoX[PMT_to_hodoX_map[tmpPAD]] = 1;
                         }
                         else
-                            hodoX1[PMT_to_hodoX_map[tmpPAD]] = 0;
+                            hodoX[PMT_to_hodoX_map[tmpPAD]] = 0;
                     }
                     else if(tmpPAD >= 32 && tmpPAD < 64)
                     {
                         if(adcData[iCh] > 700)
                         {
                             hodoYpos = PMT_to_hodoY_map[tmpPAD];
-                            hodoY1[PMT_to_hodoY_map[tmpPAD]] = 1;
+                            hodoY[PMT_to_hodoY_map[tmpPAD]] = 1;
                         }
                         else
-                            hodoY1[PMT_to_hodoY_map[tmpPAD]] = 0;
+                            hodoY[PMT_to_hodoY_map[tmpPAD]] = 0;
                     }
                 }
             }
@@ -423,7 +424,7 @@ int main (int argc, char** argv)
 		    //                    if(iCh!=trigPos) 
 		    //		    SubtractBaseline(t1-27, t1-7, &digiCh[iCh]);  
 		    SubtractBaseline(25, 50, &digiCh[iCh]);  
-                    intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
+                    intBase[iCh] = ComputeIntegral(50, 75, &digiCh[iCh]);
 
                     if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024){
                         ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
@@ -508,8 +509,9 @@ int main (int argc, char** argv)
             }
 
             run_id = run;
-
-            X0     = CFG.GetOpt<float>("global", "nX0", iRun);
+            X0 = -1;
+            if(runType == "X0")
+                X0 = CFG.GetOpt<float>("global", "nX0", iRun);
 
             // positionTree->GetEntry(iEntry);
             // tdcX = (*TDCreco)[0];
