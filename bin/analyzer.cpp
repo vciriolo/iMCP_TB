@@ -5,7 +5,7 @@
 NEW - FOR BTF:
 - options "HV1" means HV1 varying while HV2 fixed
 - options "HV2" means HV2 varying while HV1 fixed
-- options "HV12" means both HV varying
+- options "HV12" means both HV varying (use HV1-HV2 as variable)
 
 ****************************************************************************************/
 #include <iostream>
@@ -237,7 +237,7 @@ int main(int argc, char** argv)
     //    float cutTDCX_min = -5.+ShiftX, cutTDCX_max = 3.+ShiftX, cutTDCY_min = -2.+ShiftY, cutTDCY_max = 6.+ShiftY; 
     //    sprintf(str_cut_tdc, "tdcX > %f && tdcX < %f && tdcY >%f && tdcY < %f", cutTDCX_min, cutTDCX_max, cutTDCY_min, cutTDCY_max);
     //    sprintf(str_cut_saturated, "amp_max[%d] > 3450", MCPNumber);
-    //    sprintf(str_cut_nFibers, "nhodoX1<=3 && nhodoX2<=3 && nhodoY1<=3 && nhodoY2<=3");
+    //    sprintf(str_cut_nFibers, "nhodoX<=3 && nhodoY<=3 && ");
     //    sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
     //    sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
 
@@ -441,25 +441,25 @@ int main(int argc, char** argv)
 		printf(" %s\teff\te_%s\te_eff\n", var_name, var_name);
 		printf("-----------------------------\n");
 	    }
-	    if(TString(scanType).Contains("HV1") == 1) 
+	    if(TString(scanType).Contains("HV12") == 1) 
             {
-	      printf("%d\t%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i), HV2Val.at(i), eff, 0., e_eff);
+	      printf("%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i) - HV2Val.at(i), eff, 0., e_eff);
+                outputFile << HVVal.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
+                g_eff->SetPoint(i, HVVal.at(i), eff);
+                g_eff->SetPointError(i, 0, e_eff);
+	    }
+	    else if(TString(scanType).Contains("HV1") == 1) 
+            {
+                printf("%d\t%d\t%.3f\t%.3f\n", HVVal.at(i), eff, 0., e_eff);
                 outputFile << HVVal.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
                 g_eff->SetPoint(i, HVVal.at(i), eff);
                 g_eff->SetPointError(i, 0, e_eff);
 	    }
 	    else if(TString(scanType).Contains("HV2") == 1) 
             {
-	      printf("%d\t%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i), HV2Val.at(i), eff, 0., e_eff);
+                printf("%d\t%d\t%.3f\t%.3f\n", HV2Val.at(i), eff, 0., e_eff);
                 outputFile << HV2Val.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
                 g_eff->SetPoint(i, HV2Val.at(i), eff);
-                g_eff->SetPointError(i, 0, e_eff);
-	    }
-	    else if(TString(scanType).Contains("HV12") == 1) 
-            {
-	      printf("%d\t%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i), HV2Val.at(i), eff, 0., e_eff);
-                outputFile << HVVal.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
-                g_eff->SetPoint(i, HVVal.at(i), eff);
                 g_eff->SetPointError(i, 0, e_eff);
 	    }
 	    else 

@@ -374,8 +374,8 @@ int main (int argc, char** argv)
 	     X0     = X0temp;
 
 	     t1->GetEntry(iEntry);
-	     tdcX = (*TDCreco)[0];
-	     tdcY = (*TDCreco)[1];
+	     // tdcX = (*TDCreco)[0];
+	     // tdcY = (*TDCreco)[1];
 
 	     if (spill!=spillNumber || event!=evtNumber) {
 	       std::cout<<"PROBLEM: non-coherent read"<<std::endl;

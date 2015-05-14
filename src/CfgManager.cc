@@ -5,6 +5,8 @@
 //----------get option by name------------------------------------------------------------
 template<> double CfgManager::GetOpt(string block, string key, int opt)
 {
+    Errors(block, key, opt);
+    
     double opt_val;
     istringstream buffer(opts_[block].at(key).at(opt));
     buffer >> opt_val;
@@ -24,10 +26,32 @@ template<> int CfgManager::GetOpt(string block, string key, int opt)
 
 template<> string CfgManager::GetOpt(string block, string key, int opt)
 {
+    Errors(block, key, opt);
     return opts_[block].at(key).at(opt);
 }    
 
 //**********utils*************************************************************************
+
+void CfgManager::Errors(string block, string key, int opt)
+{
+    if(opts_.count(block) == 0)
+    {
+        cout << "> CfgManager --- ERROR: block '"<< block << "' not found" << endl;
+        exit(-1);
+    }
+    if(opts_[block].count(key) == 0)
+    {
+        cout << "> CfgManager --- ERROR: option '"<< key << "' not found" << endl;
+        exit(-1);
+    }
+    if(opt >= opts_[block].at(key).size())
+    {
+        cout << "> CfgManager --- ERROR: option '"<< key << "' as less then "
+             << opt << "values (" << opts_[block].at(key).size() << ")" << endl;
+        exit(-1);
+    }
+    return;
+}
 
 void CfgManager::ParseConfigFile(const char* file)
 {
@@ -55,7 +79,7 @@ void CfgManager::ParseConfigFile(const char* file)
                     current_block = "global";
                 }
                 else
-                    cout << "ERROR, cfg file: wrong closing block // " << tokens.at(0) << endl;
+                    cout << "> CfgManager --- ERROR: wrong closing block // " << tokens.at(0) << endl;
             }
             else
             {

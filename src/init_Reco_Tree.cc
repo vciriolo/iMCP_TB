@@ -26,9 +26,6 @@ float                 charge_corr[18];
 float                 baseline[18];
 int                   sci_front_adc;
 int                   bgo_back_adc;
-/*int                   fibreX[8];
-int                   fibreY[8];
-*/
 int                   run_id;
 int                   isPCOn[18];
 int                   HV[18];
@@ -37,19 +34,15 @@ int                   isTrigger[18];
 float                 X0;
 float tdcX;
 float tdcY;
-bool hodoX1[64];
-bool hodoY1[64];
-bool hodoX2[64];
-bool hodoY2[64];
+bool hodoX[32];
+bool hodoY[32];
 int hodoXpos;
 int hodoYpos;
-int nhodoX1;
-int nhodoX2;
-int nhodoY1;
-int nhodoY2;
+int nhodoX;
+int nhodoY;
 
 // List of branches                     
-TBranch *b_event;
+TBranch        *b_event;
 TBranch        *b_time_CF;   //! 
 TBranch        *b_time_CF_corr;   //!   
 TBranch        *b_time_CF30;   //! 
@@ -87,16 +80,12 @@ TBranch        *b_isTrigger;
 TBranch        *b_X0;
 TBranch *b_tdcX;
 TBranch *b_tdcY;
-TBranch *b_hodoX1;
-TBranch *b_hodoY1;
-TBranch *b_hodoX2;
-TBranch *b_hodoY2;
+TBranch *b_hodoX;
+TBranch *b_hodoY;
 TBranch *b_hodoXpos;
 TBranch *b_hodoYpos;
-TBranch *b_nhodoX1;
-TBranch *b_nhodoY1;
-TBranch *b_nhodoX2;
-TBranch *b_nhodoY2;
+TBranch *b_nhodoX;
+TBranch *b_nhodoY;
 
 void init()
 {
@@ -129,11 +118,7 @@ void SetOutTree(TTree* outTree)
   outTree->Branch("charge",&charge,"charge[18]/F"); 
   outTree->Branch("charge_corr",&charge_corr,"charge_corr[18]/F");
   outTree->Branch("baseline",&baseline,"baseline[18]/F");
-  
-  //---hodoscope branches       
-  //  outTree->Branch("fibreX",&fibreX,"fibreX[8]/I");
-  //  outTree->Branch("fibreY",&fibreY,"fibreY[8]/I");
-  
+
   //---global branches    
   outTree->Branch("sci_front_adc",&sci_front_adc,"sci_front_adc/I");
   outTree->Branch("bgo_back_adc",&bgo_back_adc,"bgo_back_adc/I");
@@ -145,21 +130,14 @@ void SetOutTree(TTree* outTree)
   outTree->Branch("HV2",&HV2,"HV2[18]/I");
   outTree->Branch("isTrigger",&isTrigger,"isTrigger[18]/I");
   outTree->Branch("X0",&X0,"X0/F");
-
-  outTree->Branch("tdcX",&tdcX,"tdcX/F");
-  outTree->Branch("tdcY",&tdcY,"tdcY/F");
-
-  outTree->Branch("hodoX1",&hodoX1,"hodoX1[64]/O");
-  outTree->Branch("hodoY1",&hodoY1,"hodoY1[64]/O");
-  outTree->Branch("hodoX2",&hodoX2,"hodoX2[64]/O");
-  outTree->Branch("hodoY2",&hodoY2,"hodoY2[64]/O");
+  // outTree->Branch("tdcX",&tdcX,"tdcX/F");
+  // outTree->Branch("tdcY",&tdcY,"tdcY/F");
+  outTree->Branch("hodoX",&hodoX,"hodoX[32]/O");
+  outTree->Branch("hodoY",&hodoY,"hodoY[32]/O");
   outTree->Branch("hodoXpos",&hodoXpos,"hodoXpos/I");
   outTree->Branch("hodoYpos",&hodoYpos,"hodoYpos/I");
-
-  outTree->Branch("nhodoX1",&nhodoX1,"nhodoX1/I");
-  outTree->Branch("nhodoY1",&nhodoY1,"nhodoY1/I");
-  outTree->Branch("nhodoX2",&nhodoX2,"nhodoX2/I");
-  outTree->Branch("nhodoY2",&nhodoY2,"nhodoY2/I");
+  outTree->Branch("nhodoX",&nhodoX,"nhodoX/I");
+  outTree->Branch("nhodoY",&nhodoY,"nhodoY/I");
 }
 
    
@@ -195,16 +173,12 @@ void InitRecoTree(TTree* nt)
   nt->SetBranchAddress("HV2", &HV2, &b_HV2);
   nt->SetBranchAddress("isTrigger", &isTrigger, &b_isTrigger);
   nt->SetBranchAddress("X0", &X0, &b_X0);
-  nt->SetBranchAddress("tdcX", &tdcX, &b_tdcX);
-  nt->SetBranchAddress("tdcY", &tdcY, &b_tdcY);
-  nt->SetBranchAddress("hodoX1", &hodoX1, &b_hodoX1);
-  nt->SetBranchAddress("hodoY1", &hodoY1, &b_hodoY1);
-  nt->SetBranchAddress("hodoX2", &hodoX2, &b_hodoX2);
-  nt->SetBranchAddress("hodoY2", &hodoY2, &b_hodoY2);
-  nt->SetBranchAddress("nhodoX1", &nhodoX1, &b_nhodoX1);
-  nt->SetBranchAddress("nhodoY1", &nhodoY1, &b_nhodoY1);
-  nt->SetBranchAddress("nhodoX2", &nhodoX2, &b_nhodoX2);
-  nt->SetBranchAddress("nhodoY2", &nhodoY2, &b_nhodoY2);
+  // nt->SetBranchAddress("tdcX", &tdcX, &b_tdcX);
+  // nt->SetBranchAddress("tdcY", &tdcY, &b_tdcY);
+  nt->SetBranchAddress("hodoX", &hodoX, &b_hodoX);
+  nt->SetBranchAddress("hodoY", &hodoY, &b_hodoY);
+  nt->SetBranchAddress("nhodoX", &nhodoX, &b_nhodoX);
+  nt->SetBranchAddress("nhodoY", &nhodoY, &b_nhodoY);
   nt->SetBranchAddress("sci_front_adc", &sci_front_adc, &b_sci_front_adc);
   nt->SetBranchAddress("bgo_back_adc", &bgo_back_adc, &b_bgo_back_adc);
 
