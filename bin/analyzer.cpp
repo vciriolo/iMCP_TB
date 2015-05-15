@@ -443,9 +443,11 @@ int main(int argc, char** argv)
 	    }
 	    if(TString(scanType).Contains("HV12") == 1) 
             {
-	      printf("%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i) - HV2Val.at(i), eff, 0., e_eff);
+	      //	      printf("%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i) - HV2Val.at(i), eff, 0., e_eff);
+	      printf("%d\t%d\t%.3f\t%.3f\t%.3f\n", HVVal.at(i), HV2Val.at(i), eff, 0., e_eff);
                 outputFile << HVVal.at(i)<<"\t"<<eff<<"\t 0.\t"<<e_eff<<std::endl;
-                g_eff->SetPoint(i, - HVVal.at(i) + HV2Val.at(i), eff);
+		//                g_eff->SetPoint(i, - HVVal.at(i) + HV2Val.at(i), eff);
+                g_eff->SetPoint(i, HVVal.at(i), eff);
                 g_eff->SetPointError(i, 0, e_eff);
 	    }
 	    else if(TString(scanType).Contains("HV1") == 1) 
