@@ -327,7 +327,7 @@ int main(int argc, char** argv)
         sprintf(f_resCFD_name, "f_resCFD_%d", i);    
         sprintf(f_corrCFD_name, "f_corrCFD_%d", i);
         sprintf(f_corrCFD_name, "f_corrCFD2_%d", i);
-        TH1F* h_resCFD = new TH1F(h_resCFD_name, "Electron Beam 50 GeV", 250, -1, 1);
+        TH1F* h_resCFD = new TH1F(h_resCFD_name, "Electron Beam 50 GeV", 250, -0.5, 0.5);
 	h_resCFD->GetXaxis()->SetTitle("time_{MCP}-time_{TRIG} (ns)");
 	h_resCFD->GetYaxis()->SetTitle("Entries");
 	h_resCFD->GetXaxis()->SetTitleSize(0.05);
@@ -588,7 +588,7 @@ int main(int argc, char** argv)
             } 
             else if(TString(scanType).Contains("HV12") == 1) 
             {
-                printf("%d\t%d\t%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i),i, HV2Val.at(i), t_res, 0., e_t_res, prob);
+                printf("%d\t%d\t%d\t%.1f\t%.0f\t%.1f\t%.3f\n", i, HVVal.at(i),HV2Val.at(i), t_res, 0., e_t_res, prob);
                 outputFile << HVVal.at(i)<<"\t"<<t_res<<"\t 0.\t"<<e_t_res<<std::endl;
                 g_resCFD->SetPoint(g_resCFD->GetN(),  HVVal.at(i), t_res);
                 g_resCFD->SetPointError(g_resCFD->GetN()-1, 0, e_t_res);
