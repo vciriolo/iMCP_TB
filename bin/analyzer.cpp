@@ -231,6 +231,7 @@ int main(int argc, char** argv)
     char str_cut_bad_timeCFD[500]="";
     char str_cut_bad_timeLED[500]="";
     char str_cut_multiplicity[500]="";
+    char str_cut_noisePeak[500]="";
     //---Define Cuts---
     //    sprintf(str_cut_sig, "charge_corr[%d] > %d", MCPNumber, treshold.at(MCPNumber));
     //    sprintf(str_cut_trig0, "charge_corr[%d] > %d", trigPos1, treshold.at(trigPos1));
@@ -250,7 +251,10 @@ int main(int argc, char** argv)
     sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
     sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
     //    sprintf(str_cut_sci, "sci_front_adc > 400 && sci_front_adc <550");
-    sprintf(str_cut_multiplicity, "sci_front_adc > 80 && sci_front_adc < 350");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+    sprintf(str_cut_multiplicity, "amp_max[1]<20 && amp_max[2]<20 && sci_front_adc > 80 && sci_front_adc < 350");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+    int notMCPnumber = 2;
+    if(notMCPnumber == MCPNumber) notMCPnumber = notMCPnumber + 1;
+    sprintf(str_cut_noisePeak, "amp_max[%d] < 30", notMCPnumber);
     //sprintf(str_cut_multiplicity, "1==1");// && bgo_back_adc > 420 && bgo_back_adc < 640");
 
     /*    if (MCPList.at(MCP)==4)
@@ -276,6 +280,7 @@ int main(int argc, char** argv)
     TCut cut_bad_timeCFD = str_cut_bad_timeCFD;
     TCut cut_bad_timeLED = str_cut_bad_timeLED;
     TCut cut_multiplicity = str_cut_multiplicity;
+    TCut cut_noisePeak = str_cut_noisePeak;
 
 
 //-------Runs loop------------------------------------------------------------------------
@@ -426,8 +431,10 @@ int main(int argc, char** argv)
             sprintf(var_trig0, "charge[%d]>>%s", trigPos1, h_trig0_name);
 	    //	    nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_multiplicity, "goff");
 	    //	    nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_tdc && cut_multiplicity, "goff");
-	    nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_multiplicity && cut_tdc, "goff");
-            nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_multiplicity && cut_tdc, "goff");
+	    //nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_multiplicity && cut_tdc, "goff");
+            //nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_multiplicity && cut_tdc, "goff");
+	    nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_multiplicity && cut_tdc && cut_noisePeak, "goff");
+            nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_multiplicity && cut_tdc && cut_noisePeak, "goff");
 	    //	    std::cout<<"DEBUG - sign: "<<h_sig->Integral(0, h_sig->GetNbinsX()+1)<<" - trig: "<<h_trig0->Integral(0, h_trig0->GetNbinsX()+1)<<std::endl;
 	    
             float eff = h_sig->GetEntries()/h_trig0->GetEntries();
