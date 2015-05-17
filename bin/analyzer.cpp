@@ -176,7 +176,8 @@ int main(int argc, char** argv)
   clockPos1 = MCPList.at("clock1");
   clockPos2 = MCPList.at("clock2");
 
-  if (trigPos1==-1 || trigPos2==-1 || clockPos1==-1 || clockPos2==-1) {
+  //  if (trigPos1==-1 || trigPos2==-1 || clockPos1==-1 || clockPos2==-1) {
+  if (trigPos1==-1) {
     std::cout<<"ERROR!!! trigger or clock not found!!!"<<std::endl;
     return -1;
   }
@@ -251,7 +252,10 @@ int main(int argc, char** argv)
     sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
     sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
     //    sprintf(str_cut_sci, "sci_front_adc > 400 && sci_front_adc <550");
-    sprintf(str_cut_multiplicity, "amp_max[1]<20 && amp_max[2]<20 && sci_front_adc > 80 && sci_front_adc < 350");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+    if (TString(MCP).Contains("Double") == 1)
+		sprintf(str_cut_multiplicity, "amp_max[1]<20 && amp_max[2]<20 && sci_front_adc > 80 && sci_front_adc < 350");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+    else
+		sprintf(str_cut_multiplicity, "amp_max[3]<20 && amp_max[4]<20 && sci_front_adc > 80 && sci_front_adc < 350");// && bgo_back_adc > 420 && bgo_back_adc < 640");
     int notMCPnumber = 2;
     if(notMCPnumber == MCPNumber) notMCPnumber = notMCPnumber + 1;
     sprintf(str_cut_noisePeak, "amp_max[%d] < 30", notMCPnumber);
