@@ -53,13 +53,12 @@ int main(int argc, char** argv)
 
   std::cout<<plot_type<<std::endl;
 
-  TFile* inF_MiB3_ON;
-  TFile* inF_MiB3_OFF;
-  TFile* inF_enSEE;
-  TFile* inF_ZStack1_ON;
-  TFile* inF_ZStack1_OFF;
-  TFile* inF_ZStack2_ON;
-  TFile* inF_ZStack2_OFF;
+  TFile* inF_GaAsEm;
+  //TFile* inF_GaAsEm_OFF;
+  TFile* inF_MultiAlkEm;
+  //TFile* inF_MultiAlkEm_OFF;
+  TFile* inF_Double9090;
+  TFile* inF_Double9040;
 
   TFile* inF_MiB3;
   TFile* inF_ZStack1;
@@ -69,82 +68,61 @@ int main(int argc, char** argv)
 
   TLegend *legC;
 
-  if(plot_type == "HVScanON"){
+  if(plot_type == "HV12"){
     legC = new TLegend(0.15,0.60,0.35,0.85,NULL,"brNDC");
 
-    inF_MiB3_ON = TFile::Open("plots/resCFD_studies/MiB3_HV_HVScan2.root");
-    inF_MiB3_OFF = TFile::Open("plots/resCFD_studies/MiB3_HV_HVScan7.root");
-    inF_enSEE = TFile::Open("plots/resCFD_studies/enSEE_HV_HVScan5.root");
-    inF_ZStack1_ON = TFile::Open("plots/resCFD_studies/ZStack1_HV_HVScan1.root");
-    inF_ZStack1_OFF = TFile::Open("plots/resCFD_studies/ZStack1_HV_HVScan8.root");
-    inF_ZStack2_ON = TFile::Open("plots/resCFD_studies/ZStack2_HV_HVScan2.root");
-    inF_ZStack2_OFF = TFile::Open("plots/resCFD_studies/ZStack2_HV_HVScan6.root");
-
-    TGraphErrors* eff_MiB3_ON = (TGraphErrors*)inF_MiB3_ON->Get("resCFD");
-    TGraphErrors* eff_MiB3_OFF = (TGraphErrors*)inF_MiB3_OFF->Get("resCFD");
-    TGraphErrors* eff_enSEE = (TGraphErrors*)inF_enSEE->Get("resCFD");
-    TGraphErrors* eff_ZStack1_ON = (TGraphErrors*)inF_ZStack1_ON->Get("resCFD");
-    TGraphErrors* eff_ZStack1_OFF = (TGraphErrors*)inF_ZStack1_OFF->Get("resCFD");
-    TGraphErrors* eff_ZStack2_ON = (TGraphErrors*)inF_ZStack2_ON->Get("resCFD");
-    TGraphErrors* eff_ZStack2_OFF = (TGraphErrors*)inF_ZStack2_OFF->Get("resCFD");
+    inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_HV12_HVScan12_MultiAlkEm.root");
+    inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_HV12_HVScan12_GaAsEm.root");
+    //inF_GaAsEm_OFF = TFile::Open("plots/efficiency_studies/GaAsEm_HV_HVScan7.root");
+    inF_Double9090 = TFile::Open("plots/resCFD_studies/Double9090_HV12_HVScan12_Double9090.root");
+    inF_Double9040 = TFile::Open("plots/resCFD_studies/Double9040_HV12_HVScan12_Double9040.root");    
+    TGraphErrors* eff_GaAsEm = (TGraphErrors*)inF_GaAsEm->Get("resCFD");
+    TGraphErrors* eff_MultiAlkEm = (TGraphErrors*)inF_MultiAlkEm->Get("resCFD");
+    TGraphErrors* eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("resCFD");
+    TGraphErrors* eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("resCFD");
 
     //settings
-    eff_MiB3_ON->SetMarkerColor(kGreen+1);
-    eff_MiB3_ON->SetLineColor(kGreen+1);
-    eff_MiB3_OFF->SetMarkerColor(kGreen+1);
-    eff_MiB3_OFF->SetLineColor(kGreen+1);
-    eff_ZStack2_ON->SetMarkerColor(kBlue);
-    eff_ZStack2_ON->SetLineColor(kBlue);
-    eff_ZStack1_ON->SetMarkerColor(kRed);
-    eff_ZStack1_ON->SetLineColor(kRed);
-    eff_ZStack2_OFF->SetMarkerColor(kBlue);
-    eff_ZStack2_OFF->SetLineColor(kBlue);
-    eff_ZStack1_OFF->SetMarkerColor(kRed);
-    eff_ZStack1_OFF->SetLineColor(kRed);
-    eff_enSEE->SetMarkerColor(1);
-    eff_enSEE->SetLineColor(1);
+    eff_GaAsEm->SetMarkerColor(kGreen+1);
+    eff_GaAsEm->SetLineColor(kGreen+1);
+    //eff_GaAsEm_OFF->SetMarkerColor(kGreen+1);
+    //eff_GaAsEm_OFF->SetLineColor(kGreen+1);
+    eff_Double9040->SetMarkerColor(kBlue);
+    eff_Double9040->SetLineColor(kBlue);
+    eff_Double9090->SetMarkerColor(kRed);
+    eff_Double9090->SetLineColor(kRed);
+    eff_MultiAlkEm->SetMarkerColor(1);
+    eff_MultiAlkEm->SetLineColor(1);
   //
-    eff_MiB3_ON->SetMarkerStyle(20);
-    eff_MiB3_ON->SetLineWidth(2);
-    eff_MiB3_ON->SetMarkerSize(0.7);
-    eff_MiB3_OFF->SetMarkerStyle(22);
-    eff_MiB3_OFF->SetLineWidth(2);
-    eff_ZStack2_ON->SetMarkerStyle(20);
-    eff_ZStack2_ON->SetLineWidth(2);
-    eff_ZStack2_ON->SetMarkerSize(0.7);
-    eff_ZStack1_ON->SetMarkerStyle(20);
-    eff_ZStack1_ON->SetLineWidth(2);
-    eff_ZStack1_ON->SetMarkerSize(0.7);
-    eff_ZStack2_OFF->SetMarkerStyle(22);
-    eff_ZStack2_OFF->SetLineWidth(2);
-    eff_ZStack1_OFF->SetMarkerStyle(22);
-    eff_ZStack1_OFF->SetLineWidth(2);
-    eff_enSEE->SetMarkerStyle(22);
-    eff_enSEE->SetLineWidth(2);
-
+    eff_GaAsEm->SetMarkerStyle(20);
+    eff_GaAsEm->SetLineWidth(2);
+    eff_GaAsEm->SetMarkerSize(0.9);
+//    eff_GaAsEm_OFF->SetMarkerStyle(22);
+//    eff_GaAsEm_OFF->SetLineWidth(2);
+    eff_Double9040->SetMarkerStyle(20);
+    eff_Double9040->SetLineWidth(2);
+    eff_Double9040->SetMarkerSize(0.9);
+    eff_Double9090->SetMarkerStyle(20);
+    eff_Double9090->SetLineWidth(2);
+    eff_Double9090->SetMarkerSize(0.9);
+    eff_MultiAlkEm->SetMarkerStyle(22);
+    eff_MultiAlkEm->SetLineWidth(2);
 
     legC->SetTextFont(42);
-    legC->SetTextSize(0.048);
+    legC->SetTextSize(0.034);
     legC->SetFillColor(kWhite);
     legC->SetLineColor(kWhite);
     legC->SetShadowColor(kWhite);
-
-    legC->AddEntry(eff_MiB3_ON, "Double layer - PMT-MCP mode", "p");
-    //legC->AddEntry(eff_MiB3_OFF, "MiB3 chevron-OFF", "p");
-    legC->AddEntry(eff_ZStack2_ON, "ZStack2 - PMT-MCP mode", "p");
-    //legC->AddEntry(eff_ZStack2_OFF, "ZStack2 OFF", "p");
-    legC->AddEntry(eff_ZStack1_ON, "ZStack1 - PMT-MCP mode", "p");
-    //legC->AddEntry(eff_ZStack1_OFF, "ZStack1 OFF", "p");
-    //legC->AddEntry(eff_enSEE, "SEE OFF", "p");
+    legC->AddEntry(eff_MultiAlkEm, "MultiAlk. emitt. ON: #DeltaV_{12} = 300 V", "p");
+    legC->AddEntry(eff_GaAsEm, "GaAs emitt. ON: #DeltaV_{12} = 300 V", "p");
+//    legC->AddEntry(eff_GaAsEm_OFF, "GaAs emitt. - iMCP mode", "p");
+    legC->AddEntry(eff_Double9040, "Double9040 HV_{1} = HV_{2}", "p");
+    legC->AddEntry(eff_Double9090, "Double9090 HV_{1} = HV_{2}", "p");
   
-    mg->Add(eff_MiB3_ON);
-    //    mg->Add(eff_MiB3_OFF);
-    mg->Add(eff_ZStack1_ON);
-    //mg->Add(eff_ZStack1_OFF);
-    //mg->Add(eff_ZStack2_OFF);
-    mg->Add(eff_ZStack2_ON);
-    //mg->Add(eff_ZStack2_OFF);
-    //mg->Add(eff_enSEE);
+    mg->Add(eff_GaAsEm);
+//    mg->Add(eff_GaAsEm_OFF);
+    mg->Add(eff_Double9090);
+    mg->Add(eff_Double9040);
+    mg->Add(eff_MultiAlkEm);
 
     TCanvas* c = new TCanvas();
     gPad->SetTicks();
@@ -154,13 +132,13 @@ int main(int argc, char** argv)
     sprintf(plot_name, "final_plots/timeResCFD_%s.pdf", plot_type.c_str());
 
     mg->Draw("AP");
-    mg->SetTitle("Electron Beam 50 GeV");
-    mg->GetXaxis()->SetRangeUser(1400,3400);
-    mg->GetXaxis()->SetTitle("Bias voltage (V)");
+    mg->SetTitle("Electron Beam 450 MeV");
+    mg->GetXaxis()->SetRangeUser(1400,4000);
+    mg->GetXaxis()->SetTitle("HV_{1} (V)");
     mg->GetXaxis()->SetTitleSize(0.048);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.048);
-    mg->SetMaximum(100);
+    mg->SetMaximum(160);
     mg->SetMinimum(0);
     mg->Draw("AP");  
     legC->Draw("same");
@@ -177,82 +155,61 @@ int main(int argc, char** argv)
     c->SaveAs(plot_name, "C");
   }
 
-  if(plot_type == "HVScanOFF"){
+  if(plot_type == "HV1"){
     legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
 
-    inF_MiB3_ON = TFile::Open("plots/resCFD_studies/MiB3_HV_HVScan2.root");
-    inF_MiB3_OFF = TFile::Open("plots/resCFD_studies/MiB3_HV_HVScan7.root");
-    inF_enSEE = TFile::Open("plots/resCFD_studies/enSEE_HV_HVScan5.root");
-    inF_ZStack1_ON = TFile::Open("plots/resCFD_studies/ZStack1_HV_HVScan1.root");
-    inF_ZStack1_OFF = TFile::Open("plots/resCFD_studies/ZStack1_HV_HVScan8.root");
-    inF_ZStack2_ON = TFile::Open("plots/resCFD_studies/ZStack2_HV_HVScan2.root");
-    inF_ZStack2_OFF = TFile::Open("plots/resCFD_studies/ZStack2_HV_HVScan6.root");
-
-    TGraphErrors* eff_MiB3_ON = (TGraphErrors*)inF_MiB3_ON->Get("resCFD");
-    TGraphErrors* eff_MiB3_OFF = (TGraphErrors*)inF_MiB3_OFF->Get("resCFD");
-    TGraphErrors* eff_enSEE = (TGraphErrors*)inF_enSEE->Get("resCFD");
-    TGraphErrors* eff_ZStack1_ON = (TGraphErrors*)inF_ZStack1_ON->Get("resCFD");
-    TGraphErrors* eff_ZStack1_OFF = (TGraphErrors*)inF_ZStack1_OFF->Get("resCFD");
-    TGraphErrors* eff_ZStack2_ON = (TGraphErrors*)inF_ZStack2_ON->Get("resCFD");
-    TGraphErrors* eff_ZStack2_OFF = (TGraphErrors*)inF_ZStack2_OFF->Get("resCFD");
+    inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_HV1_HVScan1_GaAsEm.root");
+    //inF_GaAsEm_OFF = TFile::Open("plots/efficiency_studies/GaAsEm_HV_HVScan7.root");
+    inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_HV1_HVScan1_MultiAlkEm.root");
+    inF_Double9090 = TFile::Open("plots/resCFD_studies/Double9090_HV1_HVScan1_Double9090.root");
+    inF_Double9040 = TFile::Open("plots/resCFD_studies/Double9040_HV1_HVScan1_Double9040.root");    
+    TGraphErrors* eff_GaAsEm = (TGraphErrors*)inF_GaAsEm->Get("eff");
+    TGraphErrors* eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("eff");
+    TGraphErrors* eff_MultiAlkEm = (TGraphErrors*)inF_MultiAlkEm->Get("eff");
+    TGraphErrors* eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("eff");
 
     //settings
-    eff_MiB3_ON->SetMarkerColor(kGreen+1);
-    eff_MiB3_ON->SetLineColor(kGreen+1);
-    eff_MiB3_OFF->SetMarkerColor(kGreen+1);
-    eff_MiB3_OFF->SetLineColor(kGreen+1);
-    eff_ZStack2_ON->SetMarkerColor(kBlue);
-    eff_ZStack2_ON->SetLineColor(kBlue);
-    eff_ZStack1_ON->SetMarkerColor(kRed);
-    eff_ZStack1_ON->SetLineColor(kRed);
-    eff_ZStack2_OFF->SetMarkerColor(kBlue);
-    eff_ZStack2_OFF->SetLineColor(kBlue);
-    eff_ZStack1_OFF->SetMarkerColor(kRed);
-    eff_ZStack1_OFF->SetLineColor(kRed);
-    eff_enSEE->SetMarkerColor(1);
-    eff_enSEE->SetLineColor(1);
+    eff_GaAsEm->SetMarkerColor(kGreen+1);
+    eff_GaAsEm->SetLineColor(kGreen+1);
+    //eff_GaAsEm_OFF->SetMarkerColor(kGreen+1);
+    //eff_GaAsEm_OFF->SetLineColor(kGreen+1);
+    eff_Double9040->SetMarkerColor(kBlue);
+    eff_Double9040->SetLineColor(kBlue);
+    eff_Double9090->SetMarkerColor(kRed);
+    eff_Double9090->SetLineColor(kRed);
+    eff_MultiAlkEm->SetMarkerColor(1);
+    eff_MultiAlkEm->SetLineColor(1);
   //
-    eff_MiB3_ON->SetMarkerStyle(20);
-    eff_MiB3_ON->SetLineWidth(2);
-    eff_MiB3_ON->SetMarkerSize(0.7);
-    eff_MiB3_OFF->SetMarkerStyle(22);
-    eff_MiB3_OFF->SetLineWidth(2);
-    eff_ZStack2_ON->SetMarkerStyle(20);
-    eff_ZStack2_ON->SetLineWidth(2);
-    eff_ZStack2_ON->SetMarkerSize(0.7);
-    eff_ZStack1_ON->SetMarkerStyle(20);
-    eff_ZStack1_ON->SetLineWidth(2);
-    eff_ZStack1_ON->SetMarkerSize(0.7);
-    eff_ZStack2_OFF->SetMarkerStyle(22);
-    eff_ZStack2_OFF->SetLineWidth(2);
-    eff_ZStack1_OFF->SetMarkerStyle(22);
-    eff_ZStack1_OFF->SetLineWidth(2);
-    eff_enSEE->SetMarkerStyle(22);
-    eff_enSEE->SetLineWidth(2);
-
+    eff_GaAsEm->SetMarkerStyle(20);
+    eff_GaAsEm->SetLineWidth(2);
+    eff_GaAsEm->SetMarkerSize(0.9);
+//    eff_GaAsEm_OFF->SetMarkerStyle(22);
+//    eff_GaAsEm_OFF->SetLineWidth(2);
+    eff_Double9040->SetMarkerStyle(20);
+    eff_Double9040->SetLineWidth(2);
+    eff_Double9040->SetMarkerSize(0.9);
+    eff_Double9090->SetMarkerStyle(20);
+    eff_Double9090->SetLineWidth(2);
+    eff_Double9090->SetMarkerSize(0.9);
+    eff_MultiAlkEm->SetMarkerStyle(22);
+    eff_MultiAlkEm->SetLineWidth(2);
 
     legC->SetTextFont(42);
-    legC->SetTextSize(0.045);
+    legC->SetTextSize(0.034);
     legC->SetFillColor(kWhite);
     legC->SetLineColor(kWhite);
     legC->SetShadowColor(kWhite);
-
-    //    legC->AddEntry(eff_MiB3_ON, "MiB3 chevron-ON", "p");
-    legC->AddEntry(eff_MiB3_OFF, "Double layer - iMCP mode", "p");
-    //    legC->AddEntry(eff_ZStack2_ON, "ZStack2 ON", "p");
-    legC->AddEntry(eff_ZStack2_OFF, "ZStack2 - iMCP mode", "p");
-    //    legC->AddEntry(eff_ZStack1_ON, "ZStack1 ON", "p");
-    legC->AddEntry(eff_ZStack1_OFF, "ZStack1 - iMCP mode", "p");
-    legC->AddEntry(eff_enSEE, "SEE - iMCP mode", "p");
+    legC->AddEntry(eff_MultiAlkEm, "MultiAlk emitt. HV_{2} = 2700 (V)", "p");
+    legC->AddEntry(eff_GaAsEm, "GaAs emitt. HV{2} = 2700 (V)", "p");
+//    legC->AddEntry(eff_GaAsEm_OFF, "GaAs emitt. - iMCP mode", "p");
+    legC->AddEntry(eff_Double9040, "Double9040 HV_{2} = 2700 (V)", "p");
+    legC->AddEntry(eff_Double9090, "Double9090 HV_{2} = 2700 (V)", "p");
   
-    //    mg->Add(eff_MiB3_ON);
-    mg->Add(eff_MiB3_OFF);
-    //    mg->Add(eff_ZStack1_ON);
-    mg->Add(eff_ZStack1_OFF);
-    mg->Add(eff_ZStack2_OFF);
-    //    mg->Add(eff_ZStack2_ON);
-    mg->Add(eff_ZStack2_OFF);
-    mg->Add(eff_enSEE);
+    mg->Add(eff_GaAsEm);
+//    mg->Add(eff_GaAsEm_OFF);
+    mg->Add(eff_Double9090);
+    mg->Add(eff_Double9040);
+    mg->Add(eff_MultiAlkEm);
 
     TCanvas* c = new TCanvas();
     gPad->SetTicks();
@@ -262,9 +219,9 @@ int main(int argc, char** argv)
     sprintf(plot_name, "final_plots/timeResCFD_%s.pdf", plot_type.c_str());
 
     mg->Draw("AP");
-    mg->SetTitle("Electron Beam 50 GeV");
+    mg->SetTitle("Electron Beam 450 MeV");
     mg->GetXaxis()->SetRangeUser(1400,3400);
-    mg->GetXaxis()->SetTitle("Bias voltage (V)");
+    mg->GetXaxis()->SetTitle("HV_{1} (V)");
     mg->GetXaxis()->SetTitleSize(0.048);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.048);
@@ -286,119 +243,59 @@ int main(int argc, char** argv)
   }
 
   else {
-    legC = new TLegend(0.45,0.60,0.65,0.80,NULL,"brNDC");
+    if(plot_type == "X0"){
+    legC = new TLegend(0.4,0.15,0.25,0.42,NULL,"brNDC");
 
-    TGraphErrors* eff_MiB3;
-    TGraphErrors* eff_enSEE;
-    TGraphErrors* eff_ZStack1;
-    TGraphErrors* eff_ZStack2;
+    inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_X0_X0Scan12_GaAsEm.root");
+    //inF_GaAsEm_OFF = TFile::Open("plots/efficiency_studies/GaAsEm_HV_HVScan7.root");
+    inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_X0_X0Scan12_MultiAlkEm.root");
+    inF_Double9090 = TFile::Open("plots/resCFD_studies/Double9090_X0_X0Scan12_Double9090.root");
+    inF_Double9040 = TFile::Open("plots/resCFD_studies/Double9040_X0_X0Scan12_Double9040.root");    
 
-    if(plot_type == "AngScanHigh"){
-      inF_MiB3 = TFile::Open("plots/resCFD_studies/MiB3_X0_AngScan_HVHigh.root");
-      inF_enSEE = TFile::Open("plots/resCFD_studies/enSEE_X0_AngScan_HVHigh.root");
-      inF_ZStack1 = TFile::Open("plots/resCFD_studies/ZStack1_X0_AngScan_HVHigh.root");
-    }
-    if(plot_type == "AngScanLow"){
-      inF_MiB3 = TFile::Open("plots/resCFD_studies/MiB3_X0_AngScan_HVLow.root");
-      inF_enSEE = TFile::Open("plots/resCFD_studies/enSEE_X0_AngScan_HVLow.root");
-      inF_ZStack1 = TFile::Open("plots/resCFD_studies/ZStack1_X0_AngScan_HVLow.root");
-    }
-    
-    if(plot_type == "scanX0_HVHigh_50"){
-      inF_MiB3 = TFile::Open("plots/resCFD_studies/MiB3_X0_scanX0_HVHigh50GeV.root");
-      inF_enSEE = TFile::Open("plots/resCFD_studies/enSEE_X0_scanX0_HVHigh50GeV.root");
-      inF_ZStack2 = TFile::Open("plots/resCFD_studies/ZStack2_X0_scanX0_HVHigh50GeV.root");
-      inF_ZStack1 = TFile::Open("plots/resCFD_studies/ZStack1_X0_scanX0_HVHigh50GeV.root");
-    }
-    if(plot_type == "scanX0_HVHigh_20"){
-      inF_MiB3 = TFile::Open("plots/resCFD_studies/MiB3_X0_scanX0_HVHigh20GeV.root");
-      inF_enSEE = TFile::Open("plots/resCFD_studies/enSEE_X0_scanX0_HVHigh20GeV.root");
-      inF_ZStack2 = TFile::Open("plots/resCFD_studies/ZStack2_X0_scanX0_HVHigh20GeV.root");
-      inF_ZStack1 = TFile::Open("plots/resCFD_studies/ZStack1_X0_scanX0_HVHigh20GeV.root");
-    }
-    if(plot_type == "scanX0_HVLow_50"){
-      inF_MiB3 = TFile::Open("plots/resCFD_studies/MiB3_X0_scanX0_HVLow50GeV.root");
-      inF_enSEE = TFile::Open("plots/resCFD_studies/enSEE_X0_scanX0_HVLow50GeV.root");
-      inF_ZStack2 = TFile::Open("plots/resCFD_studies/ZStack2_X0_scanX0_HVLow50GeV.root");
-      inF_ZStack1 = TFile::Open("plots/resCFD_studies/ZStack1_X0_scanX0_HVLow50GeV.root");
-    }
-    if(plot_type == "scanX0_HVLow_20"){
-      inF_MiB3 = TFile::Open("plots/resCFD_studies/MiB3_X0_scanX0_HVLow20GeV.root");
-      inF_enSEE = TFile::Open("plots/resCFD_studies/enSEE_X0_scanX0_HVLow20GeV.root");
-      inF_ZStack2 = TFile::Open("plots/resCFD_studies/ZStack2_X0_scanX0_HVLow20GeV.root");
-      inF_ZStack1 = TFile::Open("plots/resCFD_studies/ZStack1_X0_scanX0_HVLow20GeV.root");
-    }
+    TGraphErrors* eff_GaAsEm;
+    TGraphErrors* eff_MultiAlkEm;
+    TGraphErrors* eff_Double9090;
+    TGraphErrors* eff_Double9040;
     
     
-    eff_MiB3 = (TGraphErrors*)inF_MiB3->Get("resCFD");
-    eff_enSEE = (TGraphErrors*)inF_enSEE->Get("resCFD");
-    eff_ZStack1 = (TGraphErrors*)inF_ZStack1->Get("resCFD");
-    if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20" || plot_type=="scanX0_HVHigh_50" || plot_type=="scanX0_HVLow_50") 
-      eff_ZStack2 = (TGraphErrors*)inF_ZStack2->Get("resCFD");
+    eff_GaAsEm = (TGraphErrors*)inF_GaAsEm->Get("eff");
+    eff_MultiAlkEm = (TGraphErrors*)inF_MultiAlkEm->Get("eff");
+    eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("eff");
+    eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("eff");
     
     //settings
-    eff_MiB3->SetMarkerColor(kGreen+1);
-    eff_MiB3->SetLineColor(kGreen+1);
-    if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20" || plot_type=="scanX0_HVHigh_50" || plot_type=="scanX0_HVLow_50") {
-      eff_ZStack2->SetMarkerColor(kBlue);
-      eff_ZStack2->SetLineColor(kBlue);
-    }
-    eff_ZStack1->SetMarkerColor(kRed);
-    eff_ZStack1->SetLineColor(kRed);
-    eff_enSEE->SetMarkerColor(1);
-    eff_enSEE->SetLineColor(1);
-    //
-    eff_MiB3->SetMarkerStyle(20);
-    eff_MiB3->SetLineWidth(2);
-    eff_MiB3->SetMarkerSize(0.7);
-    if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20" || plot_type=="scanX0_HVHigh_50" || plot_type=="scanX0_HVLow_50") {
-      eff_ZStack2->SetMarkerStyle(20);
-      eff_ZStack2->SetLineWidth(2);
-      eff_ZStack2->SetMarkerSize(0.7);
-    }
-    eff_ZStack1->SetMarkerStyle(20);
-    eff_ZStack1->SetLineWidth(2);
-    eff_ZStack1->SetMarkerSize(0.7);
-    eff_enSEE->SetMarkerStyle(20);
-    eff_enSEE->SetLineWidth(2);
-    eff_enSEE->SetMarkerSize(0.7);
+    eff_GaAsEm->SetMarkerColor(kGreen+1);
+    eff_GaAsEm->SetLineColor(kGreen+1);
+    eff_Double9040->SetMarkerColor(kBlue);
+    eff_Double9040->SetLineColor(kBlue);
+    eff_Double9090->SetMarkerColor(kRed);
+    eff_Double9090->SetLineColor(kRed);
+    eff_MultiAlkEm->SetMarkerColor(1);
+    eff_MultiAlkEm->SetLineColor(1);
+    eff_GaAsEm->SetMarkerStyle(20);
+    eff_GaAsEm->SetLineWidth(2);
+    eff_GaAsEm->SetMarkerSize(0.9);  
+    eff_Double9040->SetMarkerStyle(20);
+    eff_Double9040->SetLineWidth(2);
+    eff_Double9040->SetMarkerSize(0.9);
+    eff_Double9090->SetMarkerStyle(20);
+    eff_Double9090->SetLineWidth(2);
+    eff_Double9090->SetMarkerSize(0.9);
+    eff_MultiAlkEm->SetMarkerStyle(20);
+    eff_MultiAlkEm->SetLineWidth(2);
+    eff_MultiAlkEm->SetMarkerSize(0.9);
     
     legC->SetTextFont(42);
-    legC->SetTextSize(0.04);
+    legC->SetTextSize(0.037);
     legC->SetFillColor(kWhite);
     legC->SetLineColor(kWhite);
     legC->SetShadowColor(kWhite);
-        
-    if(plot_type == "AngScanLow"){
-      legC->AddEntry(eff_MiB3, "Double layer - iMCP mode - 3000 V", "p");
-      legC->AddEntry(eff_ZStack1, "ZStack1 - iMCP mode - 3000 V", "p");
-      legC->AddEntry(eff_enSEE, "SEE - iMCP mode - 1900 V", "p");
-    }
-    if(plot_type == "AngScanHigh"){
-      legC->AddEntry(eff_MiB3, "Double layer - iMCP mode - 3200 V", "p");
-      legC->AddEntry(eff_ZStack1, "ZStack1 - iMCP mode - 3200 V", "p");
-      legC->AddEntry(eff_enSEE, "SEE - iMCP mode - 2200 V", "p");
-    }
 
-    if(plot_type == "scanX0_HVHigh_50" || plot_type == "scanX0_HVHigh_20"){
-      legC->AddEntry(eff_MiB3, "Double layer - iMCP mode - 3200 V", "p");
-      legC->AddEntry(eff_ZStack1, "ZStack1 - iMCP mode - 3200 V", "p");
-      legC->AddEntry(eff_enSEE, "SEE - iMCP mode - 2200 V", "p");
-      legC->AddEntry(eff_ZStack2, "ZStack2 - iMCP mode - 3200", "p");
-    }
+    mg->Add(eff_GaAsEm);
+    mg->Add(eff_Double9090);
+    mg->Add(eff_MultiAlkEm);
+    mg->Add(eff_Double9040);
 
-    if(plot_type == "scanX0_HVLow_50" || plot_type == "scanX0_HVLow_20"){
-      legC->AddEntry(eff_MiB3, "Double layer - iMCP mode - 3000 V", "p");
-      legC->AddEntry(eff_ZStack1, "ZStack1 - iMCP mode - 3000 V", "p");
-      legC->AddEntry(eff_enSEE, "SEE - iMCP mode - 1900 V", "p");
-      legC->AddEntry(eff_ZStack2, "ZStack2 - iMCP mode - 3000", "p");
-    }
-
-    mg->Add(eff_MiB3);
-    mg->Add(eff_ZStack1);
-    mg->Add(eff_enSEE);
-    if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20" || plot_type=="scanX0_HVHigh_50" || plot_type=="scanX0_HVLow_50") 
-      mg->Add(eff_ZStack2);
 
     TCanvas* c = new TCanvas();
     gPad->SetTicks();
@@ -407,36 +304,16 @@ int main(int argc, char** argv)
     system(command.c_str());
     sprintf(plot_name, "final_plots/timeResCFD_%s.pdf", plot_type.c_str());
 
-    mg->Draw("AP");
-    if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20" || plot_type=="scanX0_HVHigh_50" || plot_type=="scanX0_HVLow_50") 
-      {
-	if (plot_type=="scanX0_HVLow_20" || plot_type=="scanX0_HVHigh_20") {
-	  mg->SetTitle("Electron Beam 20 GeV");
-	  mg->GetXaxis()->SetRangeUser(-0.1,5.1);
-	}
-	else {
-	  mg->SetTitle("Electron Beam 50 GeV");
-	  mg->GetXaxis()->SetRangeUser(-0.1,5.1);
-	}
-	mg->GetXaxis()->SetTitle("Number of X_{0}");
-	mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
-	mg->GetXaxis()->SetTitleSize(0.045);
-	mg->GetYaxis()->SetTitleSize(0.045);
-	//	mg->SetTitle(plot_type.c_str());
-      }
-    else
-      {
-	mg->SetTitle("Electron Beam 50 GeV");
-	mg->GetXaxis()->SetRangeUser(-0.1, 50);
-	mg->GetXaxis()->SetTitle("Angle (degrees)");
-	mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
-	mg->GetXaxis()->SetTitleSize(0.045);
-	mg->GetYaxis()->SetTitleSize(0.045);
-	//	mg->SetTitle(plot_type.c_str());
-      }
-
-    mg->SetMaximum(100);
+   mg->Draw("AP");
+    mg->SetTitle("Electron Beam 450 MeV");
+    mg->GetXaxis()->SetRangeUser(-0.1,5.1);
+    mg->GetXaxis()->SetTitle("Number of X_{0}");
+    mg->GetXaxis()->SetTitleSize(0.046);
+    mg->GetYaxis()->SetTitle("Efficiency");
+    mg->GetYaxis()->SetTitleSize(0.046);
+    mg->SetMaximum(1);
     mg->SetMinimum(0);
+     
     mg->Draw("AP");  
     legC->Draw("same");
     banner4Plot();
@@ -451,7 +328,7 @@ int main(int argc, char** argv)
     sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
     c->SaveAs(plot_name, "C");
   }
-
+}
 
   return 0;
 }
