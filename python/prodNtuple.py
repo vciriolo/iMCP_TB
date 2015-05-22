@@ -8,9 +8,14 @@ import time
 import subprocess
 
 currentDir = os.getcwd();
-CMSSWDir = currentDir+"../../";
+CMSSWDir = currentDir+"/../../";
 
-name = ["HVScan1","HVScan2","HVScan3","HVScan4","HVScan5","HVScan6","HVScan7","HVScan8","AngScan_HVHigh","AngScan_HVLow","pedestal","preshower_600GeV_HighV","scanX0_HVHigh20GeV","scanX0_HVHigh50GeV","scanX0_HVLow20GeV","scanX0_HVLow50GeV","H4test_X0scan_HVH_20GeV", "H4test_X0scan_HVH_50GeV", "H4test_X0scan_HVL_20GeV", "H4test_X0scan_HVL_50GeV"];
+name = ["AngScan_Double9040","HVScan12_Double9040_part1","HVScan12_Double9040_part2","HVScan12_Double9090","HVScan12_GaAsEm_part1","HVScan12_GaAsEm_part2",
+        "HVScan12_MultiAlkEm_part1","HVScan12_MultiAlkEm_part2","HVScan12bis_GaAsEm","HVScan1_Double9040","HVScan1_Double9090","HVScan1_GaAsEm",
+        "HVScan1_MultiAlkEm","HVScan2_Double9040","HVScan2_Double9090","HVScanExt_Double9040","HVScanExt_Double9090","LongScan0X0_Double9040",
+        "LongScan0X0_Double9090","LongScan0X0_GaAsEm","LongScan0X0_MultiAlkEm","LongScan2X0_Double9040","LongScan2X0_Double9090","LongScan2X0_GaAsEm",
+        "LongScan2X0_MultiAlkEm","X0Scan12_Double9040","X0Scan12_Double9090","X0Scan12_GaAsEm","X0Scan12_MultiAlkEm","X0Scan1_Double9040",
+        "X0Scan1_Double9090","X0Scan1_MultiAlkEm"];
 
 for i in range(len(name)):
     fn = "Job/Job_"+name[i];
