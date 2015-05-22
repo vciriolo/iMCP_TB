@@ -41,7 +41,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
     gSystem->Load("libTree");
-    char *label, *doWhat, *scanType;
+    char *label, *doWhat, *scanTypeIN, *scanType;
     Fill_MCPList();
     Fill_inverted_MCPList();
 
@@ -49,10 +49,14 @@ int main(int argc, char** argv)
     std::ifstream inputCfg (argv[1],ios::in);
     std::string MCP = argv[2];
     doWhat = argv[3];
-    scanType = argv[4];
+    scanTypeIN = argv[4];
     label = argv[5];
 
-    std::cout<<"----START ANALYZER: analyzing MCP "<<MCP<<", mode: "<<scanType<<", scan: "<<label<<"-------"<<std::endl;
+    scanType=scanTypeIN;
+    if (strcmp(scanTypeIN,"Ang")==0)
+      scanType="X0";
+
+    std::cout<<"----START ANALYZER: analyzing MCP "<<MCP<<", mode: "<<scanTypeIN<<", scan: "<<label<<"-------"<<std::endl;
  
     int MCPNumber = MCPList.at(MCP);
     std::map <int,int> treshold;
@@ -79,7 +83,7 @@ int main(int argc, char** argv)
     InitRecoTree(nt);
     //---txt---
     char outputFileName[200]="";
-    sprintf(outputFileName, "results/%s_%s_%s_%s.txt", MCP.c_str(), doWhat, scanType, label);
+    sprintf(outputFileName, "results/%s_%s_%s_%s.txt", MCP.c_str(), doWhat, scanTypeIN, label);
     std::ofstream outputFile (outputFileName, std::ofstream::out);
   
     //---ROOT---
@@ -93,28 +97,28 @@ int main(int argc, char** argv)
     {
         sprintf(mkdir_command, "if [ ! -e plots/efficiency_studies ] ; then mkdir plots/efficiency_studies ; fi");
         system(mkdir_command);         
-        outROOT_eff = TFile::Open(Form("plots/efficiency_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
+        outROOT_eff = TFile::Open(Form("plots/efficiency_studies/%s_%s_%s.root", MCP.c_str(), scanTypeIN, label), "recreate");
     }
     //---charge
     if(strcmp(doWhat, "Q") == 0 || strcmp(doWhat, "all") == 0)
     {
         sprintf(mkdir_command, "if [ ! -e plots/charge_studies ] ; then mkdir plots/charge_studies ; fi");
         system(mkdir_command);         
-        outROOT_Q = TFile::Open(Form("plots/charge_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
+        outROOT_Q = TFile::Open(Form("plots/charge_studies/%s_%s_%s.root", MCP.c_str(), scanTypeIN, label), "recreate");
     }    
     //---time resolution CFD
     if(strcmp(doWhat, "timeCFD") == 0 || strcmp(doWhat, "all") == 0)
     {
         sprintf(mkdir_command, "if [ ! -e plots/resCFD_studies ] ; then mkdir plots/resCFD_studies ; fi");
         system(mkdir_command);         
-        outROOT_CFD = TFile::Open(Form("plots/resCFD_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
+        outROOT_CFD = TFile::Open(Form("plots/resCFD_studies/%s_%s_%s.root", MCP.c_str(), scanTypeIN, label), "recreate");
     }
     //---time resolution LED
     if(strcmp(doWhat, "timeLED") == 0 || strcmp(doWhat, "all") == 0)
     {
         sprintf(mkdir_command, "if [ ! -e plots/resLED_studies ] ; then mkdir plots/resLED_studies ; fi");
         system(mkdir_command);         
-        outROOT_LED = TFile::Open(Form("plots/resLED_studies/%s_%s_%s.root", MCP.c_str(), scanType, label), "recreate");
+        outROOT_LED = TFile::Open(Form("plots/resLED_studies/%s_%s_%s.root", MCP.c_str(), scanTypeIN, label), "recreate");
     }
 
 
@@ -246,10 +250,10 @@ int main(int argc, char** argv)
     sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
     //    std::cout<<"DEBUG: "<<str_cut_sig<<std::endl;
     sprintf(str_cut_trig0, "charge[%d] > %d && charge[%d] > %d", trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
-    if(strcmp(scanType, "X0") == 0) 
+    if(strcmp(scanTypeIN, "X0") == 0) 
       sprintf(str_cut_tdc, "hodoXpos>10 && hodoXpos<15 && hodoYpos>10 && hodoYpos<15"); 
     else
-       sprintf(str_cut_tdc, "1==1"); //selection OFF because there are some runs with bad hodo position -> need to check this!!!!!!!
+      sprintf(str_cut_tdc, "1==1"); //selection OFF because there are some runs with bad hodo position -> need to check this!!!!!!!
     sprintf(str_cut_saturated, "amp_max[%d] > 3450", MCPNumber);
     //sprintf(str_cut_nFibers, "1==1"); //selection OFF
     sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
