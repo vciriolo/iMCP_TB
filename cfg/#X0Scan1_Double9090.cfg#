@@ -1,5 +1,5 @@
 <global>
-inputDir /gwteray/users/pigazzini/IMCP/BTF2015/raw_data
+inputDir ./
 outputFile ntuples/reco_X0Scan1_Double9090.root
 
 runType X0
