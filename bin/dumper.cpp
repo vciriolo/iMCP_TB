@@ -250,7 +250,7 @@ int main (int argc, char** argv)
         // sprintf(command1, "find  %s/%d/*/dqmPlotstotal.root > ntuples/listTemp_%d.txt", (inputFolder).c_str(), run, run);
         // system(command1);
         char command2[300];
-        sprintf(command2, "find  %s/%d/[0-9]*.root > ntuples/listTemp2_%d.txt", (inputFolder).c_str(), run, run);
+        sprintf(command2, "find  %s/%d.root > ntuples/listTemp2_%d.txt", (inputFolder).c_str(), run, run);
         system(command2);
 
         // char list1[200];
