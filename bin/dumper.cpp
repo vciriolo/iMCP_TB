@@ -538,6 +538,7 @@ int main (int argc, char** argv)
             outTree->Fill();    
 	}     
         //---Get ready for next run
+	outTree->AutoSave();
         chain->Delete();
 	// positionTree->Delete();
         ++iRun;
