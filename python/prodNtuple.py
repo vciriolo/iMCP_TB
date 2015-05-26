@@ -30,4 +30,4 @@ for i in range(len(name)):
     outScript.close();
 
     os.system("chmod 777 "+currentDir+"/"+fn+".sh");
-    os.system("qsub -V -d "+currentDir+" -q longcms "+currentDir+"/"+fn+".sh");
+    os.system("qsub -V -d "+currentDir+" -q production "+currentDir+"/"+fn+".sh");
