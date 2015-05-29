@@ -13,7 +13,8 @@ if __name__ == '__main__':
     parser.add_argument ('-a', '--analysis' , default = "eff", help='select analysis: eff->efficiency, Q->charge, time->CDF resolution, timeLED')
     parser.add_argument ('-s', '--scan' , default = "HV", help='type of scan: HV = scan in HV, X0 = scan in X0')
     parser.add_argument ('-n', '--name' , default = "prova", help='suffix of the reco file in input')
+    parser.add_argument ('-i', '--inputDir', default='/gwteray/users/pigazzini/IMCP/BTF2015/ntuples/', help='input directory')
     args = parser.parse_args ()
-    print 'analyzer '+args.cfg+' '+args.MCP+' '+args.analysis+' '+args.scan+' '+args.name
-    os.system('./analyzer.exe '+args.cfg+' '+args.MCP+' '+args.analysis+' '+args.scan+' '+args.name)
+    print 'analyzer '+args.cfg+' '+args.MCP+' '+args.analysis+' '+args.scan+' '+args.name+' '+args.inputDir
+    os.system('./analyzer.exe '+args.cfg+' '+args.MCP+' '+args.analysis+' '+args.scan+' '+args.name+' '+args.inputDir)
     
