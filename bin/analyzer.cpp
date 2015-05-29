@@ -133,6 +133,8 @@ int main(int argc, char** argv)
     std::vector<float> ScanList;
     ScanList.clear();
 
+    nChannels=8; //FIX A BUG
+
   //---save list of HV (or X0) step---
   if (strcmp(scanType,"HV1")==0 || strcmp(scanType,"HV2")==0 || strcmp(scanType,"HV12")==0) {
     int prev=0, prev2=0;  
