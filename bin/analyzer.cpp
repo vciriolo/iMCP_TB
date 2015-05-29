@@ -41,7 +41,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
     gSystem->Load("libTree");
-    char *label, *doWhat, *scanTypeIN, *scanType;
+    char *label, *doWhat, *scanTypeIN, *scanType, *inputDir;
     Fill_MCPList();
     Fill_inverted_MCPList();
 
@@ -51,6 +51,7 @@ int main(int argc, char** argv)
     doWhat = argv[3];
     scanTypeIN = argv[4];
     label = argv[5];
+    inputDir = argv[6];
 
     scanType=scanTypeIN;
     if (strcmp(scanTypeIN,"Ang")==0)
@@ -77,7 +78,7 @@ int main(int argc, char** argv)
     //-----Create output files-----
 
     //open reco tree
-    std::string inFileName = "ntuples/reco_"+string(label)+".root";
+    std::string inFileName = string(inputDir)+"reco_"+string(label)+".root";
     TFile *inFile = new TFile (inFileName.c_str());
     TTree* nt = (TTree*)inFile->Get("reco_tree");
     InitRecoTree(nt);
