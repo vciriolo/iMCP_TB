@@ -1,41 +1,33 @@
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack1 -a timeCFD -n HVScan1 -s HV
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack2 -a timeCFD -n HVScan2 -s HV
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB3 -a timeCFD -n HVScan2 -s HV
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m enSEE -a timeCFD -n HVScan5 -s HV
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack2 -a timeCFD -n HVScan6 -s HV
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB3 -a timeCFD -n HVScan7 -s HV
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack1 -a timeCFD -n HVScan8 -s HV
+python python/analyzer.py -m MultiAlkEm -a timeCFD -s HV12 -cfg cfg/treshold_5s.txt -n HVScan12_MultiAlkEm
+python python/analyzer.py -m GaAsEm -a timeCFD -s HV12 -cfg cfg/treshold_5s.txt -n HVScan12_GaAsEm
+python python/analyzer.py -m Double9040 -a timeCFD -s HV12 -cfg cfg/treshold_5s.txt -n HVScan12_Double9040
+python python/analyzer.py -m Double9090 -a timeCFD -s HV12 -cfg cfg/treshold_5s.txt -n HVScan12_Double9090
+python python/analyzer.py -m MultiAlkEm -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n HVScan1_MultiAlkEm
+python python/analyzer.py -m GaAsEm -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n HVScan1_GaAsEm
+python python/analyzer.py -m Double9040 -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n HVScan1_Double9040
+python python/analyzer.py -m Double9090 -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n HVScan1_Double9090
+python python/analyzer.py -m Double9040 -a timeCFD -s HV2 -cfg cfg/treshold_5s.txt -n HVScan2_Double9040
+python python/analyzer.py -m Double9090 -a timeCFD -s HV2 -cfg cfg/treshold_5s.txt -n HVScan2_Double9090
 
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB2 -a timeCFD -n scanX0_HVHigh50GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m enSEE -a timeCFD -n scanX0_HVHigh50GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack1 -a timeCFD -n scanX0_HVHigh50GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack2 -a timeCFD -n scanX0_HVHigh50GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB3 -a timeCFD -n scanX0_HVHigh50GeV -s X0
+python python/analyzer.py -m Double9040 -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n HVScanExt_Double9040
+python python/analyzer.py -m Double9090 -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n HVScanExt_Double9090
 
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB2 -a timeCFD -n scanX0_HVHigh20GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m enSEE -a timeCFD -n scanX0_HVHigh20GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack1 -a timeCFD -n scanX0_HVHigh20GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack2 -a timeCFD -n scanX0_HVHigh20GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB3 -a timeCFD -n scanX0_HVHigh20GeV -s X0
+python python/analyzer.py -m MultiAlkEm -a timeCFD -s X0 -cfg cfg/treshold_5s.txt -n X0Scan12_MultiAlkEm
+python python/analyzer.py -m GaAsEm -a timeCFD -s X0 -cfg cfg/treshold_5s.txt -n X0Scan12_GaAsEm
+python python/analyzer.py -m Double9040 -a timeCFD -s X0 -cfg cfg/treshold_5s.txt -n X0Scan12_Double9040
+python python/analyzer.py -m Double9090 -a timeCFD -s X0 -cfg cfg/treshold_5s.txt -n X0Scan12_Double9090
+python python/analyzer.py -m MultiAlkEm -a timeCFD -s X0 -cfg cfg/treshold_5s.txt -n X0Scan1_MultiAlkEm
+python python/analyzer.py -m GaAsEm -a timeCFD -s X0 -cfg cfg/treshold_5s.txt -n X0Scan1_GaAsEm
+python python/analyzer.py -m Double9040 -a timeCFD -s X0 -cfg cfg/treshold_5s.txt -n X0Scan1_Double9040
+python python/analyzer.py -m Double9090 -a timeCFD -s X0 -cfg cfg/treshold_5s.txt -n X0Scan1_Double9090
 
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB2 -a timeCFD -n scanX0_HVLow20GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m enSEE -a timeCFD -n scanX0_HVLow20GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack1 -a timeCFD -n scanX0_HVLow20GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack2 -a timeCFD -n scanX0_HVLow20GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB3 -a timeCFD -n scanX0_HVLow20GeV -s X0
+python python/analyzer.py -m MultiAlkEm -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n LongScan0X0_MultiAlkEm
+python python/analyzer.py -m GaAsEm -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n LongScan0X0_GaAsEm
+python python/analyzer.py -m Double9040 -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n LongScan0X0_Double9040
+python python/analyzer.py -m Double9090 -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n LongScan0X0_Double9090
+python python/analyzer.py -m MultiAlkEm -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n LongScan2X0_MultiAlkEm
+python python/analyzer.py -m GaAsEm -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n LongScan2X0_GaAsEm
+python python/analyzer.py -m Double9040 -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n LongScan2X0_Double9040
+python python/analyzer.py -m Double9090 -a timeCFD -s HV1 -cfg cfg/treshold_5s.txt -n LongScan2X0_Double9090
 
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB2 -a timeCFD -n scanX0_HVLow50GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m enSEE -a timeCFD -n scanX0_HVLow50GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack1 -a timeCFD -n scanX0_HVLow50GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack2 -a timeCFD -n scanX0_HVLow50GeV -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB3 -a timeCFD -n scanX0_HVLow50GeV -s X0
-
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m enSEE -a timeCFD -n AngScan_HVLow -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack1 -a timeCFD -n AngScan_HVLow -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack2 -a timeCFD -n AngScan_HVLow -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB3 -a timeCFD -n AngScan_HVLow -s X0
-
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m enSEE -a timeCFD -n AngScan_HVHigh -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack1 -a timeCFD -n AngScan_HVHigh -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m ZStack2 -a timeCFD -n AngScan_HVHigh -s X0
-python python/analyzer.py -cfg cfg/treshold_5s.txt -m MiB3 -a timeCFD -n AngScan_HVHigh -s X0
+python python/analyzer.py -m Double9040 -a timeCFD -s Ang -cfg cfg/treshold_5s.txt -n AngScan_Double9040
