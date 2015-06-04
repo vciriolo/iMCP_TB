@@ -251,13 +251,14 @@ int main(int argc, char** argv)
     //    sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
 
     sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
-    //    std::cout<<"DEBUG: "<<str_cut_sig<<std::endl;
     sprintf(str_cut_trig0, "charge[%d] > %d && charge[%d] > %d", trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
     if(strcmp(scanTypeIN, "X0") == 0) 
       sprintf(str_cut_tdc, "hodoXpos>10 && hodoXpos<15 && hodoYpos>10 && hodoYpos<15"); 
     else
       sprintf(str_cut_tdc, "1==1"); //selection OFF because there are some runs with bad hodo position -> need to check this!!!!!!!
-    sprintf(str_cut_saturated, "amp_max[%d] > 3450", MCPNumber);
+
+    if(strcmp(doWhat, "timeCFD") == 0 || strcmp(doWhat, "timeLED") == 0 )
+       sprintf(str_cut_saturated, "amp_max[%d] > 3450", MCPNumber);
     //sprintf(str_cut_nFibers, "1==1"); //selection OFF
     sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
     sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
@@ -560,7 +561,7 @@ int main(int argc, char** argv)
 		    t_CF_diff, f_corrCFD->GetParameter(0), f_corrCFD->GetParameter(1), TOT_diff,
 		    f_corrCFD->GetParameter(2), TOT_diff, TOT_diff, h_resCFD_name);
                     //f_corrCFD->GetParameter(3), TOT_diff, TOT_diff, TOT_diff, h_resCFD_name);
-            nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers
+            nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_saturated 
                      && cut_trig_not_sat && cut_bad_timeCFD && cut_multiplicity, "goff");  
 	    
 	    //correction vs ampMax
