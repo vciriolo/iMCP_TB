@@ -15,7 +15,7 @@ name = ["AngScan_Double9040","HVScan12_Double9040_part1","HVScan12_Double9040_pa
         "HVScan1_MultiAlkEm","HVScan2_Double9040","HVScan2_Double9090","HVScanExt_Double9040","HVScanExt_Double9090","LongScan0X0_Double9040",
         "LongScan0X0_Double9090","LongScan0X0_GaAsEm","LongScan0X0_MultiAlkEm","LongScan2X0_Double9040","LongScan2X0_Double9090","LongScan2X0_GaAsEm",
         "LongScan2X0_MultiAlkEm","X0Scan12_Double9040","X0Scan12_Double9090","X0Scan12_GaAsEm","X0Scan12_MultiAlkEm","X0Scan1_Double9040",
-        "X0Scan1_Double9090","X0Scan1_MultiAlkEm"];
+        "X0Scan1_Double9090","X0Scan1_MultiAlkEm","X0Scan1_GaAsEm"];
 
 for i in range(len(name)):
     fn = "Job/Job_"+name[i];
