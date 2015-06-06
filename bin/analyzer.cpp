@@ -158,6 +158,26 @@ int main(int argc, char** argv)
 	}
       }
   }
+
+  else if (strcmp(scanType,"multiplicity1")==0 || strcmp(scanType,"multiplicity2")==0) {
+    nt->GetEntry(0);
+    ScanList.push_back(1.);
+    X0Step.push_back(1.);
+    ScanList.push_back(2.);
+    X0Step.push_back(2.);
+    ScanList.push_back(3.);
+    X0Step.push_back(3.);
+    ScanList.push_back(4.);
+    X0Step.push_back(4.);
+    ScanList.push_back(5.);
+    X0Step.push_back(5.);
+    for (int i=0; i<nChannels; i++)  //save trigger position!
+      {
+	if (isTrigger[i]==1)       trigPos1 = i;
+	if (isTrigger[i]==2)       trigPos2 = i;
+      }
+  }
+
   else {
     float prev=-1.;
     for (int iEntry=0; iEntry<nt->GetEntries(); iEntry++)
@@ -240,6 +260,10 @@ int main(int argc, char** argv)
     char str_cut_bad_timeCFD[500]="";
     char str_cut_bad_timeLED[500]="";
     char str_cut_multiplicity[500]="";
+    char str_cut_multiplicity2[500]="";
+    char str_cut_multiplicity3[500]="";
+    char str_cut_multiplicity4[500]="";
+    char str_cut_multiplicity5[500]="";
     char str_cut_noisePeak[500]="";
     //---Define Cuts---
     //    sprintf(str_cut_sig, "charge_corr[%d] > %d", MCPNumber, treshold.at(MCPNumber));
@@ -265,10 +289,20 @@ int main(int argc, char** argv)
     sprintf(str_cut_mcp_not_sat, "amp_max[%d] < 3450", MCPNumber); 
     sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
     //    sprintf(str_cut_sci, "sci_front_adc > 400 && sci_front_adc <550");
-    if (TString(MCP).Contains("Double") == 1)
+    if (TString(MCP).Contains("Double") == 1) {
 		sprintf(str_cut_multiplicity, "amp_max[1]<20 && amp_max[2]<20 && sci_front_adc > 80 && sci_front_adc < 350");// && bgo_back_adc > 420 && bgo_back_adc < 640");
-    else
+		sprintf(str_cut_multiplicity2, "amp_max[1]<20 && amp_max[2]<20 && sci_front_adc > 350 && sci_front_adc < 850");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+		sprintf(str_cut_multiplicity3, "amp_max[1]<20 && amp_max[2]<20 && sci_front_adc > 850 && sci_front_adc < 1450");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+		sprintf(str_cut_multiplicity4, "amp_max[1]<20 && amp_max[2]<20 && sci_front_adc > 1450 && sci_front_adc < 2100");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+		sprintf(str_cut_multiplicity5, "amp_max[1]<20 && amp_max[2]<20 && sci_front_adc > 2100 && sci_front_adc < 2700");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+    }
+    else {
 		sprintf(str_cut_multiplicity, "amp_max[3]<20 && amp_max[4]<20 && sci_front_adc > 80 && sci_front_adc < 350");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+		sprintf(str_cut_multiplicity2, "amp_max[3]<20 && amp_max[4]<20 && sci_front_adc > 350 && sci_front_adc < 850");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+		sprintf(str_cut_multiplicity3, "amp_max[3]<20 && amp_max[4]<20 && sci_front_adc > 850 && sci_front_adc < 1450");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+		sprintf(str_cut_multiplicity4, "amp_max[3]<20 && amp_max[4]<20 && sci_front_adc > 1450 && sci_front_adc < 2100");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+		sprintf(str_cut_multiplicity5, "amp_max[3]<20 && amp_max[4]<20 && sci_front_adc > 2100 && sci_front_adc < 2700");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+    }
     int notMCPnumber = 2;
     if(notMCPnumber == MCPNumber) notMCPnumber = notMCPnumber + 1;
     sprintf(str_cut_noisePeak, "amp_max[%d] < 30", notMCPnumber);
@@ -298,6 +332,11 @@ int main(int argc, char** argv)
     TCut cut_bad_timeCFD = str_cut_bad_timeCFD;
     TCut cut_bad_timeLED = str_cut_bad_timeLED;
     TCut cut_multiplicity = str_cut_multiplicity;
+    TCut cut_multiplicityVect[5] = {str_cut_multiplicity,str_cut_multiplicity2,str_cut_multiplicity3,str_cut_multiplicity4,str_cut_multiplicity5};
+    //    TCut cut_multiplicity2 = str_cut_multiplicity2;
+    // TCut cut_multiplicity3 = str_cut_multiplicity3;
+    //TCut cut_multiplicity4 = str_cut_multiplicity4;
+    //TCut cut_multiplicity5 = str_cut_multiplicity5;
     TCut cut_noisePeak = str_cut_noisePeak;
 
 
@@ -306,8 +345,11 @@ int main(int argc, char** argv)
     {
         //---Define run dependend cut---
         char cut_scan[100];
-	if (strcmp(scanType,"HV1")==0 || strcmp(scanType,"HV2")==0 || strcmp(scanType,"HV12")==0) 
+	if (strcmp(scanType,"HV1")==0 || strcmp(scanType,"HV2")==0 || strcmp(scanType,"HV12")==0) {
 	  sprintf(cut_scan, "HV[%d] == %d && HV2[%d] == %d", MCPNumber, HVVal.at(i), MCPNumber, HV2Val.at(i));
+	}
+        else if (strcmp(scanType,"multiplicity1")==0 || strcmp(scanType,"multiplicity2")==0) 
+	  sprintf(cut_scan, cut_multiplicityVect[i]);
         else  
             sprintf(cut_scan, "X0 == %f", X0Step.at(i));
 	//        if(MCPNumber == 2) 
@@ -316,6 +358,8 @@ int main(int argc, char** argv)
         char var_name[3] = "X0";
         if(TString(scanType).Contains("HV") == 1)    
 	  sprintf(var_name, "HV");
+        if(TString(scanType).Contains("multiplicity") == 1)    
+	  sprintf(var_name, "multiplicity");
 
         //-------define histos------------------------------------------------------------
         //-----create objects names-----
@@ -362,6 +406,7 @@ int main(int argc, char** argv)
         TProfile* pr_timeCFD_vs_ampMaxCorr;
         TF1* f_corrCFD;
         TF1* f_corrCFD2;
+
         if(strcmp(scanType, "HV") == 0)
         {                              
             pr_timeCFD_vs_TOT = new TProfile(pr_timeCFD_vs_TOT_name, "timeCF vs TOT difference",
@@ -451,9 +496,17 @@ int main(int argc, char** argv)
 	    //	    nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_tdc && cut_nFibers && cut_tdc && cut_multiplicity, "goff");
 	    //nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_multiplicity && cut_tdc, "goff");
             //nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_multiplicity && cut_tdc, "goff");
-	    nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_multiplicity && cut_tdc && cut_noisePeak, "goff");
-            nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_multiplicity && cut_tdc && cut_noisePeak, "goff");
-	    //	    std::cout<<"DEBUG - sign: "<<h_sig->Integral(0, h_sig->GetNbinsX()+1)<<" - trig: "<<h_trig0->Integral(0, h_trig0->GetNbinsX()+1)<<std::endl;
+	    if (strcmp(scanType,"multiplicity1")==0 || strcmp(scanType,"multiplicity2")==0) {
+	      nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_noisePeak, "goff");
+	      nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_tdc && cut_noisePeak, "goff");
+	    }
+	    else {
+	      nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_multiplicity && cut_tdc && cut_noisePeak, "goff");
+	      nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_multiplicity && cut_tdc && cut_noisePeak, "goff");
+	    }
+	    //	    	    std::cout<<"DEBUG - sign: "<<h_sig->Integral(0, h_sig->GetNbinsX()+1)<<" - trig: "<<h_trig0->Integral(0, h_trig0->GetNbinsX()+1)<<std::endl;
+	    //    std::cout<<var_sig<<" "<<cut_trig0 <<"&&"<< cut_sig <<"&&"<< cut_scan <<"&&"<< cut_multiplicity <<"&&"<< cut_tdc <<"&&"<< cut_noisePeak<<" - "<<
+	    //	      var_trig0<<" "<<cut_trig0 <<"&&"<< cut_scan <<"&&"<< cut_multiplicity <<"&&"<< cut_tdc <<"&&"<< cut_noisePeak<<std::endl;
 	    
             float eff = h_sig->GetEntries()/h_trig0->GetEntries();
 	    float e_eff = TMath::Sqrt((TMath::Abs(eff*(1-eff)))/h_trig0->Integral(0, h_trig0->GetNbinsX()+1)); //BUG
@@ -550,8 +603,14 @@ int main(int argc, char** argv)
 	    sprintf(t_CF_diff, "(time_CF[%d]-time_CF[%d])", MCPNumber, trigPos1);
 	    sprintf(var_timeCFD_vs_TOT, "%s:%s>>%s", t_CF_diff, TOT_diff, pr_timeCFD_vs_TOT_name);
             //---correction
+	    if (strcmp(scanType,"multiplicity1")==0 || strcmp(scanType,"multiplicity2")==0) {
+            nt->Draw(var_timeCFD_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
+                     && cut_tdc && cut_trig_not_sat && cut_bad_timeCFD , "goff");
+	    }
+	    else {
             nt->Draw(var_timeCFD_vs_TOT, cut_trig0 && cut_sig && cut_scan && cut_nFibers
                      && cut_tdc && cut_trig_not_sat && cut_bad_timeCFD && cut_multiplicity, "goff");
+	    }
             //---skip run with low stat
             if(pr_timeCFD_vs_TOT->GetEntries() < 200)
                 h_resCFD->Rebin(2);
@@ -564,10 +623,16 @@ int main(int argc, char** argv)
 		    t_CF_diff, f_corrCFD->GetParameter(0), f_corrCFD->GetParameter(1), TOT_diff,
 		    f_corrCFD->GetParameter(2), TOT_diff, TOT_diff, h_resCFD_name);
                     //f_corrCFD->GetParameter(3), TOT_diff, TOT_diff, TOT_diff, h_resCFD_name);
+	    if (strcmp(scanType,"multiplicity1")==0 || strcmp(scanType,"multiplicity2")==0) {
+            nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_mcp_not_sat 
+                     && cut_trig_not_sat && cut_bad_timeCFD
+		     , "goff");  
+	    }	    
+	    else {
             nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_mcp_not_sat 
                      && cut_trig_not_sat && cut_bad_timeCFD && cut_multiplicity
 		     , "goff");  
-	    
+	    }	    
 	    //correction vs ampMax
 	    sprintf(var_timeCFD_red, "(%s-(%f + %f*%s + %f*%s*%s))",
 		    t_CF_diff, f_corrCFD->GetParameter(0), f_corrCFD->GetParameter(1), TOT_diff,
