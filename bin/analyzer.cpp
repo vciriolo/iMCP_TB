@@ -236,6 +236,7 @@ int main(int argc, char** argv)
     char str_cut_saturated[500]="";
     char str_cut_nFibers[500]="";
     char str_cut_trig_not_sat[500]="";
+    char str_cut_mcp_not_sat[500]="";
     char str_cut_bad_timeCFD[500]="";
     char str_cut_bad_timeLED[500]="";
     char str_cut_multiplicity[500]="";
@@ -261,6 +262,7 @@ int main(int argc, char** argv)
        sprintf(str_cut_saturated, "amp_max[%d] > 3450", MCPNumber);
     //sprintf(str_cut_nFibers, "1==1"); //selection OFF
     sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
+    sprintf(str_cut_mcp_not_sat, "amp_max[%d] < 3450", MCPNumber); 
     sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
     //    sprintf(str_cut_sci, "sci_front_adc > 400 && sci_front_adc <550");
     if (TString(MCP).Contains("Double") == 1)
@@ -292,6 +294,7 @@ int main(int argc, char** argv)
     TCut cut_saturated = str_cut_saturated;
     TCut cut_nFibers = str_cut_nFibers;
     TCut cut_trig_not_sat = str_cut_trig_not_sat;
+    TCut cut_mcp_not_sat = str_cut_mcp_not_sat;
     TCut cut_bad_timeCFD = str_cut_bad_timeCFD;
     TCut cut_bad_timeLED = str_cut_bad_timeLED;
     TCut cut_multiplicity = str_cut_multiplicity;
@@ -372,7 +375,7 @@ int main(int argc, char** argv)
         else
         {
             pr_timeCFD_vs_TOT = new TProfile(pr_timeCFD_vs_TOT_name, "timeCF vs TOT difference",
-                                          30, 0, 10, -5, 2);
+                                          30, 0, 10, -5, 5);
             f_corrCFD = new TF1(f_corrCFD_name, "pol2", 0, 6);
 
             pr_timeCFD_vs_ampMaxCorr = new TProfile(pr_timeCFD_vs_ampMaxCorr_name, "timeCF vs ampMaxCorr",
@@ -561,8 +564,9 @@ int main(int argc, char** argv)
 		    t_CF_diff, f_corrCFD->GetParameter(0), f_corrCFD->GetParameter(1), TOT_diff,
 		    f_corrCFD->GetParameter(2), TOT_diff, TOT_diff, h_resCFD_name);
                     //f_corrCFD->GetParameter(3), TOT_diff, TOT_diff, TOT_diff, h_resCFD_name);
-            nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_saturated 
-                     && cut_trig_not_sat && cut_bad_timeCFD && cut_multiplicity, "goff");  
+            nt->Draw(var_timeCFD, cut_trig0 && cut_sig && cut_scan && cut_tdc && cut_nFibers && cut_mcp_not_sat 
+                     && cut_trig_not_sat && cut_bad_timeCFD && cut_multiplicity
+		     , "goff");  
 	    
 	    //correction vs ampMax
 	    sprintf(var_timeCFD_red, "(%s-(%f + %f*%s + %f*%s*%s))",
