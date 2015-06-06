@@ -13,9 +13,15 @@ CMSSWDir = currentDir+"/../../";
 name = ["AngScan_Double9040","HVScan12_Double9040_part1","HVScan12_Double9040_part2","HVScan12_Double9090","HVScan12_GaAsEm_part1","HVScan12_GaAsEm_part2",
         "HVScan12_MultiAlkEm_part1","HVScan12_MultiAlkEm_part2","HVScan12bis_GaAsEm","HVScan1_Double9040","HVScan1_Double9090","HVScan1_GaAsEm",
         "HVScan1_MultiAlkEm","HVScan2_Double9040","HVScan2_Double9090","HVScanExt_Double9040","HVScanExt_Double9090","LongScan0X0_Double9040",
-        "LongScan0X0_Double9090","LongScan0X0_GaAsEm","LongScan0X0_MultiAlkEm","LongScan2X0_Double9040","LongScan2X0_Double9090","LongScan2X0_GaAsEm",
+        "LongScan0X0_Double9090","LongScan0X0_GaAsEm","LongScan0X0_MultiAlkEm","LongScan0X0_Double9040_2",
+        "LongScan0X0_Double9090_2","LongScan0X0_GaAsEm_2","LongScan0X0_MultiAlkEm_2","LongScan2X0_Double9040","LongScan2X0_Double9090","LongScan2X0_GaAsEm",
         "LongScan2X0_MultiAlkEm","X0Scan12_Double9040","X0Scan12_Double9090","X0Scan12_GaAsEm","X0Scan12_MultiAlkEm","X0Scan1_Double9040",
         "X0Scan1_Double9090","X0Scan1_MultiAlkEm","X0Scan1_GaAsEm"];
+'''
+name = ["LongScan0X0_Double9040",
+        "LongScan0X0_Double9090","LongScan0X0_GaAsEm","LongScan0X0_MultiAlkEm","LongScan0X0_Double9040_2",
+        "LongScan0X0_Double9090_2","LongScan0X0_GaAsEm_2","LongScan0X0_MultiAlkEm_2"];
+'''
 
 for i in range(len(name)):
     fn = "Job/Job_"+name[i];
