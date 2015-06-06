@@ -203,8 +203,8 @@ if(plot_type == "HV1"){
     legC->SetFillColor(kWhite);
     legC->SetLineColor(kWhite);
     legC->SetShadowColor(kWhite);
-    legC->AddEntry(eff_MultiAlkEm, "MultiAlk emitt. HV_{2} = 2700 (V)", "p");
-    legC->AddEntry(eff_GaAsEm, "GaAs emitt. HV_{2} = 2700 (V)", "p");
+    legC->AddEntry(eff_MultiAlkEm, "MultiAlk emitt. HV_{2} = 3100 (V)", "p");
+    legC->AddEntry(eff_GaAsEm, "GaAs emitt. HV_{2} = 3100 (V)", "p");
 //    legC->AddEntry(eff_GaAsEm_OFF, "GaAs emitt. - iMCP mode", "p");
     legC->AddEntry(eff_Double9040, "Double9040 HV_{2} = 2700 (V)", "p");
     legC->AddEntry(eff_Double9090, "Double9090 HV_{2} = 2700 (V)", "p");
