@@ -21,10 +21,15 @@ python python/analyzer.py -m GaAsEm -a eff -s X0 -cfg cfg/treshold_5s.txt -n X0S
 python python/analyzer.py -m Double9040 -a eff -s X0 -cfg cfg/treshold_5s.txt -n X0Scan1_Double9040
 python python/analyzer.py -m Double9090 -a eff -s X0 -cfg cfg/treshold_5s.txt -n X0Scan1_Double9090
 
-python python/analyzer.py -m MultiAlkEm -a eff -s HV1 -cfg cfg/treshold_5s.txt -n LongScan0X0_MultiAlkEm
-python python/analyzer.py -m GaAsEm -a eff -s HV1 -cfg cfg/treshold_5s.txt -n LongScan0X0_GaAsEm
-python python/analyzer.py -m Double9040 -a eff -s HV1 -cfg cfg/treshold_5s.txt -n LongScan0X0_Double9040
-python python/analyzer.py -m Double9090 -a eff -s HV1 -cfg cfg/treshold_5s.txt -n LongScan0X0_Double9090
+python python/analyzer.py -m MultiAlkEm -a eff -s multiplicity1 -cfg cfg/treshold_5s.txt -n LongScan0X0_MultiAlkEm_1
+python python/analyzer.py -m GaAsEm -a eff -s multiplicity1 -cfg cfg/treshold_5s.txt -n LongScan0X0_GaAsEm_1
+python python/analyzer.py -m Double9040 -a eff -s multiplicity1 -cfg cfg/treshold_5s.txt -n LongScan0X0_Double9040_1
+python python/analyzer.py -m Double9090 -a eff -s multiplicity1 -cfg cfg/treshold_5s.txt -n LongScan0X0_Double9090_1
+python python/analyzer.py -m MultiAlkEm -a eff -s multiplicity2 -cfg cfg/treshold_5s.txt -n LongScan0X0_MultiAlkEm_2
+python python/analyzer.py -m GaAsEm -a eff -s multiplicity2 -cfg cfg/treshold_5s.txt -n LongScan0X0_GaAsEm_2
+python python/analyzer.py -m Double9040 -a eff -s multiplicity2 -cfg cfg/treshold_5s.txt -n LongScan0X0_Double9040_2
+python python/analyzer.py -m Double9090 -a eff -s multiplicity2 -cfg cfg/treshold_5s.txt -n LongScan0X0_Double9090_2
+
 python python/analyzer.py -m MultiAlkEm -a eff -s HV1 -cfg cfg/treshold_5s.txt -n LongScan2X0_MultiAlkEm
 python python/analyzer.py -m GaAsEm -a eff -s HV1 -cfg cfg/treshold_5s.txt -n LongScan2X0_GaAsEm
 python python/analyzer.py -m Double9040 -a eff -s HV1 -cfg cfg/treshold_5s.txt -n LongScan2X0_Double9040
