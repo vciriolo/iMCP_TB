@@ -283,10 +283,10 @@ int main(int argc, char** argv)
       sprintf(str_cut_tdc, "1==1"); //selection OFF because there are some runs with bad hodo position -> need to check this!!!!!!!
 
     if(strcmp(doWhat, "timeCFD") == 0 || strcmp(doWhat, "timeLED") == 0 )
-       sprintf(str_cut_saturated, "amp_max[%d] > 3450", MCPNumber);
-    //sprintf(str_cut_nFibers, "1==1"); //selection OFF
-    sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
-    sprintf(str_cut_mcp_not_sat, "amp_max[%d] < 3450", MCPNumber); 
+       sprintf(str_cut_saturated, "amp_max[%d] > 2500", MCPNumber);
+    //sprintf(str_cut_nFibers, "1==1"); //selectionOFF
+    sprintf(str_cut_trig_not_sat, "amp_max[%d] < 2500", trigPos1); 
+    sprintf(str_cut_mcp_not_sat, "amp_max[%d] < 2500", MCPNumber); 
     sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
     //    sprintf(str_cut_sci, "sci_front_adc > 400 && sci_front_adc <550");
     if (TString(MCP).Contains("Double") == 1) {
