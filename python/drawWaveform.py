@@ -8,7 +8,7 @@ import argparse
 import string
 if __name__ == '__main__':
     parser = argparse.ArgumentParser (description = 'draw waveform: read raw data and draw some waveforms')
-    parser.add_argument ('-d', '--dir' , default = '/gwteray/users/pigazzini/IMCP/BTF2015', help='directory containing raw data')
+    parser.add_argument ('-d', '--dir' , default = '/gwteray/users/pigazzini/IMCP/BTF2015/raw_data', help='directory containing raw data')
     parser.add_argument ('-r', '--run' , default = '1834', help='run to scan')
     parser.add_argument ('-c', '--channel' , default = '1', help='channel to analyze')
     parser.add_argument ('-f', '--firstEntry' , default = '11', help='first entry')
