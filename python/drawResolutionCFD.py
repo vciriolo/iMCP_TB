@@ -7,13 +7,14 @@ import datetime
 import argparse
 import string
 if __name__ == '__main__':
-    os.system('./drawResolutionCFD.exe HVScanON')
-    os.system('./drawResolutionCFD.exe HVScanOFF')
-    os.system('./drawResolutionCFD.exe scanX0_HVHigh_50')
-    os.system('./drawResolutionCFD.exe scanX0_HVHigh_20')
-    os.system('./drawResolutionCFD.exe scanX0_HVLow_50')
-    os.system('./drawResolutionCFD.exe scanX0_HVLow_20')
-    os.system('./drawResolutionCFD.exe AngScanLow')
-    os.system('./drawResolutionCFD.exe AngScanHigh')
-
+    os.system('./drawResolutionCFD.exe HV12')
+    os.system('./drawResolutionCFD.exe HV1')
+    os.system('./drawResolutionCFD.exe HV2')
+    os.system('./drawResolutionCFD.exe Extreme')
+    os.system('./drawResolutionCFD.exe Ang')
+    os.system('./drawResolutionCFD.exe X0_12')
+    os.system('./drawResolutionCFD.exe X0_1')
+#    os.system('./drawResolutionCFD.exe multiplicity1')
+#    os.system('./drawResolutionCFD.exe multiplicity2')
+    os.system('./drawResolutionCFD.exe LongScan2X0')
     

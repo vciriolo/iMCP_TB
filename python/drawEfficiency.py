@@ -16,4 +16,5 @@ if __name__ == '__main__':
     os.system('./drawEfficiency.exe X0_1')
     os.system('./drawEfficiency.exe multiplicity1')
     os.system('./drawEfficiency.exe multiplicity2')
+    os.system('./drawEfficiency.exe LongScan2X0')
     
