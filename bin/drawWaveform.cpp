@@ -90,7 +90,7 @@ int main (int argc, char** argv)
       //      sprintf(command1, "find  %s/%d/*/dqmPlotstotal.root > listTemp.txt", (inputFolder).c_str(), run);
       //      system(command1);
       char command2[300];
-      sprintf(command2, "find  %s/%d/[0-9]*.root > listTemp2.txt", (inputFolder).c_str(), run);
+      sprintf(command2, "find  %s/%d.root > listTemp2.txt", (inputFolder).c_str(), run);
       system(command2);
 
       //    ifstream rootList ("listTemp.txt");
