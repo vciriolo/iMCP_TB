@@ -17,4 +17,6 @@ if __name__ == '__main__':
 #    os.system('./drawResolutionCFD.exe multiplicity1')
 #    os.system('./drawResolutionCFD.exe multiplicity2')
     os.system('./drawResolutionCFD.exe LongScan2X0')
+    os.system('./drawResolutionCFD.exe saturated_HV12')
+    os.system('./drawResolutionCFD.exe saturated_X0_12')
     
