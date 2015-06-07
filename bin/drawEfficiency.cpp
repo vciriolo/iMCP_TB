@@ -639,6 +639,8 @@ if(plot_type == "Ang"){
  }
 
 
+ /////----------------------------------------------------------------------------////////////// 
+
  if(plot_type == "multiplicity1"){
     legC = new TLegend(0.15,0.15,0.45,0.32,NULL,"brNDC");
 
@@ -701,7 +703,7 @@ if(plot_type == "Ang"){
 
     mg->Draw("ALP");
     mg->SetTitle("Electron Beam 450 MeV");
-    mg->GetXaxis()->SetRangeUser(-0.1,5.2);
+    mg->GetXaxis()->SetRangeUser(-0.1,7.2);
     mg->GetXaxis()->SetTitle("multiplicity");
     mg->GetXaxis()->SetTitleSize(0.046);
     mg->GetYaxis()->SetTitle("Efficiency");
@@ -796,7 +798,7 @@ if(plot_type == "Ang"){
 
     mg->Draw("ALP");
     mg->SetTitle("Electron Beam 450 MeV");
-    mg->GetXaxis()->SetRangeUser(-0.1,5.2);
+    mg->GetXaxis()->SetRangeUser(-0.1,7.2);
     mg->GetXaxis()->SetTitle("multiplicity");
     mg->GetXaxis()->SetTitleSize(0.046);
     mg->GetYaxis()->SetTitle("Efficiency");
@@ -890,7 +892,7 @@ if(plot_type == "Ang"){
 
     mg->Draw("ALP");
     mg->SetTitle("Electron Beam 450 MeV");
-    mg->GetXaxis()->SetRangeUser(1400,3400);
+    mg->GetXaxis()->SetRangeUser(1400,3800);
     mg->GetXaxis()->SetTitle("HV_{2} (V)");
     mg->GetXaxis()->SetTitleSize(0.046);
     mg->GetYaxis()->SetTitle("Efficiency");

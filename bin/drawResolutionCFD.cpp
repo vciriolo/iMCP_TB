@@ -138,7 +138,7 @@ int main(int argc, char** argv)
     mg->GetXaxis()->SetTitleSize(0.048);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.048);
-    mg->SetMaximum(160);
+    mg->SetMaximum(200);
     mg->SetMinimum(0);
     mg->Draw("AP");  
     legC->Draw("same");
@@ -154,6 +154,9 @@ int main(int argc, char** argv)
     sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
     c->SaveAs(plot_name, "C");
   }
+
+
+  /////----------------------------------------------------------------------------////////////// 
 
   if(plot_type == "HV1"){
     legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
@@ -220,12 +223,12 @@ int main(int argc, char** argv)
 
     mg->Draw("AP");
     mg->SetTitle("Electron Beam 450 MeV");
-    mg->GetXaxis()->SetRangeUser(1400,3400);
+    mg->GetXaxis()->SetRangeUser(1400,3800);
     mg->GetXaxis()->SetTitle("HV_{2} (V)");
     mg->GetXaxis()->SetTitleSize(0.048);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.048);
-    mg->SetMaximum(100);
+    mg->SetMaximum(200);
     mg->SetMinimum(0);
     mg->Draw("AP");  
     legC->Draw("same");
@@ -241,6 +244,9 @@ int main(int argc, char** argv)
     sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
     c->SaveAs(plot_name, "C");
   }
+
+
+  /////----------------------------------------------------------------------------////////////// 
 
   if(plot_type == "HV2"){
     legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
@@ -287,12 +293,12 @@ int main(int argc, char** argv)
 
     mg->Draw("AP");
     mg->SetTitle("Electron Beam 450 MeV");
-    mg->GetXaxis()->SetRangeUser(1400,3400);
+    mg->GetXaxis()->SetRangeUser(1400,3800);
     mg->GetXaxis()->SetTitle("HV_{1} (V)");
     mg->GetXaxis()->SetTitleSize(0.048);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.048);
-    mg->SetMaximum(100);
+    mg->SetMaximum(200);
     mg->SetMinimum(0);
     mg->Draw("AP");  
     legC->Draw("same");
@@ -308,6 +314,9 @@ int main(int argc, char** argv)
     sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
     c->SaveAs(plot_name, "C");
   }
+
+
+  /////----------------------------------------------------------------------------////////////// 
 
   if(plot_type == "Extreme"){
     legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
@@ -354,12 +363,12 @@ int main(int argc, char** argv)
 
     mg->Draw("AP");
     mg->SetTitle("Electron Beam 450 MeV");
-    mg->GetXaxis()->SetRangeUser(1400,3400);
+    mg->GetXaxis()->SetRangeUser(1400,3800);
     mg->GetXaxis()->SetTitle("HV_{1} (V)");
     mg->GetXaxis()->SetTitleSize(0.048);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.048);
-    mg->SetMaximum(100);
+    mg->SetMaximum(200);
     mg->SetMinimum(0);
     mg->Draw("AP");  
     legC->Draw("same");
@@ -375,6 +384,9 @@ int main(int argc, char** argv)
     sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
     c->SaveAs(plot_name, "C");
   }
+
+
+  /////----------------------------------------------------------------------------////////////// 
 
   if(plot_type == "Ang"){
     legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
@@ -417,7 +429,7 @@ int main(int argc, char** argv)
     mg->GetXaxis()->SetTitleSize(0.048);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.048);
-    mg->SetMaximum(100);
+    mg->SetMaximum(200);
     mg->SetMinimum(0);
     mg->Draw("AP");  
     legC->Draw("same");
@@ -434,8 +446,11 @@ int main(int argc, char** argv)
     c->SaveAs(plot_name, "C");
   }
 
+
+  /////----------------------------------------------------------------------------////////////// 
+
  if(plot_type == "X0_12"){
-    legC = new TLegend(0.4,0.15,0.25,0.42,NULL,"brNDC");
+    legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
 
     inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_X0_X0Scan12_GaAsEm.root");
     inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_X0_X0Scan12_MultiAlkEm.root");
@@ -501,12 +516,12 @@ int main(int argc, char** argv)
 
    mg->Draw("AP");
     mg->SetTitle("Electron Beam 450 MeV");
-    mg->GetXaxis()->SetRangeUser(-0.1,5.1);
+    mg->GetXaxis()->SetRangeUser(-0.1,7.2);
     mg->GetXaxis()->SetTitle("Number of X_{0}");
     mg->GetXaxis()->SetTitleSize(0.046);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.046);
-    mg->SetMaximum(1);
+    mg->SetMaximum(200);
     mg->SetMinimum(0);
      
     mg->Draw("AP");  
@@ -524,8 +539,11 @@ int main(int argc, char** argv)
     c->SaveAs(plot_name, "C");
   }
 
+
+ /////----------------------------------------------------------------------------////////////// 
+
  if(plot_type == "X0_1"){
-    legC = new TLegend(0.4,0.15,0.25,0.42,NULL,"brNDC");
+   legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
 
     inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_X0_X0Scan1_GaAsEm.root");
     inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_X0_X0Scan1_MultiAlkEm.root");
@@ -591,12 +609,12 @@ int main(int argc, char** argv)
 
    mg->Draw("AP");
     mg->SetTitle("Electron Beam 450 MeV");
-    mg->GetXaxis()->SetRangeUser(-0.1,5.1);
+    mg->GetXaxis()->SetRangeUser(-0.1,7.2);
     mg->GetXaxis()->SetTitle("Number of X_{0}");
     mg->GetXaxis()->SetTitleSize(0.046);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.046);
-    mg->SetMaximum(1);
+    mg->SetMaximum(200);
     mg->SetMinimum(0);
      
     mg->Draw("AP");  
@@ -615,8 +633,10 @@ int main(int argc, char** argv)
   }
 
 
+ /////----------------------------------------------------------------------------////////////// 
+
  if(plot_type == "multiplicity1"){
-    legC = new TLegend(0.4,0.15,0.25,0.42,NULL,"brNDC");
+   legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
 
     inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_multiplicity1_LongScan0X0_GaAsEm_1.root");
     inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_multiplicity1_LongScan0X0_MultiAlkEm_1.root");
@@ -677,12 +697,12 @@ int main(int argc, char** argv)
 
    mg->Draw("AP");
     mg->SetTitle("Electron Beam 450 MeV");
-    mg->GetXaxis()->SetRangeUser(-0.1,5.2);
+    mg->GetXaxis()->SetRangeUser(-0.1,7.2);
     mg->GetXaxis()->SetTitle("multiplicity");
     mg->GetXaxis()->SetTitleSize(0.046);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.046);
-    mg->SetMaximum(1);
+    mg->SetMaximum(200);
     mg->SetMinimum(0);
      
     legC->AddEntry(eff_MultiAlkEm, "MultiAlk emitt (ON) HV_{1} = -3800 HV_{2} = -3500 (V)", "p"); 
@@ -707,8 +727,10 @@ int main(int argc, char** argv)
   }
 
 
+ /////----------------------------------------------------------------------------////////////// 
+
  if(plot_type == "multiplicity2"){
-    legC = new TLegend(0.4,0.15,0.25,0.42,NULL,"brNDC");
+   legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
 
     inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_multiplicity2_LongScan0X0_GaAsEm_2.root");
     inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_multiplicity2_LongScan0X0_MultiAlkEm_2.root");
@@ -774,12 +796,12 @@ int main(int argc, char** argv)
 
    mg->Draw("AP");
     mg->SetTitle("Electron Beam 450 MeV");
-    mg->GetXaxis()->SetRangeUser(-0.1,5.2);
+    mg->GetXaxis()->SetRangeUser(-0.1,7.2);
     mg->GetXaxis()->SetTitle("multiplicity");
     mg->GetXaxis()->SetTitleSize(0.046);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.046);
-    mg->SetMaximum(1);
+    mg->SetMaximum(200);
     mg->SetMinimum(0);
      
     mg->Draw("AP");  
@@ -797,8 +819,11 @@ int main(int argc, char** argv)
     c->SaveAs(plot_name, "C");
   }
 
+
+ /////----------------------------------------------------------------------------////////////// 
+
  if(plot_type == "LongScan2X0"){
-    legC = new TLegend(0.4,0.15,0.25,0.42,NULL,"brNDC");
+   legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
 
     inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_HV1_LongScan2X0_GaAsEm.root");
     inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_HV1_LongScan2X0_MultiAlkEm.root");
@@ -864,12 +889,12 @@ int main(int argc, char** argv)
 
    mg->Draw("AP");
     mg->SetTitle("Electron Beam 450 MeV");
-    mg->GetXaxis()->SetRangeUser(1400,3400);
+    mg->GetXaxis()->SetRangeUser(1400,3800);
     mg->GetXaxis()->SetTitle("HV_{2} (V)");
     mg->GetXaxis()->SetTitleSize(0.046);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.046);
-    mg->SetMaximum(1);
+    mg->SetMaximum(200);
     mg->SetMinimum(0);
      
     mg->Draw("AP");  
