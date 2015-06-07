@@ -163,10 +163,10 @@ int main(int argc, char** argv)
     inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_HV1_HVScan1_MultiAlkEm.root");
     inF_Double9090 = TFile::Open("plots/resCFD_studies/Double9090_HV1_HVScan1_Double9090.root");
     inF_Double9040 = TFile::Open("plots/resCFD_studies/Double9040_HV1_HVScan1_Double9040.root");    
-    TGraphErrors* eff_GaAsEm = (TGraphErrors*)inF_GaAsEm->Get("eff");
-    TGraphErrors* eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("eff");
-    TGraphErrors* eff_MultiAlkEm = (TGraphErrors*)inF_MultiAlkEm->Get("eff");
-    TGraphErrors* eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("eff");
+    TGraphErrors* eff_GaAsEm = (TGraphErrors*)inF_GaAsEm->Get("resCFD");
+    TGraphErrors* eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("resCFD");
+    TGraphErrors* eff_MultiAlkEm = (TGraphErrors*)inF_MultiAlkEm->Get("resCFD");
+    TGraphErrors* eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("resCFD");
 
     //settings
     eff_GaAsEm->SetMarkerColor(kGreen+1);
@@ -199,8 +199,8 @@ int main(int argc, char** argv)
     legC->SetFillColor(kWhite);
     legC->SetLineColor(kWhite);
     legC->SetShadowColor(kWhite);
-    legC->AddEntry(eff_MultiAlkEm, "MultiAlk emitt. HV_{2} = 2700 (V)", "p");
-    legC->AddEntry(eff_GaAsEm, "GaAs emitt. HV{2} = 2700 (V)", "p");
+    legC->AddEntry(eff_MultiAlkEm, "MultiAlk emitt. HV_{2} = 3100 (V)", "p");
+    legC->AddEntry(eff_GaAsEm, "GaAs emitt. HV{2} = 3100 (V)", "p");
 //    legC->AddEntry(eff_GaAsEm_OFF, "GaAs emitt. - iMCP mode", "p");
     legC->AddEntry(eff_Double9040, "Double9040 HV_{2} = 2700 (V)", "p");
     legC->AddEntry(eff_Double9090, "Double9090 HV_{2} = 2700 (V)", "p");
@@ -210,6 +210,73 @@ int main(int argc, char** argv)
     mg->Add(eff_Double9090);
     mg->Add(eff_Double9040);
     mg->Add(eff_MultiAlkEm);
+
+    TCanvas* c = new TCanvas();
+    gPad->SetTicks();
+    char plot_name[100];
+    std::string command = "if [ ! -e final_plots/ ] ; then mkdir final_plots ; fi";
+    system(command.c_str());
+    sprintf(plot_name, "final_plots/timeResCFD_%s.pdf", plot_type.c_str());
+
+    mg->Draw("AP");
+    mg->SetTitle("Electron Beam 450 MeV");
+    mg->GetXaxis()->SetRangeUser(1400,3400);
+    mg->GetXaxis()->SetTitle("HV_{2} (V)");
+    mg->GetXaxis()->SetTitleSize(0.048);
+    mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
+    mg->GetYaxis()->SetTitleSize(0.048);
+    mg->SetMaximum(100);
+    mg->SetMinimum(0);
+    mg->Draw("AP");  
+    legC->Draw("same");
+    banner4Plot();
+    c->Update();
+
+    c->Print(plot_name, "pdf");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.png", plot_type.c_str());
+    c->Print(plot_name, "png");
+
+    sprintf(plot_name, "final_plots/timeResCFD_%s.root", plot_type.c_str());
+    c->SaveAs(plot_name, "root");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
+    c->SaveAs(plot_name, "C");
+  }
+
+  if(plot_type == "HV2"){
+    legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
+
+    inF_Double9090 = TFile::Open("plots/resCFD_studies/Double9090_HV2_HVScan2_Double9090.root");
+    inF_Double9040 = TFile::Open("plots/resCFD_studies/Double9040_HV2_HVScan2_Double9040.root");    
+    TGraphErrors* eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("resCFD");
+    TGraphErrors* eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("resCFD");
+
+    //settings
+    eff_Double9040->SetMarkerColor(kBlue);
+    eff_Double9040->SetLineColor(kBlue);
+    eff_Double9090->SetMarkerColor(kRed);
+    eff_Double9090->SetLineColor(kRed);
+
+  //
+
+    eff_Double9040->SetMarkerStyle(20);
+    eff_Double9040->SetLineWidth(2);
+    eff_Double9040->SetMarkerSize(0.9);
+    eff_Double9090->SetMarkerStyle(20);
+    eff_Double9090->SetLineWidth(2);
+    eff_Double9090->SetMarkerSize(0.9);
+
+    legC->SetTextFont(42);
+    legC->SetTextSize(0.034);
+    legC->SetFillColor(kWhite);
+    legC->SetLineColor(kWhite);
+    legC->SetShadowColor(kWhite);
+
+//    legC->AddEntry(eff_GaAsEm_OFF, "GaAs emitt. - iMCP mode", "p");
+    legC->AddEntry(eff_Double9040, "Double9040 HV_{2} = 2700 (V)", "p");
+    legC->AddEntry(eff_Double9090, "Double9090 HV_{2} = 2700 (V)", "p");
+  
+    mg->Add(eff_Double9090);
+    mg->Add(eff_Double9040);
 
     TCanvas* c = new TCanvas();
     gPad->SetTicks();
@@ -242,12 +309,135 @@ int main(int argc, char** argv)
     c->SaveAs(plot_name, "C");
   }
 
-  else {
-    if(plot_type == "X0"){
+  if(plot_type == "Extreme"){
+    legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
+
+    inF_Double9090 = TFile::Open("plots/resCFD_studies/Double9090_HV1_HVScanExt_Double9090.root");
+    inF_Double9040 = TFile::Open("plots/resCFD_studies/Double9040_HV1_HVScanExt_Double9040.root");    
+    TGraphErrors* eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("resCFD");
+    TGraphErrors* eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("resCFD");
+
+    //settings
+    eff_Double9040->SetMarkerColor(kBlue);
+    eff_Double9040->SetLineColor(kBlue);
+    eff_Double9090->SetMarkerColor(kRed);
+    eff_Double9090->SetLineColor(kRed);
+
+  //
+
+    eff_Double9040->SetMarkerStyle(20);
+    eff_Double9040->SetLineWidth(2);
+    eff_Double9040->SetMarkerSize(0.9);
+    eff_Double9090->SetMarkerStyle(20);
+    eff_Double9090->SetLineWidth(2);
+    eff_Double9090->SetMarkerSize(0.9);
+
+    legC->SetTextFont(42);
+    legC->SetTextSize(0.034);
+    legC->SetFillColor(kWhite);
+    legC->SetLineColor(kWhite);
+    legC->SetShadowColor(kWhite);
+
+//    legC->AddEntry(eff_GaAsEm_OFF, "GaAs emitt. - iMCP mode", "p");
+    legC->AddEntry(eff_Double9040, "Double9040 HV_{2} = 3000 (V)", "p");
+    legC->AddEntry(eff_Double9090, "Double9090 HV_{2} = 3000 (V)", "p");
+  
+    mg->Add(eff_Double9090);
+    mg->Add(eff_Double9040);
+
+    TCanvas* c = new TCanvas();
+    gPad->SetTicks();
+    char plot_name[100];
+    std::string command = "if [ ! -e final_plots/ ] ; then mkdir final_plots ; fi";
+    system(command.c_str());
+    sprintf(plot_name, "final_plots/timeResCFD_%s.pdf", plot_type.c_str());
+
+    mg->Draw("AP");
+    mg->SetTitle("Electron Beam 450 MeV");
+    mg->GetXaxis()->SetRangeUser(1400,3400);
+    mg->GetXaxis()->SetTitle("HV_{1} (V)");
+    mg->GetXaxis()->SetTitleSize(0.048);
+    mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
+    mg->GetYaxis()->SetTitleSize(0.048);
+    mg->SetMaximum(100);
+    mg->SetMinimum(0);
+    mg->Draw("AP");  
+    legC->Draw("same");
+    banner4Plot();
+    c->Update();
+
+    c->Print(plot_name, "pdf");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.png", plot_type.c_str());
+    c->Print(plot_name, "png");
+
+    sprintf(plot_name, "final_plots/timeResCFD_%s.root", plot_type.c_str());
+    c->SaveAs(plot_name, "root");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
+    c->SaveAs(plot_name, "C");
+  }
+
+  if(plot_type == "Ang"){
+    legC = new TLegend(0.15,0.65,0.35,0.85,NULL,"brNDC");
+
+    inF_Double9040 = TFile::Open("plots/resCFD_studies/Double9040_Ang_AngScan_Double9040.root");    
+    TGraphErrors* eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("resCFD");
+
+    //settings
+    eff_Double9040->SetMarkerColor(kBlue);
+    eff_Double9040->SetLineColor(kBlue);
+
+  //
+
+    eff_Double9040->SetMarkerStyle(20);
+    eff_Double9040->SetLineWidth(2);
+    eff_Double9040->SetMarkerSize(0.9);
+
+    legC->SetTextFont(42);
+    legC->SetTextSize(0.034);
+    legC->SetFillColor(kWhite);
+    legC->SetLineColor(kWhite);
+    legC->SetShadowColor(kWhite);
+
+//    legC->AddEntry(eff_GaAsEm_OFF, "GaAs emitt. - iMCP mode", "p");
+    legC->AddEntry(eff_Double9040, "Double9040 HV_{1} = 2700 V, HV_{2} = 2700 V", "p");
+  
+    mg->Add(eff_Double9040);
+
+    TCanvas* c = new TCanvas();
+    gPad->SetTicks();
+    char plot_name[100];
+    std::string command = "if [ ! -e final_plots/ ] ; then mkdir final_plots ; fi";
+    system(command.c_str());
+    sprintf(plot_name, "final_plots/timeResCFD_%s.pdf", plot_type.c_str());
+
+    mg->Draw("AP");
+    mg->SetTitle("Electron Beam 450 MeV");
+    mg->GetXaxis()->SetRangeUser(-1,50);
+    mg->GetXaxis()->SetTitle("Angle (degrees)");
+    mg->GetXaxis()->SetTitleSize(0.048);
+    mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
+    mg->GetYaxis()->SetTitleSize(0.048);
+    mg->SetMaximum(100);
+    mg->SetMinimum(0);
+    mg->Draw("AP");  
+    legC->Draw("same");
+    banner4Plot();
+    c->Update();
+
+    c->Print(plot_name, "pdf");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.png", plot_type.c_str());
+    c->Print(plot_name, "png");
+
+    sprintf(plot_name, "final_plots/timeResCFD_%s.root", plot_type.c_str());
+    c->SaveAs(plot_name, "root");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
+    c->SaveAs(plot_name, "C");
+  }
+
+ if(plot_type == "X0_12"){
     legC = new TLegend(0.4,0.15,0.25,0.42,NULL,"brNDC");
 
     inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_X0_X0Scan12_GaAsEm.root");
-    //inF_GaAsEm_OFF = TFile::Open("plots/efficiency_studies/GaAsEm_HV_HVScan7.root");
     inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_X0_X0Scan12_MultiAlkEm.root");
     inF_Double9090 = TFile::Open("plots/resCFD_studies/Double9090_X0_X0Scan12_Double9090.root");
     inF_Double9040 = TFile::Open("plots/resCFD_studies/Double9040_X0_X0Scan12_Double9040.root");    
@@ -258,10 +448,10 @@ int main(int argc, char** argv)
     TGraphErrors* eff_Double9040;
     
     
-    eff_GaAsEm = (TGraphErrors*)inF_GaAsEm->Get("eff");
-    eff_MultiAlkEm = (TGraphErrors*)inF_MultiAlkEm->Get("eff");
-    eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("eff");
-    eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("eff");
+    eff_GaAsEm = (TGraphErrors*)inF_GaAsEm->Get("resCFD");
+    eff_MultiAlkEm = (TGraphErrors*)inF_MultiAlkEm->Get("resCFD");
+    eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("resCFD");
+    eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("resCFD");
     
     //settings
     eff_GaAsEm->SetMarkerColor(kGreen+1);
@@ -309,7 +499,7 @@ int main(int argc, char** argv)
     mg->GetXaxis()->SetRangeUser(-0.1,5.1);
     mg->GetXaxis()->SetTitle("Number of X_{0}");
     mg->GetXaxis()->SetTitleSize(0.046);
-    mg->GetYaxis()->SetTitle("Efficiency");
+    mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.046);
     mg->SetMaximum(1);
     mg->SetMinimum(0);
@@ -328,7 +518,348 @@ int main(int argc, char** argv)
     sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
     c->SaveAs(plot_name, "C");
   }
-}
+
+ if(plot_type == "X0_1"){
+    legC = new TLegend(0.4,0.15,0.25,0.42,NULL,"brNDC");
+
+    inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_X0_X0Scan1_GaAsEm.root");
+    inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_X0_X0Scan1_MultiAlkEm.root");
+    inF_Double9090 = TFile::Open("plots/resCFD_studies/Double9090_X0_X0Scan1_Double9090.root");
+    inF_Double9040 = TFile::Open("plots/resCFD_studies/Double9040_X0_X0Scan1_Double9040.root");    
+
+    TGraphErrors* eff_GaAsEm;
+    TGraphErrors* eff_MultiAlkEm;
+    TGraphErrors* eff_Double9090;
+    TGraphErrors* eff_Double9040;
+    
+    
+    eff_GaAsEm = (TGraphErrors*)inF_GaAsEm->Get("resCFD");
+    eff_MultiAlkEm = (TGraphErrors*)inF_MultiAlkEm->Get("resCFD");
+    eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("resCFD");
+    eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("resCFD");
+    
+    //settings
+    eff_GaAsEm->SetMarkerColor(kGreen+1);
+    eff_GaAsEm->SetLineColor(kGreen+1);
+    eff_Double9040->SetMarkerColor(kBlue);
+    eff_Double9040->SetLineColor(kBlue);
+    eff_Double9090->SetMarkerColor(kRed);
+    eff_Double9090->SetLineColor(kRed);
+    eff_MultiAlkEm->SetMarkerColor(1);
+    eff_MultiAlkEm->SetLineColor(1);
+    eff_GaAsEm->SetMarkerStyle(20);
+    eff_GaAsEm->SetLineWidth(2);
+    eff_GaAsEm->SetMarkerSize(0.9);  
+    eff_Double9040->SetMarkerStyle(20);
+    eff_Double9040->SetLineWidth(2);
+    eff_Double9040->SetMarkerSize(0.9);
+    eff_Double9090->SetMarkerStyle(20);
+    eff_Double9090->SetLineWidth(2);
+    eff_Double9090->SetMarkerSize(0.9);
+    eff_MultiAlkEm->SetMarkerStyle(20);
+    eff_MultiAlkEm->SetLineWidth(2);
+    eff_MultiAlkEm->SetMarkerSize(0.9);
+    
+    legC->SetTextFont(42);
+    legC->SetTextSize(0.037);
+    legC->SetFillColor(kWhite);
+    legC->SetLineColor(kWhite);
+    legC->SetShadowColor(kWhite);
+
+    mg->Add(eff_GaAsEm);
+    mg->Add(eff_Double9090);
+    mg->Add(eff_MultiAlkEm);
+    mg->Add(eff_Double9040);
+
+
+    TCanvas* c = new TCanvas();
+    gPad->SetTicks();
+    char plot_name[100];
+    std::string command = "if [ ! -e final_plots/ ] ; then mkdir final_plots ; fi";
+    system(command.c_str());
+    sprintf(plot_name, "final_plots/timeResCFD_%s.pdf", plot_type.c_str());
+
+   mg->Draw("AP");
+    mg->SetTitle("Electron Beam 450 MeV");
+    mg->GetXaxis()->SetRangeUser(-0.1,5.1);
+    mg->GetXaxis()->SetTitle("Number of X_{0}");
+    mg->GetXaxis()->SetTitleSize(0.046);
+    mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
+    mg->GetYaxis()->SetTitleSize(0.046);
+    mg->SetMaximum(1);
+    mg->SetMinimum(0);
+     
+    mg->Draw("AP");  
+    legC->Draw("same");
+    banner4Plot();
+    c->Update();
+
+    c->Print(plot_name, "pdf");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.png", plot_type.c_str());
+    c->Print(plot_name, "png");
+
+    sprintf(plot_name, "final_plots/timeResCFD_%s.root", plot_type.c_str());
+    c->SaveAs(plot_name, "root");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
+    c->SaveAs(plot_name, "C");
+  }
+
+
+ if(plot_type == "multiplicity1"){
+    legC = new TLegend(0.4,0.15,0.25,0.42,NULL,"brNDC");
+
+    inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_multiplicity1_LongScan0X0_GaAsEm_1.root");
+    inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_multiplicity1_LongScan0X0_MultiAlkEm_1.root");
+    inF_Double9090 = TFile::Open("plots/resCFD_studies/Double9090_multiplicity1_LongScan0X0_Double9090_1.root");
+    inF_Double9040 = TFile::Open("plots/resCFD_studies/Double9040_multiplicity1_LongScan0X0_Double9040_1.root");    
+
+    TGraphErrors* eff_GaAsEm;
+    TGraphErrors* eff_MultiAlkEm;
+    TGraphErrors* eff_Double9090;
+    TGraphErrors* eff_Double9040;
+    
+    
+    eff_GaAsEm = (TGraphErrors*)inF_GaAsEm->Get("resCFD");
+    eff_MultiAlkEm = (TGraphErrors*)inF_MultiAlkEm->Get("resCFD");
+    eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("resCFD");
+    eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("resCFD");
+    
+    //settings
+    eff_GaAsEm->SetMarkerColor(kGreen+1);
+    eff_GaAsEm->SetLineColor(kGreen+1);
+    eff_Double9040->SetMarkerColor(kBlue);
+    eff_Double9040->SetLineColor(kBlue);
+    eff_Double9090->SetMarkerColor(kRed);
+    eff_Double9090->SetLineColor(kRed);
+    eff_MultiAlkEm->SetMarkerColor(1);
+    eff_MultiAlkEm->SetLineColor(1);
+    eff_GaAsEm->SetMarkerStyle(20);
+    eff_GaAsEm->SetLineWidth(2);
+    eff_GaAsEm->SetMarkerSize(0.9);  
+    eff_Double9040->SetMarkerStyle(20);
+    eff_Double9040->SetLineWidth(2);
+    eff_Double9040->SetMarkerSize(0.9);
+    eff_Double9090->SetMarkerStyle(20);
+    eff_Double9090->SetLineWidth(2);
+    eff_Double9090->SetMarkerSize(0.9);
+    eff_MultiAlkEm->SetMarkerStyle(20);
+    eff_MultiAlkEm->SetLineWidth(2);
+    eff_MultiAlkEm->SetMarkerSize(0.9);
+    
+    legC->SetTextFont(42);
+    legC->SetTextSize(0.037);
+    legC->SetFillColor(kWhite);
+    legC->SetLineColor(kWhite);
+    legC->SetShadowColor(kWhite);
+
+    mg->Add(eff_GaAsEm);
+    mg->Add(eff_Double9090);
+    mg->Add(eff_MultiAlkEm);
+    mg->Add(eff_Double9040);
+
+
+    TCanvas* c = new TCanvas();
+    gPad->SetTicks();
+    char plot_name[100];
+    std::string command = "if [ ! -e final_plots/ ] ; then mkdir final_plots ; fi";
+    system(command.c_str());
+    sprintf(plot_name, "final_plots/timeResCFD_%s.pdf", plot_type.c_str());
+
+   mg->Draw("AP");
+    mg->SetTitle("Electron Beam 450 MeV");
+    mg->GetXaxis()->SetRangeUser(-0.1,5.2);
+    mg->GetXaxis()->SetTitle("multiplicity");
+    mg->GetXaxis()->SetTitleSize(0.046);
+    mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
+    mg->GetYaxis()->SetTitleSize(0.046);
+    mg->SetMaximum(1);
+    mg->SetMinimum(0);
+     
+    mg->Draw("AP");  
+    legC->Draw("same");
+    banner4Plot();
+    c->Update();
+
+    c->Print(plot_name, "pdf");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.png", plot_type.c_str());
+    c->Print(plot_name, "png");
+
+    sprintf(plot_name, "final_plots/timeResCFD_%s.root", plot_type.c_str());
+    c->SaveAs(plot_name, "root");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
+    c->SaveAs(plot_name, "C");
+  }
+
+ if(plot_type == "multiplicity1"){
+    legC = new TLegend(0.4,0.15,0.25,0.42,NULL,"brNDC");
+
+    inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_multiplicity1_LongScan0X0_GaAsEm_1.root");
+    inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_multiplicity1_LongScan0X0_MultiAlkEm_1.root");
+    inF_Double9090 = TFile::Open("plots/resCFD_studies/Double9090_multiplicity1_LongScan0X0_Double9090_1.root");
+    inF_Double9040 = TFile::Open("plots/resCFD_studies/Double9040_multiplicity1_LongScan0X0_Double9040_1.root");    
+
+    TGraphErrors* eff_GaAsEm;
+    TGraphErrors* eff_MultiAlkEm;
+    TGraphErrors* eff_Double9090;
+    TGraphErrors* eff_Double9040;
+    
+    
+    eff_GaAsEm = (TGraphErrors*)inF_GaAsEm->Get("resCFD");
+    eff_MultiAlkEm = (TGraphErrors*)inF_MultiAlkEm->Get("resCFD");
+    eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("resCFD");
+    eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("resCFD");
+    
+    //settings
+    eff_GaAsEm->SetMarkerColor(kGreen+1);
+    eff_GaAsEm->SetLineColor(kGreen+1);
+    eff_Double9040->SetMarkerColor(kBlue);
+    eff_Double9040->SetLineColor(kBlue);
+    eff_Double9090->SetMarkerColor(kRed);
+    eff_Double9090->SetLineColor(kRed);
+    eff_MultiAlkEm->SetMarkerColor(1);
+    eff_MultiAlkEm->SetLineColor(1);
+    eff_GaAsEm->SetMarkerStyle(20);
+    eff_GaAsEm->SetLineWidth(2);
+    eff_GaAsEm->SetMarkerSize(0.9);  
+    eff_Double9040->SetMarkerStyle(20);
+    eff_Double9040->SetLineWidth(2);
+    eff_Double9040->SetMarkerSize(0.9);
+    eff_Double9090->SetMarkerStyle(20);
+    eff_Double9090->SetLineWidth(2);
+    eff_Double9090->SetMarkerSize(0.9);
+    eff_MultiAlkEm->SetMarkerStyle(20);
+    eff_MultiAlkEm->SetLineWidth(2);
+    eff_MultiAlkEm->SetMarkerSize(0.9);
+    
+    legC->SetTextFont(42);
+    legC->SetTextSize(0.037);
+    legC->SetFillColor(kWhite);
+    legC->SetLineColor(kWhite);
+    legC->SetShadowColor(kWhite);
+
+    mg->Add(eff_GaAsEm);
+    mg->Add(eff_Double9090);
+    mg->Add(eff_MultiAlkEm);
+    mg->Add(eff_Double9040);
+
+
+    TCanvas* c = new TCanvas();
+    gPad->SetTicks();
+    char plot_name[100];
+    std::string command = "if [ ! -e final_plots/ ] ; then mkdir final_plots ; fi";
+    system(command.c_str());
+    sprintf(plot_name, "final_plots/timeResCFD_%s.pdf", plot_type.c_str());
+
+   mg->Draw("AP");
+    mg->SetTitle("Electron Beam 450 MeV");
+    mg->GetXaxis()->SetRangeUser(-0.1,5.2);
+    mg->GetXaxis()->SetTitle("multiplicity");
+    mg->GetXaxis()->SetTitleSize(0.046);
+    mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
+    mg->GetYaxis()->SetTitleSize(0.046);
+    mg->SetMaximum(1);
+    mg->SetMinimum(0);
+     
+    mg->Draw("AP");  
+    legC->Draw("same");
+    banner4Plot();
+    c->Update();
+
+    c->Print(plot_name, "pdf");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.png", plot_type.c_str());
+    c->Print(plot_name, "png");
+
+    sprintf(plot_name, "final_plots/timeResCFD_%s.root", plot_type.c_str());
+    c->SaveAs(plot_name, "root");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
+    c->SaveAs(plot_name, "C");
+  }
+
+ if(plot_type == "multiplicity2"){
+    legC = new TLegend(0.4,0.15,0.25,0.42,NULL,"brNDC");
+
+    inF_GaAsEm = TFile::Open("plots/resCFD_studies/GaAsEm_multiplicity2_LongScan0X0_GaAsEm_2.root");
+    inF_MultiAlkEm = TFile::Open("plots/resCFD_studies/MultiAlkEm_multiplicity2_LongScan0X0_MultiAlkEm_2.root");
+    inF_Double9090 = TFile::Open("plots/resCFD_studies/Double9090_multiplicity2_LongScan0X0_Double9090_2.root");
+    inF_Double9040 = TFile::Open("plots/resCFD_studies/Double9040_multiplicity2_LongScan0X0_Double9040_2.root");    
+
+    TGraphErrors* eff_GaAsEm;
+    TGraphErrors* eff_MultiAlkEm;
+    TGraphErrors* eff_Double9090;
+    TGraphErrors* eff_Double9040;
+    
+    
+    eff_GaAsEm = (TGraphErrors*)inF_GaAsEm->Get("resCFD");
+    eff_MultiAlkEm = (TGraphErrors*)inF_MultiAlkEm->Get("resCFD");
+    eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("resCFD");
+    eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("resCFD");
+    
+    //settings
+    eff_GaAsEm->SetMarkerColor(kGreen+1);
+    eff_GaAsEm->SetLineColor(kGreen+1);
+    eff_Double9040->SetMarkerColor(kBlue);
+    eff_Double9040->SetLineColor(kBlue);
+    eff_Double9090->SetMarkerColor(kRed);
+    eff_Double9090->SetLineColor(kRed);
+    eff_MultiAlkEm->SetMarkerColor(1);
+    eff_MultiAlkEm->SetLineColor(1);
+    eff_GaAsEm->SetMarkerStyle(20);
+    eff_GaAsEm->SetLineWidth(2);
+    eff_GaAsEm->SetMarkerSize(0.9);  
+    eff_Double9040->SetMarkerStyle(20);
+    eff_Double9040->SetLineWidth(2);
+    eff_Double9040->SetMarkerSize(0.9);
+    eff_Double9090->SetMarkerStyle(20);
+    eff_Double9090->SetLineWidth(2);
+    eff_Double9090->SetMarkerSize(0.9);
+    eff_MultiAlkEm->SetMarkerStyle(20);
+    eff_MultiAlkEm->SetLineWidth(2);
+    eff_MultiAlkEm->SetMarkerSize(0.9);
+    
+    legC->SetTextFont(42);
+    legC->SetTextSize(0.037);
+    legC->SetFillColor(kWhite);
+    legC->SetLineColor(kWhite);
+    legC->SetShadowColor(kWhite);
+
+    mg->Add(eff_GaAsEm);
+    mg->Add(eff_Double9090);
+    mg->Add(eff_MultiAlkEm);
+    mg->Add(eff_Double9040);
+
+
+    TCanvas* c = new TCanvas();
+    gPad->SetTicks();
+    char plot_name[100];
+    std::string command = "if [ ! -e final_plots/ ] ; then mkdir final_plots ; fi";
+    system(command.c_str());
+    sprintf(plot_name, "final_plots/timeResCFD_%s.pdf", plot_type.c_str());
+
+   mg->Draw("AP");
+    mg->SetTitle("Electron Beam 450 MeV");
+    mg->GetXaxis()->SetRangeUser(-0.1,5.2);
+    mg->GetXaxis()->SetTitle("multiplicity");
+    mg->GetXaxis()->SetTitleSize(0.046);
+    mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
+    mg->GetYaxis()->SetTitleSize(0.046);
+    mg->SetMaximum(1);
+    mg->SetMinimum(0);
+     
+    mg->Draw("AP");  
+    legC->Draw("same");
+    banner4Plot();
+    c->Update();
+
+    c->Print(plot_name, "pdf");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.png", plot_type.c_str());
+    c->Print(plot_name, "png");
+
+    sprintf(plot_name, "final_plots/timeResCFD_%s.root", plot_type.c_str());
+    c->SaveAs(plot_name, "root");
+    sprintf(plot_name, "final_plots/timeResCFD_%s.C", plot_type.c_str());
+    c->SaveAs(plot_name, "C");
+  }
+
 
   return 0;
 }
