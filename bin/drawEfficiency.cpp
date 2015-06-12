@@ -62,6 +62,8 @@ int main(int argc, char** argv)
   //TFile* inF_MultiAlkEm_OFF;
   TFile* inF_Double9090;
   TFile* inF_Double9040;
+  TFile* inF_Double9090b;
+  TFile* inF_Double9040b;
 
   TMultiGraph *mg = new TMultiGraph();
 
@@ -159,7 +161,7 @@ int main(int argc, char** argv)
 /////----------------------------------------------------------------------------//////////////
 
 if(plot_type == "HV1"){
-    legC = new TLegend(0.12,0.62,0.40,0.87,NULL,"brNDC");
+    legC = new TLegend(0.52,0.58,0.80,0.83,NULL,"brNDC");
 
 	//plot name MCPName_ScanType_HVScanScanType_MCPName
     inF_GaAsEm = TFile::Open("plots/efficiency_studies/GaAsEm_HV1_HVScan1_GaAsEm.root");
@@ -206,13 +208,13 @@ if(plot_type == "HV1"){
     legC->AddEntry(eff_MultiAlkEm, "MultiAlk emitt. HV_{2} = 3100 (V)", "p");
     legC->AddEntry(eff_GaAsEm, "GaAs emitt. HV_{2} = 3100 (V)", "p");
 //    legC->AddEntry(eff_GaAsEm_OFF, "GaAs emitt. - iMCP mode", "p");
-    legC->AddEntry(eff_Double9040, "Double9040 HV_{2} = 2700 (V)", "p");
-    legC->AddEntry(eff_Double9090, "Double9090 HV_{2} = 2700 (V)", "p");
+//    legC->AddEntry(eff_Double9040, "Double9040 HV_{2} = 2700 (V)", "p");
+//    legC->AddEntry(eff_Double9090, "Double9090 HV_{2} = 2700 (V)", "p");
   
     mg->Add(eff_GaAsEm);
 //    mg->Add(eff_GaAsEm_OFF);
-    mg->Add(eff_Double9090);
-    mg->Add(eff_Double9040);
+    //  mg->Add(eff_Double9090);
+    //    mg->Add(eff_Double9040);
     mg->Add(eff_MultiAlkEm);
 
     //    TCanvas* c = new TCanvas("cEff","cEff",400,800);
@@ -258,10 +260,13 @@ if(plot_type == "HV2"){
     //inF_MultiAlkEm = TFile::Open("plots/efficiency_studies/MultiAlkEm_HV1_HVScan1_MultiAlkEm.root");
     inF_Double9090 = TFile::Open("plots/efficiency_studies/Double9090_HV2_HVScan2_Double9090.root");
     inF_Double9040 = TFile::Open("plots/efficiency_studies/Double9040_HV2_HVScan2_Double9040.root");    
+    inF_Double9090b = TFile::Open("plots/efficiency_studies/Double9090_HV1_HVScan1_Double9090.root");
+    inF_Double9040b = TFile::Open("plots/efficiency_studies/Double9040_HV1_HVScan1_Double9040.root");    
     //TGraphErrors* eff_GaAsEm = (TGraphErrors*)inF_GaAsEm->Get("eff");
     TGraphErrors* eff_Double9090 = (TGraphErrors*)inF_Double9090->Get("eff");
-    //TGraphErrors* eff_MultiAlkEm = (TGraphErrors*)inF_MultiAlkEm->Get("eff");
     TGraphErrors* eff_Double9040 = (TGraphErrors*)inF_Double9040->Get("eff");
+    TGraphErrors* eff_Double9090b = (TGraphErrors*)inF_Double9090b->Get("eff");
+    TGraphErrors* eff_Double9040b = (TGraphErrors*)inF_Double9040b->Get("eff");
 
     //settings
     eff_Double9040->SetMarkerColor(kBlue);
@@ -276,16 +281,34 @@ if(plot_type == "HV2"){
     eff_Double9090->SetLineWidth(2);
     eff_Double9090->SetMarkerSize(0.9);
 
+
+    eff_Double9040b->SetMarkerColor(kBlue);
+    eff_Double9040b->SetLineColor(kBlue);
+    eff_Double9090b->SetMarkerColor(kRed);
+    eff_Double9090b->SetLineColor(kRed);
+  //
+    eff_Double9040b->SetMarkerStyle(22);
+    eff_Double9040b->SetLineWidth(2);
+    eff_Double9040b->SetMarkerSize(0.9);
+    eff_Double9090b->SetMarkerStyle(22);
+    eff_Double9090b->SetLineWidth(2);
+    eff_Double9090b->SetMarkerSize(0.9);
+
     legC->SetTextFont(42);
     legC->SetTextSize(0.034);
     legC->SetFillColor(kWhite);
     legC->SetLineColor(kWhite);
     legC->SetShadowColor(kWhite);
-    legC->AddEntry(eff_Double9040, "Double9040 HV_{1} = 2700 (V)", "p");
-    legC->AddEntry(eff_Double9090, "Double9090 HV_{1} = 2700 (V)", "p");
+    legC->AddEntry(eff_Double9040, "Double9040 HV_{1} = 2700 (V), scan on HV_{2}", "p");
+    legC->AddEntry(eff_Double9090, "Double9090 HV_{1} = 2700 (V), scan on HV_{2}", "p");
+
+    legC->AddEntry(eff_Double9040b, "Double9040 HV_{2} = 2700 (V), scan on HV_{1}", "p");
+    legC->AddEntry(eff_Double9090b, "Double9090 HV_{2} = 2700 (V), scan on HV_{1}", "p");
   
     mg->Add(eff_Double9090);
     mg->Add(eff_Double9040);
+    mg->Add(eff_Double9090b);
+    mg->Add(eff_Double9040b);
 
     //    TCanvas* c = new TCanvas("cEff","cEff",400,800);
     TCanvas* c = new TCanvas();
@@ -298,7 +321,7 @@ if(plot_type == "HV2"){
     mg->Draw("APL");
     mg->SetTitle("Electron Beam 450 MeV");
     mg->GetXaxis()->SetRangeUser(1200,4000);
-    mg->GetXaxis()->SetTitle("HV_{2} (V)");
+    mg->GetXaxis()->SetTitle("HV_{1} or HV_{2} (V)");
     mg->GetXaxis()->SetTitleSize(0.05);
     mg->GetYaxis()->SetTitle("Efficiency");
     mg->GetYaxis()->SetTitleSize(0.05);
