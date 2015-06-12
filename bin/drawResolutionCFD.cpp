@@ -224,7 +224,7 @@ int main(int argc, char** argv)
     mg->Draw("AP");
     mg->SetTitle("Electron Beam 450 MeV");
     mg->GetXaxis()->SetRangeUser(1400,3800);
-    mg->GetXaxis()->SetTitle("HV_{2} (V)");
+    mg->GetXaxis()->SetTitle("HV_{1} (V)");
     mg->GetXaxis()->SetTitleSize(0.048);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.048);
@@ -278,8 +278,8 @@ int main(int argc, char** argv)
     legC->SetShadowColor(kWhite);
 
 //    legC->AddEntry(eff_GaAsEm_OFF, "GaAs emitt. - iMCP mode", "p");
-    legC->AddEntry(eff_Double9040, "Double9040 HV_{2} = 2700 (V)", "p");
-    legC->AddEntry(eff_Double9090, "Double9090 HV_{2} = 2700 (V)", "p");
+    legC->AddEntry(eff_Double9040, "Double9040 HV_{1} = 2700 (V)", "p");
+    legC->AddEntry(eff_Double9090, "Double9090 HV_{1} = 2700 (V)", "p");
   
     mg->Add(eff_Double9090);
     mg->Add(eff_Double9040);
@@ -294,7 +294,7 @@ int main(int argc, char** argv)
     mg->Draw("AP");
     mg->SetTitle("Electron Beam 450 MeV");
     mg->GetXaxis()->SetRangeUser(1400,3800);
-    mg->GetXaxis()->SetTitle("HV_{1} (V)");
+    mg->GetXaxis()->SetTitle("HV_{2} (V)");
     mg->GetXaxis()->SetTitleSize(0.048);
     mg->GetYaxis()->SetTitle("Spread on the time difference (ps)");
     mg->GetYaxis()->SetTitleSize(0.048);
