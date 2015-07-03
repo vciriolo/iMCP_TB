@@ -149,7 +149,13 @@ int main (int argc, char** argv)
 	  for(int iCh=0; iCh<18; iCh++) digiCh[iCh].clear();
 
 	  //---Read digitizer samples
-	    for(unsigned int iSample=0; iSample<18432; iSample++){
+	  //	    for(unsigned int iSample=0; iSample<18432; iSample++){
+	  //	      digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(digiSampleValue[iSample]);
+
+	  for(unsigned int iSample=0; iSample<18432; iSample++) {
+	    if (digiGroup[iSample]*9+digiChannel[iSample]==6 || digiGroup[iSample]*9+digiChannel[iSample]==7)
+	      digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(-digiSampleValue[iSample]);
+	    else
 	      digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(digiSampleValue[iSample]);
 	    //	    if(iSample > 1024*10 - 1) break;
 	    // std::cout << " >>> iSample = " << iSample << std::endl;
@@ -160,8 +166,6 @@ int main (int argc, char** argv)
 
 	  //---loop over MPC's channels                                                                                                               
 	  triggerTime=100;
-
-	  std::cout<<"trigger: "<<trigPos<<std::endl;
 
 	  if (iEntry>=firstEntry) {
 
