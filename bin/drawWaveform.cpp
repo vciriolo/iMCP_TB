@@ -149,7 +149,7 @@ int main (int argc, char** argv)
 	  for(int iCh=0; iCh<18; iCh++) digiCh[iCh].clear();
 
 	  //---Read digitizer samples
-	    for(unsigned int iSample=0; iSample<nDigiSamples; iSample++){
+	    for(unsigned int iSample=0; iSample<18432; iSample++){
 	      digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(digiSampleValue[iSample]);
 	    //	    if(iSample > 1024*10 - 1) break;
 	    // std::cout << " >>> iSample = " << iSample << std::endl;
@@ -159,12 +159,14 @@ int main (int argc, char** argv)
 	  int i=0;
 
 	  //---loop over MPC's channels                                                                                                               
-	  triggerTime=400;
+	  triggerTime=100;
+
+	  std::cout<<"trigger: "<<trigPos<<std::endl;
 
 	  if (iEntry>=firstEntry) {
 
 	    SubtractBaseline(5, 25, &digiCh[trigPos]);
-	    triggerTime=int(TimeConstFrac(triggerTime, 600, &digiCh[trigPos], 1.)/0.2);
+	    triggerTime=int(TimeConstFrac(triggerTime, 400, &digiCh[trigPos], 1.)/0.2);
 	    if (triggerTime<100 || triggerTime >800)  continue;
 		int ampMaxTimeTemp = TimeConstFrac(triggerTime-50, triggerTime+50, &digiCh[channel], 1)/0.2;
 
@@ -174,10 +176,10 @@ int main (int argc, char** argv)
 		  //		if (channel!=trigPos)  SubtractBaseline(t1-27, t1-7, &digiCh[channel]);
 		if (channel!=trigPos)  SubtractBaseline(25, 50, &digiCh[channel]);
 		  if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024) ampMaxTimeTemp = AmpMax(t1, t2, &digiCh[channel]);
-		  ampMaxTimeTemp = AmpMax(47, 500, &digiCh[channel]);
+		  ampMaxTimeTemp = AmpMax(47, 500, &digiCh[channel]);		 
 
 		  timeCF = TimeConstFracAbs(t1-10, t2+10, &digiCh[channel], 0.5, ampMaxTimeTemp);		    
-		    //		    if (-AmpMax(5, 25, &digiCh[channel])<-200)  std::cout<<iEntry<<" "<<-AmpMax(5, 25, &digiCh[channel])<<std::endl;
+		  //		  std::cout<<iEntry<<" "<<AmpMax(t1, t2, &digiCh[channel])<<std::endl;
 		if (channel==8 || channel==17) {
 		  TimeOverThreshold(200, 1000, &digiCh[channel], -150., tStart, tStop);
 		}

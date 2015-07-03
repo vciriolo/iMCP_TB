@@ -200,12 +200,12 @@ int main(int argc, char** argv)
       }
   }
   
-  clockPos1 = MCPList.at("clock1");
-  clockPos2 = MCPList.at("clock2");
+  //  clockPos1 = MCPList.at("clock1");
+  //  clockPos2 = MCPList.at("clock2");
 
   //  if (trigPos1==-1 || trigPos2==-1 || clockPos1==-1 || clockPos2==-1) {
   if (trigPos1==-1) {
-    std::cout<<"ERROR!!! trigger or clock not found!!!"<<std::endl;
+    std::cout<<"ERROR!!! trigger not found!!!"<<std::endl;
     return -1;
   }
   else
@@ -276,11 +276,11 @@ int main(int argc, char** argv)
     //    sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
 
     sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
-    sprintf(str_cut_trig0, "charge[%d] > %d && charge[%d] > %d", trigPos1, treshold.at(trigPos1), trigPos2, treshold.at(trigPos2));
-    if(strcmp(scanTypeIN, "X0") == 0) 
-      sprintf(str_cut_tdc, "hodoXpos>10 && hodoXpos<15 && hodoYpos>10 && hodoYpos<15"); 
-    else
-      sprintf(str_cut_tdc, "1==1"); //selection OFF because there are some runs with bad hodo position -> need to check this!!!!!!!
+    sprintf(str_cut_trig0, "charge[%d] > %d", trigPos1, treshold.at(trigPos1));
+    //    if(strcmp(scanTypeIN, "X0") == 0) 
+    //  sprintf(str_cut_tdc, "hodoXpos>10 && hodoXpos<15 && hodoYpos>10 && hodoYpos<15"); 
+    //else
+      sprintf(str_cut_tdc, "1==1"); 
 
     if(strcmp(doWhat, "timeCFD") == 0 || strcmp(doWhat, "timeLED") == 0 )
        sprintf(str_cut_saturated, "amp_max[%d] > 2500", MCPNumber);
@@ -304,9 +304,10 @@ int main(int argc, char** argv)
 		sprintf(str_cut_multiplicity5, "amp_max[3]<20 && amp_max[4]<20 && sci_front_adc > 2100 && sci_front_adc < 2700");// && bgo_back_adc > 420 && bgo_back_adc < 640");
     }
     int notMCPnumber = 2;
-    if(notMCPnumber == MCPNumber) notMCPnumber = notMCPnumber + 1;
-    sprintf(str_cut_noisePeak, "amp_max[%d] < 30", notMCPnumber);
-    //sprintf(str_cut_multiplicity, "1==1");// && bgo_back_adc > 420 && bgo_back_adc < 640");
+    //    if(notMCPnumber == MCPNumber) notMCPnumber = notMCPnumber + 1;
+    sprintf(str_cut_noisePeak, "1==1");
+    //    sprintf(str_cut_noisePeak, "amp_max[%d] < 30", notMCPnumber);
+    sprintf(str_cut_multiplicity, "1==1");// && bgo_back_adc > 420 && bgo_back_adc < 640");
 
     /*    if (MCPList.at(MCP)==4)
     {
@@ -504,7 +505,7 @@ int main(int argc, char** argv)
 	      nt->Draw(var_sig, cut_trig0 && cut_sig && cut_scan && cut_multiplicity && cut_tdc && cut_noisePeak, "goff");
 	      nt->Draw(var_trig0, cut_trig0 && cut_scan && cut_multiplicity && cut_tdc && cut_noisePeak, "goff");
 	    }
-	    //	    	    std::cout<<"DEBUG - sign: "<<h_sig->Integral(0, h_sig->GetNbinsX()+1)<<" - trig: "<<h_trig0->Integral(0, h_trig0->GetNbinsX()+1)<<std::endl;
+	    	    	    std::cout<<"DEBUG - sign: "<<h_sig->Integral(0, h_sig->GetNbinsX()+1)<<" - trig: "<<h_trig0->Integral(0, h_trig0->GetNbinsX()+1)<<std::endl;
 	    //    std::cout<<var_sig<<" "<<cut_trig0 <<"&&"<< cut_sig <<"&&"<< cut_scan <<"&&"<< cut_multiplicity <<"&&"<< cut_tdc <<"&&"<< cut_noisePeak<<" - "<<
 	    //	      var_trig0<<" "<<cut_trig0 <<"&&"<< cut_scan <<"&&"<< cut_multiplicity <<"&&"<< cut_tdc <<"&&"<< cut_noisePeak<<std::endl;
 	    

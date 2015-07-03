@@ -207,7 +207,8 @@ int main (int argc, char** argv)
     int nRuns = CFG.GetOpt<int>("global", "nRuns");
     int nCh = CFG.GetOpt<int>("global", "nChannels");
     int trigPos = CFG.GetOpt<int>("global", "trigPos");
-    int trigPos2 = CFG.GetOpt<int>("global", "trigPos2");
+    //    int trigPos2 = CFG.GetOpt<int>("global", "trigPos2");
+    int trigPos2 = -1;
 
     //---------output tree----------------
     TFile* outROOT = TFile::Open(outputFile.c_str(), "recreate");  
@@ -326,8 +327,10 @@ int main (int argc, char** argv)
 
             hodoXpos = -1;
             hodoYpos = -1;
-	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
+	    /*	    for(unsigned int iCh=0; iCh<nAdcChannels; iCh++)
             {
+	      std::cout<<"debug: ch "<<iCh<<std::endl;
+
                 if(adcBoard[iCh] == 100728833 && adcChannel[iCh] == 0) 
                     sci_front_adc = adcData[iCh];                
                 if(adcBoard[iCh] == 100728833 && adcChannel[iCh] == 1) 
@@ -356,15 +359,19 @@ int main (int argc, char** argv)
                             hodoY[PMT_to_hodoY_map[tmpPAD]] = 0;
                     }
                 }
-            }
+	    
+	    }
+	    */
 
 	    //---Read digitizer samples
-	    for(unsigned int iSample=0; iSample<nDigiSamples; iSample++)
+	//	for(unsigned int iSample=0; iSample<nDigiSamples; iSample++) {
+	for(unsigned int iSample=0; iSample<18432; iSample++) {
                 digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(digiSampleValue[iSample]);
+	}
 
-	    int triggerTime=400;                  //DON'T CHANGE THIS!!!!!
+	    int triggerTime=100;                  //DON'T CHANGE THIS!!!!!
 	    SubtractBaseline(5, 25, &digiCh[trigPos]);  //trigger baseline subtraction
-	    triggerTime=int(TimeConstFrac(triggerTime, 600, &digiCh[trigPos], 1.)/0.2); //trigger
+	    triggerTime=int(TimeConstFrac(triggerTime, 400, &digiCh[trigPos], 1.)/0.2); //trigger
 	    if (triggerTime<100 || triggerTime >800)  
                 continue;
 
@@ -429,6 +436,8 @@ int main (int argc, char** argv)
                     if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024){
                         ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
                         intSignal[iCh] = ComputeIntegral(t1, t2, &digiCh[iCh]);
+			//std::cout<<ampMax[0]<<" "<<intSignal[0]<<std::endl;
+			//			getchar();
                     }
                     else
                         ampMax[iCh] = AmpMax(47, 500, &digiCh[iCh]);
