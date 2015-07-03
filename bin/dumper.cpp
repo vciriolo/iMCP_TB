@@ -366,6 +366,9 @@ int main (int argc, char** argv)
 	    //---Read digitizer samples
 	//	for(unsigned int iSample=0; iSample<nDigiSamples; iSample++) {
 	for(unsigned int iSample=0; iSample<18432; iSample++) {
+	  if (digiGroup[iSample]*9+digiChannel[iSample]==6 || digiGroup[iSample]*9+digiChannel[iSample]==7)
+                digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(-digiSampleValue[iSample]);
+	  else
                 digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(digiSampleValue[iSample]);
 	}
 
@@ -381,9 +384,8 @@ int main (int argc, char** argv)
                 string currentMCP = CFG.GetOpt<string>("global", "MCPs", jCh);
                 int iCh = CFG.GetOpt<int>(currentMCP, "digiChannel");
 
-		if(currentMCP.find("clock") != string::npos) 
+		if(currentMCP.find("clock") != string::npos || currentMCP.find("TorGain1") != string::npos || currentMCP.find("TorGain2") != string::npos ) 
                 { 
-                    //---clock digitization info
                     SubtractBaseline(5, 25, &digiCh[iCh]);  
                     ampMax[iCh] = AmpMax(51, 1000, &digiCh[iCh]);
                     intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
