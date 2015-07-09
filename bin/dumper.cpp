@@ -211,7 +211,7 @@ int main (int argc, char** argv)
     int trigPos2 = -1;
 
     //---------output tree----------------
-    TFile* outROOT = TFile::Open(outputFile.c_str(), "recreate");  
+    TFile* outROOT = TFile::Open(outputFile.c_str(), "recreate"); 
     outROOT->cd();
 
     TProfile** wf_promed = new TProfile*[18];
@@ -251,7 +251,7 @@ int main (int argc, char** argv)
         // sprintf(command1, "find  %s/%d/*/dqmPlotstotal.root > ntuples/listTemp_%d.txt", (inputFolder).c_str(), run, run);
         // system(command1);
         char command2[300];
-        sprintf(command2, "find  %s/%d.root > ntuples/listTemp2_%d.txt", (inputFolder).c_str(), run, run);
+        sprintf(command2, "find  %s/%d/*.root > ntuples/listTemp2_%d.txt", (inputFolder).c_str(), run, run);
         system(command2);
 
         // char list1[200];
@@ -366,15 +366,23 @@ int main (int argc, char** argv)
 	    //---Read digitizer samples
 	//	for(unsigned int iSample=0; iSample<nDigiSamples; iSample++) {
 	for(unsigned int iSample=0; iSample<18432; iSample++) {
+	//    std::cout << " >>> iSample = " << iSample << std::endl;
+	  //   std::cout << " >>> digiChannel[iSample] = " << digiSampleValue[iSample] << std::endl; 
+
 	  if (digiGroup[iSample]*9+digiChannel[iSample]==6 || digiGroup[iSample]*9+digiChannel[iSample]==7)
                 digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(-digiSampleValue[iSample]);
 	  else
                 digiCh[digiGroup[iSample]*9+digiChannel[iSample]].push_back(digiSampleValue[iSample]);
 	}
 
+
+
+//getchar();
 	    int triggerTime=100;                  //DON'T CHANGE THIS!!!!!
 	    SubtractBaseline(5, 25, &digiCh[trigPos]);  //trigger baseline subtraction
+
 	    triggerTime=int(TimeConstFrac(triggerTime, 400, &digiCh[trigPos], 1.)/0.2); //trigger
+	//std::cout<<"triggerTime: "<<triggerTime<<std::endl; getchar();
 	    if (triggerTime<100 || triggerTime >800)  
                 continue;
 
@@ -384,12 +392,15 @@ int main (int argc, char** argv)
                 string currentMCP = CFG.GetOpt<string>("global", "MCPs", jCh);
                 int iCh = CFG.GetOpt<int>(currentMCP, "digiChannel");
 
+
 		if(currentMCP.find("clock") != string::npos || currentMCP.find("TorGain1") != string::npos || currentMCP.find("TorGain2") != string::npos ) 
                 { 
                     SubtractBaseline(5, 25, &digiCh[iCh]);  
                     ampMax[iCh] = AmpMax(51, 1000, &digiCh[iCh]);
-                    intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
-                    intSignal[iCh] = ComputeIntegral(51, 1000, &digiCh[iCh]);
+                    //intBase[iCh] = ComputeIntegral(26, 50, &digiCh[iCh]);
+                    intBase[iCh] =2 * ComputeIntegral(0, 100, &digiCh[iCh]);
+                    //intSignal[iCh] = ComputeIntegral(51, 1000, &digiCh[iCh]);
+                    intSignal[iCh] = ComputeIntegral(200, 400, &digiCh[iCh]);
                     timeCF[iCh] = TimeConstFracAbs(51, 1000, &digiCh[iCh], 0.5, ampMax[iCh]);
 
                     TimeOverThreshold(51, 1000, &digiCh[iCh], -150., tStart, tStop);		  
@@ -428,18 +439,26 @@ int main (int argc, char** argv)
                     int t1 = ampMaxTimeTemp-13;
                     int t2 = ampMaxTimeTemp+12;
                     ampMaxT[iCh]=ampMaxTimeTemp;
-		
+//for(unsigned int iev = 0; iev < 20; iev++){
+		//if (iCh==trigPos && evtNumber < 21)	cout<<"ch"<<"\t"<<iCh<<"\t"<<"evt"<<"\t"<<evtNumber<<"\t"<<"t1"<<"\t"<<t1<<"\t"<<"t2"<<"\t"<<t2<<endl;
+//}
                     //subtract baseline immediately before pulse		
 		    //                    if(iCh!=trigPos) 
-		    //		    SubtractBaseline(t1-27, t1-7, &digiCh[iCh]);  
-		    SubtractBaseline(25, 50, &digiCh[iCh]);  
+		    //		    SubtractBaseline(t1-27, t1-7, &digiCh[iCh]); 
+
+		   if (iCh!=trigPos) SubtractBaseline(25, 50, &digiCh[iCh]); 
+/*	for (int co=0; co<digiCh[0].size(); co++)
+{
+	std::cout<<"digiCh0: "<<digiCh[0].at(co)<<std::endl;
+} */
                     intBase[iCh] = ComputeIntegral(50, 75, &digiCh[iCh]);
+
 
                     if(t1 > 50 && t1 < 1024 && t2 > 50 && t2 < 1024){
                         ampMax[iCh] = AmpMax(t1, t2, &digiCh[iCh]);
                         intSignal[iCh] = ComputeIntegral(t1, t2, &digiCh[iCh]);
-			//std::cout<<ampMax[0]<<" "<<intSignal[0]<<std::endl;
-			//			getchar();
+			//std::cout<<ampMax[0]<<" "<<intSignal[0]<<std::endl; getchar();
+					//	getchar();
                     }
                     else
                         ampMax[iCh] = AmpMax(47, 500, &digiCh[iCh]);
@@ -546,8 +565,10 @@ int main (int argc, char** argv)
             //     if (hodoY1[i]==true)   nhodoY1++;
             //     if (hodoY2[i]==true)   nhodoY2++;
             // }
+
             outTree->Fill();    
 	}     
+
         //---Get ready for next run
 	outTree->AutoSave();
         chain->Delete();

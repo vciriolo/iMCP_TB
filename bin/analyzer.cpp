@@ -202,7 +202,7 @@ int main(int argc, char** argv)
   
   //  clockPos1 = MCPList.at("clock1");
   //  clockPos2 = MCPList.at("clock2");
-
+//trigPos1 = 0;
   //  if (trigPos1==-1 || trigPos2==-1 || clockPos1==-1 || clockPos2==-1) {
   if (trigPos1==-1) {
     std::cout<<"ERROR!!! trigger not found!!!"<<std::endl;
@@ -275,8 +275,10 @@ int main(int argc, char** argv)
     //    sprintf(str_cut_trig_not_sat, "amp_max[%d] < 3450", trigPos1); 
     //    sprintf(str_cut_bad_timeCFD, "time_start_150[%d] != -20", MCPNumber);
 
-    sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
+//    sprintf(str_cut_sig, "charge[%d] > %d", MCPNumber, treshold.at(MCPNumber));
+sprintf(str_cut_sig, "amp_max[%d] > %d", MCPNumber, treshold.at(MCPNumber));
     sprintf(str_cut_trig0, "charge[%d] > %d", trigPos1, treshold.at(trigPos1));
+//sprintf(str_cut_trig0, "amp_max[%d] > %d", trigPos1, treshold.at(trigPos1));
     //    if(strcmp(scanTypeIN, "X0") == 0) 
     //  sprintf(str_cut_tdc, "hodoXpos>10 && hodoXpos<15 && hodoYpos>10 && hodoYpos<15"); 
     //else
@@ -395,7 +397,7 @@ int main(int argc, char** argv)
         sprintf(f_resCFD_name, "f_resCFD_%d", i);    
         sprintf(f_corrCFD_name, "f_corrCFD_%d", i);
         sprintf(f_corrCFD_name, "f_corrCFD2_%d", i);
-        TH1F* h_resCFD = new TH1F(h_resCFD_name, "Electron Beam 50 GeV", 250, -0.5, 0.5);
+        TH1F* h_resCFD = new TH1F(h_resCFD_name, "Electron Beam 50 GeV", 450, -10.5, 10.5);
 	h_resCFD->GetXaxis()->SetTitle("time_{MCP}-time_{TRIG} (ns)");
 	h_resCFD->GetYaxis()->SetTitle("Entries");
 	h_resCFD->GetXaxis()->SetTitleSize(0.05);
@@ -418,11 +420,11 @@ int main(int argc, char** argv)
 						    20, 0, 8000, -2, 2);
             f_corrCFD2 = new TF1(f_corrCFD2_name, "pol4", 0, 8000);
         }
-        else
+        else 
         {
             pr_timeCFD_vs_TOT = new TProfile(pr_timeCFD_vs_TOT_name, "timeCF vs TOT difference",
-                                          30, 0, 10, -5, 5);
-            f_corrCFD = new TF1(f_corrCFD_name, "pol2", 0, 6);
+                                          30, -50, 300, -1001, 4000);
+            f_corrCFD = new TF1(f_corrCFD_name, "pol2", 0, 300);
 
             pr_timeCFD_vs_ampMaxCorr = new TProfile(pr_timeCFD_vs_ampMaxCorr_name, "timeCF vs ampMaxCorr",
                                           20, 0, 8000, -2, 2);
@@ -613,10 +615,11 @@ int main(int argc, char** argv)
                      && cut_tdc && cut_trig_not_sat && cut_bad_timeCFD && cut_multiplicity, "goff");
 	    }
             //---skip run with low stat
-            if(pr_timeCFD_vs_TOT->GetEntries() < 200)
+            if(pr_timeCFD_vs_TOT->GetEntries() < 200){
                 h_resCFD->Rebin(2);
-            if(pr_timeCFD_vs_TOT->GetEntries() < 50) 
-                continue;         
+	cout<<pr_timeCFD_vs_TOT->GetEntries()<<endl;}
+            if(pr_timeCFD_vs_TOT->GetEntries() < 50)  cout<<pr_timeCFD_vs_TOT->GetEntries()<<endl;
+              //  continue;         
             pr_timeCFD_vs_TOT->Fit(f_corrCFD, "QR");    
 
 	    //---draw res histo with corrections
@@ -634,6 +637,7 @@ int main(int argc, char** argv)
                      && cut_trig_not_sat && cut_bad_timeCFD && cut_multiplicity
 		     , "goff");  
 	    }	    
+
 	    //correction vs ampMax
 	    sprintf(var_timeCFD_red, "(%s-(%f + %f*%s + %f*%s*%s))",
 		    t_CF_diff, f_corrCFD->GetParameter(0), f_corrCFD->GetParameter(1), TOT_diff,
@@ -653,12 +657,14 @@ int main(int argc, char** argv)
                      && cut_trig_not_sat && cut_bad_timeCFD && cut_multiplicity, "goff");  
 	    */
             //---fit coincidence peak
+
             f_resCFD->SetParameters(h_resCFD->GetEntries(), h_resCFD->GetMean(), h_resCFD->GetRMS());
             f_resCFD->SetParLimits(1, -1, 1);
             f_resCFD->SetParLimits(2, 0.01, 0.5);
             h_resCFD->Fit(f_resCFD, "QRB");
             h_resCFD->Fit(f_resCFD, "QRBIM", "", f_resCFD->GetParameter(1)-2*f_resCFD->GetParameter(2),
                           f_resCFD->GetParameter(1)+2*f_resCFD->GetParameter(2));
+cout<<"entries"<<""<<h_resCFD->GetEntries()<<""<<"mean"<<""<< h_resCFD->GetMean()<<""<<"rms"<<""<<h_resCFD->GetRMS()<<endl;
             //---get resolution
             float e_t_res = f_resCFD->GetParError(2)*1000.;
             float t_res = f_resCFD->GetParameter(2)*1000.;
@@ -767,6 +773,7 @@ int main(int argc, char** argv)
 	    */
             //---fit coincidence peak
             f_resLED->SetParameters(h_resLED->GetEntries(), h_resLED->GetMean(), h_resLED->GetRMS());
+
             f_resLED->SetParLimits(1, -0.05, 0.05);
             f_resLED->SetParLimits(2, 0.02, 0.5);
             h_resLED->Fit(f_resLED, "QRB"); 
